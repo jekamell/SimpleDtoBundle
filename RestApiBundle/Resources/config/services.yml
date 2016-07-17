@@ -1,4 +1,15 @@
+parameters:
+  mell_rest_api.param_fields: _fields
+  mell_rest_api.param_expands: _expands
+  mell_rest_api.param_limit: _limit
+  mell_rest_api.param_offset: _offset
+
 services:
-#    mell_rest_api.example:
-#        class: Mell\RestApiBundle\Example
-#        arguments: ["@service_id", "plain_value", %parameter%]
+  mell_rest_api.request_manager:
+    class: Mell\RestApiBundle\Services\RequestManager
+    arguments:
+      - "@request_stack"
+      - "%mell_rest_api.param_fields%"
+      - "%mell_rest_api.param_expands%"
+      - "%mell_rest_api.param_limit%"
+      - "%mell_rest_api.param_offset%"
