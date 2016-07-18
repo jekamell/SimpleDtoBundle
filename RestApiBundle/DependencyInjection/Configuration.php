@@ -20,9 +20,30 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('mell_rest_api');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+            ->children()
+                ->scalarNode('param_fields')
+                    ->cannotBeEmpty()
+                    ->defaultValue('_fields')
+                    ->info('Get param for require response fields')
+                    ->end()
+                ->scalarNode('param_expands')
+                    ->defaultvalue('_expands')
+                    ->info('Get param for require embedded objects')
+                    ->end()
+                ->scalarNode('param_limit')
+                    ->defaultValue('_limit')
+                    ->info('Get param for define collection limit')
+                    ->end()
+                ->scalarNode('param_offset')
+                    ->defaultValue('_offset')
+                    ->info('Get param for define collection offset')
+                    ->end()
+                ->scalarNode('dto_config_path')
+                    ->isRequired()
+                    ->info('Path to dto config. Alias can be used: @AppBundle/Resources/config/dto.yml')
+                    ->end()
+            ->end();
 
         return $treeBuilder;
     }
