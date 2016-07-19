@@ -52,7 +52,7 @@ class RequestManager
     public function getFields()
     {
         if ($fieldsStr = $this->request->get($this->fieldsParam)) {
-            return array_map('trim', explode(',', $fieldsStr));
+            return array_unique(array_map('trim', explode(',', $fieldsStr)));
         }
 
         return [];
@@ -64,7 +64,7 @@ class RequestManager
     public function getExpands()
     {
         if ($expandsStr = $this->request->get($this->expandsParam)) {
-            return array_map('trim', explode(',', $expandsStr));
+            return array_unique(array_map('trim', explode(',', $expandsStr)));
         }
 
         return [];
@@ -92,7 +92,7 @@ class RequestManager
     public function getSort()
     {
         if ($sortStr = $this->request->get($this->sortParam)) {
-            return array_map('trim', explode(',', $sortStr));
+            return array_unique(array_map('trim', explode(',', $sortStr)));
         }
 
         return [];
