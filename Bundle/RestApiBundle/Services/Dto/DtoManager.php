@@ -53,29 +53,42 @@ class DtoManager
     /**
      * @param $data
      * @param string $dtoType
+     * @param array $allowedExpands
      * @return Dto
      */
-    public function createDto($data, $dtoType)
+    public function createDto($data, $dtoType, array $allowedExpands = [])
     {
         $dtoConfig = $this->getDtoConfig();
         $this->validateDto($dtoConfig, $dtoType, $data);
 
         $requestedFields = $this->requestManager->getFields();
+        $requestedExpands = $this->requestManager->getExpands();
 
         $dtoData = [];
         foreach ($dtoConfig[$dtoType]['fields'] as $field => $options) {
             $this->processFields($data, $dtoData, $field, $options, $requestedFields);
         }
 
+        $this->processExpands(
+            $data,
+            $dtoData,
+            $dtoConfig[$dtoType],
+            $requestedExpands,
+            $allowedExpands
+        );
+//        echo '<pre>';
+//        var_dump($dtoData);exit;
+//        echo '</pre>';
         return new Dto($dtoData);
     }
 
     /**
      * @param array $data
      * @param $dtoType
+     * @param array $allowedExpands
      * @return DtoCollection
      */
-    public function createDtoCollection(array $data, $dtoType)
+    public function createDtoCollection(array $data, $dtoType, array $allowedExpands = [])
     {
         $collection = [];
         foreach ($data as $item) {
@@ -101,6 +114,30 @@ class DtoManager
         $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
         $value = call_user_func([$data, $getter]);
         $dtoData[$field] = $this->castValueType($options['type'], $value);
+    }
+
+    protected function processExpands(
+        $data,
+        array &$dtoData,
+        $dtoConfig,
+        array $requestedExpands,
+        array $allowedExpands
+    ) {
+        // process _expands param
+        if (empty($requestedExpands) || empty($dtoConfig['expands'])) {
+            return;
+        }
+
+        $expandsConfig = $dtoConfig['expands'];
+        foreach ($requestedExpands as $requestedExpand) {
+            $expandConfig = $expandsConfig[$requestedExpand];
+            $expandGetter = !empty($expandConfig['getter'])
+                ? $expandConfig['getter']
+                : $this->dtoHelper->getFieldGetter($requestedExpand);
+            $expandObject = call_user_func([$data, $expandGetter]);
+            $dtoData['_expands'][$requestedExpand][] = $this->createDto($expandObject, $expandConfig['type'], []);
+        }
+
     }
 
     /**

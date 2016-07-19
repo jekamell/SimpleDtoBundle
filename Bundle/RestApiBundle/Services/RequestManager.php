@@ -97,4 +97,14 @@ class RequestManager
 
         return [];
     }
+
+    protected function validateFields()
+    {
+        // TODO
+    }
+
+    protected function validateExpands()
+    {
+        // TODO
+    }
 }

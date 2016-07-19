@@ -6,9 +6,15 @@ use Mell\Bundle\RestApiBundle\Model\DtoInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-class AbstractController extends Controller
+abstract class AbstractController extends Controller
 {
     const FORMAT_JSON = 'json';
+
+    /** @return string */
+    protected abstract function getDtoType();
+
+    /** @return array */
+    protected abstract function getAllowedExpands();
 
     /**
      * @return \Doctrine\ORM\EntityManager
