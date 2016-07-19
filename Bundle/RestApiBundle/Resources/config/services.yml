@@ -3,6 +3,7 @@ parameters:
     mell_rest_api.param_expands: _expands
     mell_rest_api.param_limit: _limit
     mell_rest_api.param_offset: _offset
+    mell_rest_api.param_sort: _sort
 
 services:
     mell_rest_api.request_manager:
@@ -13,7 +14,7 @@ services:
             - "%mell_rest_api.param_expands%"
             - "%mell_rest_api.param_limit%"
             - "%mell_rest_api.param_offset%"
-            - "%%mell_rest_api.param_sort%%"
+            - "%mell_rest_api.param_sort%"
 
     mell_rest_api.dto_manager:
         class: Mell\Bundle\RestApiBundle\Services\Dto\DtoManager
