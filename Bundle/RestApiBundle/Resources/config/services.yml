@@ -20,5 +20,9 @@ services:
         class: Mell\Bundle\RestApiBundle\Services\Dto\DtoManager
         arguments:
             - "@mell_rest_api.request_manager"
+            - "@mell_rest_api.dto_validator"
             - "@file_locator"
             - "%mell_rest_api.dto_config_path%"
+
+    mell_rest_api.dto_validator:
+        class: Mell\Bundle\RestApiBundle\Services\Dto\DtoValidator

@@ -10,6 +10,8 @@ class DtoManager
 {
     /** @var RequestManager */
     protected $requestManager;
+    /** @var DtoValidator */
+    protected $dtoValidator;
     /** @var Yaml */
     protected $yaml;
     /** @var  FileLocator */
@@ -22,12 +24,18 @@ class DtoManager
     /**
      * DtoManager constructor.
      * @param RequestManager $requestManager
+     * @param DtoValidator $dtoValidator
      * @param FileLocator $fileLocator
      * @param string $configPath
      */
-    public function __construct(RequestManager $requestManager, FileLocator $fileLocator, $configPath)
-    {
+    public function __construct(
+        RequestManager $requestManager,
+        DtoValidator $dtoValidator,
+        FileLocator $fileLocator,
+        $configPath
+    ) {
         $this->requestManager = $requestManager;
+        $this->dtoValidator = $dtoValidator;
         $this->fileLocator = $fileLocator;
         $this->configPath = $configPath;
     }
@@ -40,9 +48,8 @@ class DtoManager
     public function createDto($data, $dtoType)
     {
         $dtoConfig = $this->getDtoConfig();
-        if (!isset($dtoConfig[$dtoType])) {
-            throw new \InvalidArgumentException(sprintf('Dto config not found: %s', $dtoType));
-        }
+        $this->validateDto($dtoConfig, $dtoType, $data);
+
 
     }
 
@@ -63,5 +70,15 @@ class DtoManager
         }
 
         return $this->dtoConfig;
+    }
+
+    /**
+     * @param array $dtoConfig
+     * @param string $dtoType
+     * @param \stdClass $object
+     */
+    protected function validateDto($dtoConfig, $dtoType, $object)
+    {
+        $this->dtoValidator->validateDto($dtoConfig, $object, $dtoType);
     }
 }
