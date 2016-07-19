@@ -1,9 +1,13 @@
 parameters:
+    # request get params
     mell_rest_api.param_fields: _fields
     mell_rest_api.param_expands: _expands
     mell_rest_api.param_limit: _limit
     mell_rest_api.param_offset: _offset
     mell_rest_api.param_sort: _sort
+
+    mell_rest_api:date_format: 'Y-m-d'
+    mell_rest_api:date_time_format: 'Y-m-d:H:i:sZ'
 
 services:
     mell_rest_api.request_manager:
@@ -23,6 +27,8 @@ services:
             - "@mell_rest_api.dto_validator"
             - "@mell_rest_api.dto_helper"
             - "@file_locator"
+            - "%mell_rest_api:date_format%"
+            - "%mell_rest_api:date_time_format%"
             - "%mell_rest_api.dto_config_path%"
 
     mell_rest_api.dto_validator:
