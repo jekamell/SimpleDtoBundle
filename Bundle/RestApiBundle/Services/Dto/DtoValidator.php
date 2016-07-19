@@ -3,9 +3,23 @@
 namespace Mell\Bundle\RestApiBundle\Services\Dto;
 
 use Mell\Bundle\RestApiBundle\Exceptions\DtoException;
+use Mell\Bundle\RestApiBundle\Helpers\DtoHelper;
+use Mell\Bundle\RestApiBundle\Model\Dto;
 
 class DtoValidator
 {
+    /** @var DtoHelper */
+    protected $dtoHelper;
+
+    /**
+     * DtoValidator constructor.
+     * @param DtoHelper $dtoHelper
+     */
+    public function __construct(DtoHelper $dtoHelper)
+    {
+        $this->dtoHelper = $dtoHelper;
+    }
+
     /**
      * @param array $config Parsed dto config
      * @param \stdClass $object Object to serialize
@@ -50,11 +64,34 @@ class DtoValidator
     }
 
     /**
+     * @param array $config
+     * @param string $type
+     * @throws DtoException
+     */
+    protected function validateDtoTypes(array $config, $type)
+    {
+        foreach ($config['fields'] as $field => $options) {
+            if (empty($options['type'])) {
+                throw new DtoException('%s: Field type should be defined: %s', $type, $field);
+            }
+            if (!in_array($options['type'], Dto::getAvailableTypes())) {
+                throw new DtoException(
+                    sprintf(
+                        '%s: Unsupported field type: %s. User one of: %s',
+                        $type, $options['type'],
+                        implode(',', Dto::getAvailableTypes())
+                    )
+                );
+            }
+        }
+    }
+
+    /**
      * @param string $field
      * @return string
      */
     private function getFieldGetter($field)
     {
-        return 'get' . ucfirst($field);
+        return $this->dtoHelper->getFieldGetter($field);
     }
 }
