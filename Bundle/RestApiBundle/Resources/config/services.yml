@@ -1,0 +1,22 @@
+parameters:
+  mell_rest_api.param_fields: _fields
+  mell_rest_api.param_expands: _expands
+  mell_rest_api.param_limit: _limit
+  mell_rest_api.param_offset: _offset
+
+services:
+  mell_rest_api.request_manager:
+    class: Mell\RestApiBundle\Services\RequestManager
+    arguments:
+      - "@request_stack"
+      - "%mell_rest_api.param_fields%"
+      - "%mell_rest_api.param_expands%"
+      - "%mell_rest_api.param_limit%"
+      - "%mell_rest_api.param_offset%"
+
+  mell_rest_api.dto_manager:
+    class: Mell\RestApiBundle\Services\Dto\DtoManager
+    arguments:
+      - "@mell_rest_api.request_manager"
+      - "@file_locator"
+      - "%mell_rest_api.dto_config_path%"
