@@ -25,8 +25,6 @@ class MellRestApiExtension extends Extension
         $loader->load('services.yml');
 
         $this->addContainerParams($container, $config);
-
-        var_dump($container->getParameter('mell_rest_api'));exit;
     }
 
     /**
