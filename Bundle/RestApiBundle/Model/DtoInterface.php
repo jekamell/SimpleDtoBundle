@@ -2,7 +2,7 @@
 
 namespace Mell\Bundle\RestApiBundle\Model;
 
-interface DtoInterface
+interface DtoInterface extends \JsonSerializable
 {
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mell\RestApiBundle\Exceptions;
+namespace Mell\Bundle\RestApiBundle\Exceptions;
 
 class DtoException extends \Exception
 {
