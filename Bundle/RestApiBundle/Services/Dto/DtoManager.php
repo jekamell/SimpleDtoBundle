@@ -60,8 +60,14 @@ class DtoManager
         $dtoConfig = $this->getDtoConfig();
         $this->validateDto($dtoConfig, $dtoType, $data);
 
+        $requestedFields = $this->requestManager->getFields();
+
         $dtoData = [];
         foreach ($dtoConfig[$dtoType]['fields'] as $field => $options) {
+            // process _fields param
+            if (!empty($requestedFields) && !in_array($field, $requestedFields)) {
+                continue;
+            }
             $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
             $value = call_user_func([$data, $getter]);
             $dtoData[$field] = $this->castValueType($options['type'], $value);
