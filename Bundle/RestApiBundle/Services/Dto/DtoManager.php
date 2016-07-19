@@ -64,13 +64,7 @@ class DtoManager
 
         $dtoData = [];
         foreach ($dtoConfig[$dtoType]['fields'] as $field => $options) {
-            // process _fields param
-            if (!empty($requestedFields) && !in_array($field, $requestedFields)) {
-                continue;
-            }
-            $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
-            $value = call_user_func([$data, $getter]);
-            $dtoData[$field] = $this->castValueType($options['type'], $value);
+            $this->processFields($data, $dtoData, $field, $options, $requestedFields);
         }
 
         return new Dto($dtoData);
@@ -89,6 +83,24 @@ class DtoManager
         }
 
         return new DtoCollection($collection, $this->configurator->getCollectionKey());
+    }
+
+    /**
+     * @param $data
+     * @param array $dtoData
+     * @param string $field
+     * @param array $options
+     * @param array $requestedFields
+     */
+    protected function processFields($data, array &$dtoData, $field, array $options, array $requestedFields)
+    {
+        // process _fields param
+        if (!empty($requestedFields) && !in_array($field, $requestedFields)) {
+            return;
+        }
+        $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+        $value = call_user_func([$data, $getter]);
+        $dtoData[$field] = $this->castValueType($options['type'], $value);
     }
 
     /**
