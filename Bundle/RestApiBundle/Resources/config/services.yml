@@ -6,8 +6,10 @@ parameters:
     mell_rest_api.param_offset: _offset
     mell_rest_api.param_sort: _sort
 
-    mell_rest_api:date_format: 'Y-m-d'
-    mell_rest_api:date_time_format: 'Y-m-d:H:i:sZ'
+    mell_rest_api:date_format: "Y-m-d"
+    mell_rest_api:date_time_format: "Y-m-d:H:i:sZ"
+
+    mell_rest_api:collection_key: "_collection"
 
 services:
     mell_rest_api.request_manager:
@@ -27,13 +29,19 @@ services:
             - "@mell_rest_api.dto_validator"
             - "@mell_rest_api.dto_helper"
             - "@file_locator"
-            - "%mell_rest_api:date_format%"
-            - "%mell_rest_api:date_time_format%"
-            - "%mell_rest_api.dto_config_path%"
+            - "@mell_rest_api.dto_manager_configurator"
 
     mell_rest_api.dto_validator:
         class: Mell\Bundle\RestApiBundle\Services\Dto\DtoValidator
         arguments: ["@mell_rest_api.dto_helper"]
+
+    mell_rest_api.dto_manager_configurator:
+        class: Mell\Bundle\RestApiBundle\Model\DtoManagerConfigurator
+        arguments:
+            - "%mell_rest_api.dto_config_path%"
+            - "%mell_rest_api:collection_key%"
+            - "%mell_rest_api:date_format%"
+            - "%mell_rest_api:date_time_format%"
 
     mell_rest_api.dto_helper:
         class: Mell\Bundle\RestApiBundle\Helpers\DtoHelper

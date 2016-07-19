@@ -4,10 +4,11 @@ namespace Mell\Bundle\RestApiBundle\Services\Dto;
 
 use Mell\Bundle\RestApiBundle\Helpers\DtoHelper;
 use Mell\Bundle\RestApiBundle\Model\Dto;
+use Mell\Bundle\RestApiBundle\Model\DtoCollection;
 use Mell\Bundle\RestApiBundle\Model\DtoInterface;
+use Mell\Bundle\RestApiBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\RestApiBundle\Services\RequestManager;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Yaml\Yaml;
 
 class DtoManager
@@ -22,14 +23,10 @@ class DtoManager
     protected $yaml;
     /** @var  FileLocator */
     protected $fileLocator;
-    /** @var string */
-    protected $configPath;
+    /** @var DtoManagerConfigurator */
+    protected $configurator;
     /** @var array */
-    protected $dtoConfig;
-    /** @var string */
-    protected $dateFormat;
-    /** @var string */
-    protected $dateTimeFormat;
+    private $dtoConfig;
 
     /**
      * DtoManager constructor.
@@ -37,24 +34,20 @@ class DtoManager
      * @param DtoValidator $dtoValidator
      * @param DtoHelper $dtoHelper
      * @param FileLocator $fileLocator
-     * @param string $configPath
+     * @param DtoManagerConfigurator $configurator
      */
     public function __construct(
         RequestManager $requestManager,
         DtoValidator $dtoValidator,
         DtoHelper $dtoHelper,
         FileLocator $fileLocator,
-        $dateFormat,
-        $dateTimeFormat,
-        $configPath
+        DtoManagerConfigurator $configurator
     ) {
         $this->requestManager = $requestManager;
         $this->dtoValidator = $dtoValidator;
         $this->dtoHelper = $dtoHelper;
         $this->fileLocator = $fileLocator;
-        $this->dateFormat = $dateFormat;
-        $this->dateTimeFormat = $dateTimeFormat;
-        $this->configPath = $configPath;
+        $this->configurator = $configurator;
     }
 
     /**
@@ -77,9 +70,19 @@ class DtoManager
         return new Dto($dtoData);
     }
 
+    /**
+     * @param array $data
+     * @param $dtoType
+     * @return DtoCollection
+     */
     public function createDtoCollection(array $data, $dtoType)
     {
+        $collection = [];
+        foreach ($data as $item) {
+            $collection[] = $this->createDto($item, $dtoType);
+        }
 
+        return new DtoCollection($collection, $this->configurator->getCollectionKey());
     }
 
     /**
@@ -89,7 +92,7 @@ class DtoManager
     {
         // TODO: caching
         if ($this->dtoConfig === null) {
-            $absolutePath = $this->fileLocator->locate($this->configPath);
+            $absolutePath = $this->fileLocator->locate($this->configurator->getConfigPath());
             $this->dtoConfig = Yaml::parse(file_get_contents($absolutePath));
         }
 
@@ -133,17 +136,16 @@ class DtoManager
                 if (!$value instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
-                $value = $value->format($this->dateFormat);
+                $value = $value->format($this->configurator->getFormatDate());
                 break;
             case DtoInterface::TYPE_DATE_TIME:
                 if (!$value instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
-                $value = $value->format($this->dateTimeFormat);
+                $value = $value->format($this->configurator->getFormatDateTime());
                 break;
             default:
                 $value = null;
-
         }
 
         return $value;
