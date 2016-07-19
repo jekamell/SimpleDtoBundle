@@ -38,7 +38,7 @@ class Dto implements DtoInterface
      */
     function jsonSerialize()
     {
-        return json_encode($this->data, JSON_HEX_QUOT);
+        return $this->data;
     }
 
     /** @return array */
