@@ -38,6 +38,6 @@ class DtoCollection implements DtoInterface
             $data[] = $item->jsonSerialize();
         }
 
-        return [$this->collectionKey => $data];
+        return $this->collectionKey ? [$this->collectionKey => $data] : $data;
     }
 }
