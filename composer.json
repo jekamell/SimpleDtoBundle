@@ -1,5 +1,5 @@
 {
-    "name": "mell/rest-api-bundle",
+    "name": "jekamell/rest-api-bundle",
     "description": "Provide base functionality to build restful api",
     "type": "library",
     "authors": [
