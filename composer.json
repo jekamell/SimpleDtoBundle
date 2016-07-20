@@ -8,5 +8,10 @@
             "email": "55jeka@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "": ""
+        }
+    }
 }
