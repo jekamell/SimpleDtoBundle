@@ -28,7 +28,6 @@ services:
             - "@mell_rest_api.request_manager"
             - "@mell_rest_api.dto_validator"
             - "@mell_rest_api.dto_helper"
-            - "@file_locator"
             - "@mell_rest_api.dto_manager_configurator"
 
     mell_rest_api.dto_validator:
@@ -45,3 +44,6 @@ services:
 
     mell_rest_api.dto_helper:
         class: Mell\Bundle\RestApiBundle\Helpers\DtoHelper
+        arguments:
+            - "@file_locator"
+            - "%mell_rest_api.dto_config_path%"

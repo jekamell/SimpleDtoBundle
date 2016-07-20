@@ -33,7 +33,7 @@ class DtoValidator
 
     /**
      * @param array $config
-     * @param array $type
+     * @param string $type
      * @throws DtoException
      */
     protected function validateDtoExist(array $config, $type)
@@ -56,7 +56,7 @@ class DtoValidator
         }
 
         foreach ($config['fields'] as $field => $options) {
-            $getter = isset($options['getter']) ? $options['getter'] : $this->getFieldGetter($field);
+            $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
             if (!method_exists($object, $getter)) {
                 throw new DtoException(sprintf('%s: Method not found: %s', $type, $getter));
             }
@@ -84,14 +84,5 @@ class DtoValidator
                 );
             }
         }
-    }
-
-    /**
-     * @param string $field
-     * @return string
-     */
-    private function getFieldGetter($field)
-    {
-        return $this->dtoHelper->getFieldGetter($field);
     }
 }

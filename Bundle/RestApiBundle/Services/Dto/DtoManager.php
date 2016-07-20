@@ -8,8 +8,6 @@ use Mell\Bundle\RestApiBundle\Model\DtoCollection;
 use Mell\Bundle\RestApiBundle\Model\DtoInterface;
 use Mell\Bundle\RestApiBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\RestApiBundle\Services\RequestManager;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Yaml\Yaml;
 
 class DtoManager
 {
@@ -19,34 +17,25 @@ class DtoManager
     protected $dtoValidator;
     /** @var DtoHelper */
     protected $dtoHelper;
-    /** @var Yaml */
-    protected $yaml;
-    /** @var  FileLocator */
-    protected $fileLocator;
     /** @var DtoManagerConfigurator */
     protected $configurator;
-    /** @var array */
-    private $dtoConfig;
 
     /**
      * DtoManager constructor.
      * @param RequestManager $requestManager
      * @param DtoValidator $dtoValidator
      * @param DtoHelper $dtoHelper
-     * @param FileLocator $fileLocator
      * @param DtoManagerConfigurator $configurator
      */
     public function __construct(
         RequestManager $requestManager,
         DtoValidator $dtoValidator,
         DtoHelper $dtoHelper,
-        FileLocator $fileLocator,
         DtoManagerConfigurator $configurator
     ) {
         $this->requestManager = $requestManager;
         $this->dtoValidator = $dtoValidator;
         $this->dtoHelper = $dtoHelper;
-        $this->fileLocator = $fileLocator;
         $this->configurator = $configurator;
     }
 
@@ -54,11 +43,11 @@ class DtoManager
      * @param $data
      * @param string $dtoType
      * @param array $allowedExpands
-     * @return Dto
+     * @return DtoInterface
      */
     public function createDto($data, $dtoType, array $allowedExpands = [])
     {
-        $dtoConfig = $this->getDtoConfig();
+        $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDto($dtoConfig, $dtoType, $data);
 
         $requestedFields = $this->requestManager->getFields();
@@ -76,9 +65,7 @@ class DtoManager
             $requestedExpands,
             $allowedExpands
         );
-//        echo '<pre>';
-//        var_dump($dtoData);exit;
-//        echo '</pre>';
+
         return new Dto($dtoData);
     }
 
@@ -86,13 +73,13 @@ class DtoManager
      * @param array $data
      * @param $dtoType
      * @param array $allowedExpands
-     * @return DtoCollection
+     * @return DtoInterface
      */
     public function createDtoCollection(array $data, $dtoType, array $allowedExpands = [])
     {
         $collection = [];
         foreach ($data as $item) {
-            $collection[] = $this->createDto($item, $dtoType);
+            $collection[] = $this->createDto($item, $dtoType, $allowedExpands);
         }
 
         return new DtoCollection($collection, $this->configurator->getCollectionKey());
@@ -129,7 +116,7 @@ class DtoManager
         }
 
         $expandsConfig = $dtoConfig['expands'];
-        foreach ($requestedExpands as $requestedExpand) {
+        foreach (array_intersect($requestedExpands, $allowedExpands) as $requestedExpand) {
             $expandConfig = $expandsConfig[$requestedExpand];
             $expandGetter = !empty($expandConfig['getter'])
                 ? $expandConfig['getter']
@@ -137,21 +124,6 @@ class DtoManager
             $expandObject = call_user_func([$data, $expandGetter]);
             $dtoData['_expands'][$requestedExpand][] = $this->createDto($expandObject, $expandConfig['type'], []);
         }
-
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDtoConfig()
-    {
-        // TODO: caching
-        if ($this->dtoConfig === null) {
-            $absolutePath = $this->fileLocator->locate($this->configurator->getConfigPath());
-            $this->dtoConfig = Yaml::parse(file_get_contents($absolutePath));
-        }
-
-        return $this->dtoConfig;
     }
 
     /**
