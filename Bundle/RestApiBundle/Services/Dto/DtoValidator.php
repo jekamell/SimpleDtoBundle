@@ -5,6 +5,7 @@ namespace Mell\Bundle\RestApiBundle\Services\Dto;
 use Mell\Bundle\RestApiBundle\Exceptions\DtoException;
 use Mell\Bundle\RestApiBundle\Helpers\DtoHelper;
 use Mell\Bundle\RestApiBundle\Model\Dto;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DtoValidator
 {
@@ -29,6 +30,19 @@ class DtoValidator
     {
         $this->validateDtoExist($config, $type);
         $this->validateDtoFields($config[$type], $object, $type);
+    }
+
+    /**
+     * @param array $expandsConfig
+     * @param array $requestedExpands
+     */
+    public function validateExpands(array $expandsConfig, array $requestedExpands)
+    {
+        foreach ($requestedExpands as $requestedExpand) {
+            if (!array_key_exists($requestedExpand, $expandsConfig)) {
+                throw new BadRequestHttpException(sprintf('Invalid expands required: %s', $requestedExpand));
+            }
+        }
     }
 
     /**

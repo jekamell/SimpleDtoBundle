@@ -103,6 +103,13 @@ class DtoManager
         $dtoData[$field] = $this->castValueType($options['type'], $value);
     }
 
+    /**
+     * @param $data
+     * @param array $dtoData
+     * @param $dtoConfig
+     * @param array $requestedExpands
+     * @param array $allowedExpands
+     */
     protected function processExpands(
         $data,
         array &$dtoData,
@@ -116,6 +123,7 @@ class DtoManager
         }
 
         $expandsConfig = $dtoConfig['expands'];
+        $this->validateExpands($expandsConfig, $requestedExpands);
         foreach (array_intersect($requestedExpands, $allowedExpands) as $requestedExpand) {
             $expandConfig = $expandsConfig[$requestedExpand];
             $expandGetter = !empty($expandConfig['getter'])
@@ -134,6 +142,15 @@ class DtoManager
     protected function validateDto($dtoConfig, $dtoType, $object)
     {
         $this->dtoValidator->validateDto($dtoConfig, $object, $dtoType);
+    }
+
+    /**
+     * @param array $expandsConfig
+     * @param array $requestedExpands
+     */
+    protected function validateExpands(array $expandsConfig, array $requestedExpands)
+    {
+        return $this->dtoValidator->validateExpands($expandsConfig, $requestedExpands);
     }
 
     /**
