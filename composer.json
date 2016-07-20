@@ -8,5 +8,10 @@
             "email": "55jeka@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
 }
