@@ -8,14 +8,5 @@
             "email": "55jeka@gmail.com"
         }
     ],
-    "require": {},
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
-    },
-    "autoload": {
-        "psr-0": { "Mell": "" }
-    }
+    "require": {}
 }
