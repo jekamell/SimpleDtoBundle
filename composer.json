@@ -1,0 +1,13 @@
+{
+    "name": "mell/rest-api-bundle",
+    "description": "Provide base functionality to build restful api",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Malykhin Evgeniy",
+            "email": "55jeka@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
