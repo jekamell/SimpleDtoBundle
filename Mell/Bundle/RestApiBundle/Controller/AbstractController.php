@@ -3,9 +3,13 @@
 namespace Mell\Bundle\RestApiBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
+use Mell\Bundle\RestApiBundle\Model\Dto;
 use Mell\Bundle\RestApiBundle\Model\DtoInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 abstract class AbstractController extends Controller
 {
@@ -21,17 +25,29 @@ abstract class AbstractController extends Controller
     protected abstract function getAllowedExpands();
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @param $entity
      * @return Response
      */
-    protected function listResources(QueryBuilder $queryBuilder)
+    protected function createResource(Request $request, $entity)
     {
+        if (!$data = json_decode($request->getContent(), true)) {
+            throw new BadRequestHttpException('Missing json data');
+        }
+
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType());
+
+        $errors = $this->get('validator')->validate($entity);
+        if ($errors->count()) {
+            return $this->serializeResponse($errors);
+        }
+
+        // TODO: throw events
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
+
         return $this->serializeResponse(
-            $this->getDtoManager()->createDtoCollection(
-                $queryBuilder->getQuery()->getResult(),
-                $this->getDtoType(),
-                $this->getAllowedExpands()
-            )
+            $this->getDtoManager()->createDto($entity, $this->getDtoType(), $this->getAllowedExpands())
         );
     }
 
@@ -43,6 +59,21 @@ abstract class AbstractController extends Controller
     {
         return $this->serializeResponse(
             $this->getDtoManager()->createDto($entity, $this->getDtoType(), $this->getAllowedExpands())
+        );
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @return Response
+     */
+    protected function listResources(QueryBuilder $queryBuilder)
+    {
+        return $this->serializeResponse(
+            $this->getDtoManager()->createDtoCollection(
+                $queryBuilder->getQuery()->getResult(),
+                $this->getDtoType(),
+                $this->getAllowedExpands()
+            )
         );
     }
 
@@ -71,6 +102,12 @@ abstract class AbstractController extends Controller
      */
     protected function serializeResponse($data, $statusCode = Response::HTTP_OK, $format = self::FORMAT_JSON)
     {
+
+        if ($data instanceof ConstraintViolationListInterface) {
+            // TODO: handle validation error
+            return new Response('', Response::HTTP_UNPROCESSABLE_ENTITY, ['Content-Type' => 'application/json']);
+        }
+
         return new Response(
             $this->get('serializer')->serialize($data, $format, []),
             $statusCode,
