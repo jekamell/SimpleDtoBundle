@@ -35,6 +35,15 @@ class DtoHelper
     }
 
     /**
+     * @param $field
+     * @return string
+     */
+    public function getFieldSetter($field)
+    {
+        return 'set' . ucfirst($field);
+    }
+
+    /**
      * @return array
      */
     public function getDtoConfig()

@@ -40,26 +40,28 @@ class DtoManager
     }
 
     /**
-     * @param $data
+     * Convert entity to dto
+     *
+     * @param $entity
      * @param string $dtoType
      * @param array $allowedExpands
      * @return DtoInterface
      */
-    public function createDto($data, $dtoType, array $allowedExpands = [])
+    public function createDto($entity, $dtoType, array $allowedExpands = [])
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
-        $this->validateDto($dtoConfig, $dtoType, $data);
+        $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
         $requestedFields = $this->requestManager->getFields();
         $requestedExpands = $this->requestManager->getExpands();
 
         $dtoData = [];
         foreach ($dtoConfig[$dtoType]['fields'] as $field => $options) {
-            $this->processFields($data, $dtoData, $field, $options, $requestedFields);
+            $this->processFields($entity, $dtoData, $field, $options, $requestedFields);
         }
 
         $this->processExpands(
-            $data,
+            $entity,
             $dtoData,
             $dtoConfig[$dtoType],
             $requestedExpands,
@@ -70,19 +72,45 @@ class DtoManager
     }
 
     /**
-     * @param array $data
+     * @param array $collection
      * @param $dtoType
      * @param array $allowedExpands
      * @return DtoInterface
      */
-    public function createDtoCollection(array $data, $dtoType, array $allowedExpands = [])
+    public function createDtoCollection(array $collection, $dtoType, array $allowedExpands = [])
     {
-        $collection = [];
-        foreach ($data as $item) {
-            $collection[] = $this->createDto($item, $dtoType, $allowedExpands);
+        $data = [];
+        foreach ($collection as $item) {
+            $data[] = $this->createDto($item, $dtoType, $allowedExpands);
         }
 
-        return new DtoCollection($collection, $this->configurator->getCollectionKey());
+        return new DtoCollection($data, $this->configurator->getCollectionKey());
+    }
+
+    /**
+     * @param $entity
+     * @param DtoInterface $dto
+     * @param string $dtoType
+     * @return mixed
+     */
+    public function createEntityFromDto($entity, DtoInterface $dto, $dtoType)
+    {
+        $dtoConfig = $this->dtoHelper->getDtoConfig();
+        $this->validateDto($dto, $dtoConfig, $dtoType);
+
+        $fieldsConfig = $dtoConfig[$dtoType]['fields'];
+        foreach ($dto->getRawData() as $property => $value) {
+            if (!empty($fieldsConfig[$property]['readonly'])) {
+                continue;
+            }
+            $setter = isset($fieldsConfig[$property]['setter'])
+                ? $fieldsConfig[$property]['setter']
+                :  $this->dtoHelper->getFieldSetter($property);
+
+            call_user_func([$entity, $setter], $value);
+        }
+
+        return $entity;
     }
 
     /**
@@ -139,9 +167,20 @@ class DtoManager
      * @param string $dtoType
      * @param $object
      */
-    protected function validateDto($dtoConfig, $dtoType, $object)
+    protected function validateDtoConfig($dtoConfig, $dtoType, $object)
     {
-        $this->dtoValidator->validateDto($dtoConfig, $object, $dtoType);
+        // TODO: setter validation
+        $this->dtoValidator->validateDtoConfig($dtoConfig, $object, $dtoType);
+    }
+
+    /**
+     * @param DtoInterface $dto
+     * @param array $config
+     * @param string $dtoType
+     */
+    protected function validateDto(DtoInterface $dto, $config, $dtoType)
+    {
+        $this->dtoValidator->validateDto($dto, $config, $dtoType);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Mell\Bundle\RestApiBundle\Services\Dto;
 use Mell\Bundle\RestApiBundle\Exceptions\DtoException;
 use Mell\Bundle\RestApiBundle\Helpers\DtoHelper;
 use Mell\Bundle\RestApiBundle\Model\Dto;
+use Mell\Bundle\RestApiBundle\Model\DtoInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DtoValidator
@@ -22,14 +23,28 @@ class DtoValidator
     }
 
     /**
+     * TODO: description
+     *
+     * @param DtoInterface $dto
+     * @param $config
+     * @param $dtoType
+     */
+    public function validateDto(DtoInterface $dto, $config, $dtoType)
+    {
+        $this->validateDtoExist($config, $dtoType);
+        $this->validateDtoFields($dto, $config[$dtoType], $dtoType);
+
+    }
+
+    /**
      * @param array $config Parsed dto config
      * @param \stdClass $object Object to serialize
      * @param string $type
      */
-    public function validateDto(array $config, $object, $type)
+    public function validateDtoConfig(array $config, $object, $type)
     {
         $this->validateDtoExist($config, $type);
-        $this->validateDtoFields($config[$type], $object, $type);
+        $this->validateDtoConfigFields($config[$type], $object, $type);
     }
 
     /**
@@ -41,6 +56,26 @@ class DtoValidator
         foreach ($requestedExpands as $requestedExpand) {
             if (!array_key_exists($requestedExpand, $expandsConfig)) {
                 throw new BadRequestHttpException(sprintf('Invalid expands required: %s', $requestedExpand));
+            }
+        }
+    }
+
+    /**
+     * TODO: description
+     *
+     * @param DtoInterface $dto
+     * @param array $config
+     * @param $type
+     */
+    protected function validateDtoFields(DtoInterface $dto, array $config, $type)
+    {
+        $fieldsConfig = $config['fields'];
+        foreach ($dto->getRawData() as $field => $value) {
+            if (!isset($fieldsConfig[$field])) {
+                throw new BadRequestHttpException(sprintf('%s: Field "%s" is not defined', $type, $field));
+            }
+            if (!empty($fieldsConfig[$field]['readonly'])) {
+                throw new BadRequestHttpException(sprintf('%s: Field "%s" is readonly', $type, $field));
             }
         }
     }
@@ -63,7 +98,7 @@ class DtoValidator
      * @param $type
      * @throws DtoException
      */
-    protected function validateDtoFields(array $config, $object, $type)
+    protected function validateDtoConfigFields(array $config, $object, $type)
     {
         if (empty($config['fields'])) {
             throw new DtoException(sprintf('Fields definition not found: %s', $type));
