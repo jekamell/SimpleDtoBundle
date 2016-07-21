@@ -16,6 +16,12 @@ abstract class AbstractController extends Controller
 {
     const FORMAT_JSON = 'json';
 
+    const DTO_GROUP_CREATE = 'create';
+    const DTO_GROUP_READ = 'read';
+    const DTO_GROUP_UPDATE = 'update';
+    const DTO_GROUP_DELETE = 'delete';
+    const DTO_GROUP_LIST = 'list';
+
     /** @return string */
     protected abstract function getDtoType();
 
@@ -28,15 +34,16 @@ abstract class AbstractController extends Controller
     /**
      * @param Request $request
      * @param $entity
+     * @param string|null $dtoGroup
      * @return Response
      */
-    protected function createResource(Request $request, $entity)
+    protected function createResource(Request $request, $entity, $dtoGroup = null)
     {
         if (!$data = json_decode($request->getContent(), true)) {
             throw new BadRequestHttpException('Missing json data');
         }
 
-        $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType());
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType(), $dtoGroup);
         $event = new ApiEvent($entity, 'create');
 
         $this->getEventDispatcher()->dispatch('mell_rest_api.pre_validate', $event);
@@ -59,15 +66,16 @@ abstract class AbstractController extends Controller
     /**
      * @param Request $request
      * @param $entity
+     * @param string|null $dtoGroup
      * @return Response
      */
-    protected function updateResource(Request $request, $entity)
+    protected function updateResource(Request $request, $entity, $dtoGroup = null)
     {
         if (!$data = json_decode($request->getContent(), true)) {
             throw new BadRequestHttpException('Missing json data');
         }
 
-        $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType());
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType(), $dtoGroup);
         $event = new ApiEvent($entity, 'update');
 
         $this->getEventDispatcher()->dispatch('mell_rest_api.pre_validate', $event);
@@ -86,12 +94,13 @@ abstract class AbstractController extends Controller
 
     /**
      * @param $entity
+     * @param string|null $dtoGroup
      * @return Response
      */
-    protected function readResource($entity)
+    protected function readResource($entity, $dtoGroup = null)
     {
         return $this->serializeResponse(
-            $this->getDtoManager()->createDto($entity, $this->getDtoType(), $this->getAllowedExpands())
+            $this->getDtoManager()->createDto($entity, $this->getDtoType(), $dtoGroup, $this->getAllowedExpands())
         );
     }
 
@@ -105,6 +114,7 @@ abstract class AbstractController extends Controller
             $this->getDtoManager()->createDtoCollection(
                 $queryBuilder->getQuery()->getResult(),
                 $this->getDtoType(),
+                self::DTO_GROUP_LIST,
                 $this->getAllowedExpands()
             )
         );

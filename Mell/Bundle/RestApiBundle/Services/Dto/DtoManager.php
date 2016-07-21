@@ -44,10 +44,11 @@ class DtoManager
      *
      * @param $entity
      * @param string $dtoType
+     * @param string $group
      * @param array $allowedExpands
      * @return DtoInterface
      */
-    public function createDto($entity, $dtoType, array $allowedExpands = [])
+    public function createDto($entity, $dtoType, $group, array $allowedExpands = [])
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
@@ -57,7 +58,7 @@ class DtoManager
 
         $dtoData = [];
         foreach ($dtoConfig[$dtoType]['fields'] as $field => $options) {
-            $this->processFields($entity, $dtoData, $field, $options, $requestedFields);
+            $this->processField($entity, $dtoData, $group, $field, $options, $requestedFields);
         }
 
         $this->processExpands(
@@ -77,11 +78,11 @@ class DtoManager
      * @param array $allowedExpands
      * @return DtoInterface
      */
-    public function createDtoCollection(array $collection, $dtoType, array $allowedExpands = [])
+    public function createDtoCollection(array $collection, $dtoType, $group, array $allowedExpands = [])
     {
         $data = [];
         foreach ($collection as $item) {
-            $data[] = $this->createDto($item, $dtoType, $allowedExpands);
+            $data[] = $this->createDto($item, $dtoType, $group, $allowedExpands);
         }
 
         return new DtoCollection($data, $this->configurator->getCollectionKey());
@@ -91,9 +92,10 @@ class DtoManager
      * @param $entity
      * @param DtoInterface $dto
      * @param string $dtoType
+     * @param string|null $group
      * @return mixed
      */
-    public function createEntityFromDto($entity, DtoInterface $dto, $dtoType)
+    public function createEntityFromDto($entity, DtoInterface $dto, $dtoType, $group)
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDto($dto, $dtoConfig, $dtoType);
@@ -103,6 +105,10 @@ class DtoManager
             if (!empty($fieldsConfig[$property]['readonly'])) {
                 continue;
             }
+            if (isset($fieldsConfig[$property]['groups']) && !in_array($group, $fieldsConfig[$property]['groups'])) {
+                continue;
+            }
+            $value = $this->castValueType($fieldsConfig[$property]['type'], $value, false);
             $setter = isset($fieldsConfig[$property]['setter'])
                 ? $fieldsConfig[$property]['setter']
                 :  $this->dtoHelper->getFieldSetter($property);
@@ -116,16 +122,20 @@ class DtoManager
     /**
      * @param $data
      * @param array $dtoData
+     * @param $group
      * @param string $field
      * @param array $options
      * @param array $requestedFields
      */
-    protected function processFields($data, array &$dtoData, $field, array $options, array $requestedFields)
+    protected function processField($data, array &$dtoData, $group,  $field, array $options, array $requestedFields)
     {
-        // process _fields param
         if (!empty($requestedFields) && !in_array($field, $requestedFields)) {
             return;
         }
+        if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
+            return;
+        }
+
         $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
         $value = call_user_func([$data, $getter]);
         $dtoData[$field] = $this->castValueType($options['type'], $value);
@@ -169,7 +179,6 @@ class DtoManager
      */
     protected function validateDtoConfig($dtoConfig, $dtoType, $object)
     {
-        // TODO: setter validation
         $this->dtoValidator->validateDtoConfig($dtoConfig, $object, $dtoType);
     }
 
@@ -197,7 +206,7 @@ class DtoManager
      * @param mixed $value
      * @return mixed
      */
-    protected function castValueType($type, $value)
+    protected function castValueType($type, $value, $raw = true)
     {
         switch ($type) {
             case DtoInterface::TYPE_INTEGER:
@@ -219,13 +228,17 @@ class DtoManager
                 if (!$value instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
-                $value = $value->format($this->configurator->getFormatDate());
+                if ($raw) {
+                    $value = $value->format($this->configurator->getFormatDate());
+                }
                 break;
             case DtoInterface::TYPE_DATE_TIME:
                 if (!$value instanceof \DateTime) {
                     $value = new \DateTime($value);
                 }
-                $value = $value->format($this->configurator->getFormatDateTime());
+                if ($raw) {
+                    $value = $value->format($this->configurator->getFormatDateTime());
+                }
                 break;
             default:
                 $value = null;

@@ -71,9 +71,6 @@ class DtoValidator
     {
         $fieldsConfig = $config['fields'];
         foreach ($dto->getRawData() as $field => $value) {
-            if (!isset($fieldsConfig[$field])) {
-                throw new BadRequestHttpException(sprintf('%s: Field "%s" is not defined', $type, $field));
-            }
             if (!empty($fieldsConfig[$field]['readonly'])) {
                 throw new BadRequestHttpException(sprintf('%s: Field "%s" is readonly', $type, $field));
             }
