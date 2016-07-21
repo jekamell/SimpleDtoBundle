@@ -37,10 +37,13 @@ abstract class AbstractController extends Controller
 
     /**
      * @param $entity
+     * @return Response
      */
     protected function readResource($entity)
     {
-        $this->getDtoManager()->createDto($entity, $this->getDtoType(), $this->getAllowedExpands());
+        return $this->serializeResponse(
+            $this->getDtoManager()->createDto($entity, $this->getDtoType(), $this->getAllowedExpands())
+        );
     }
 
     /**
