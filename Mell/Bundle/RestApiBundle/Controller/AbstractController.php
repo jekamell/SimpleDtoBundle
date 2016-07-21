@@ -5,6 +5,7 @@ namespace Mell\Bundle\RestApiBundle\Controller;
 use Doctrine\ORM\QueryBuilder;
 use Mell\Bundle\RestApiBundle\Model\Dto;
 use Mell\Bundle\RestApiBundle\Model\DtoInterface;
+use Mell\Mell\Bundle\RestApiBundle\ApiEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,14 +37,18 @@ abstract class AbstractController extends Controller
         }
 
         $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType());
+        $event = new ApiEvent($entity, 'create');
 
+        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_validate', $event);
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        // TODO: throw events
+        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_persist', $event);
         $this->getEntityManager()->persist($entity);
+
+        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_flush', $event);
         $this->getEntityManager()->flush();
 
         return $this->serializeResponse(
@@ -63,13 +68,15 @@ abstract class AbstractController extends Controller
         }
 
         $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType());
+        $event = new ApiEvent($entity, 'update');
 
+        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_validate', $event);
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        // TODO: throw events
+        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_flush', $event);
         $this->getEntityManager()->flush();
 
         return $this->serializeResponse(
@@ -147,5 +154,13 @@ abstract class AbstractController extends Controller
     protected function getDtoManager()
     {
         return $this->get('mell_rest_api.dto_manager');
+    }
+
+    /**
+     * @return object|\Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher|\Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
+     */
+    protected function getEventDispatcher()
+    {
+        return $this->get('event_dispatcher');
     }
 }
