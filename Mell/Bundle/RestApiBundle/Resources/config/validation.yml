@@ -1,8 +1,0 @@
-AppBundle\Entity\User:
-    properties:
-        firstname:
-            - NotBlank: ~
-        lastname:
-            - NotBlank: ~
-        birthday:
-            - Date: ~
