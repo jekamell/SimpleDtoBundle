@@ -52,6 +52,32 @@ abstract class AbstractController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param $entity
+     * @return Response
+     */
+    protected function updateResource(Request $request, $entity)
+    {
+        if (!$data = json_decode($request->getContent(), true)) {
+            throw new BadRequestHttpException('Missing json data');
+        }
+
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, new Dto($data), $this->getDtoType());
+
+        $errors = $this->get('validator')->validate($entity);
+        if ($errors->count()) {
+            return $this->serializeResponse($errors);
+        }
+
+        // TODO: throw events
+        $this->getEntityManager()->flush();
+
+        return $this->serializeResponse(
+            $this->getDtoManager()->createDto($entity, $this->getDtoType(), $this->getAllowedExpands())
+        );
+    }
+
+    /**
      * @param $entity
      * @return Response
      */
