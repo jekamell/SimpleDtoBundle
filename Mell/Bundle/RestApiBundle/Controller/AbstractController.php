@@ -5,7 +5,7 @@ namespace Mell\Bundle\RestApiBundle\Controller;
 use Doctrine\ORM\QueryBuilder;
 use Mell\Bundle\RestApiBundle\Model\Dto;
 use Mell\Bundle\RestApiBundle\Model\DtoInterface;
-use Mell\Mell\Bundle\RestApiBundle\ApiEvent;
+use Mell\Bundle\RestApiBundle\Event\ApiEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

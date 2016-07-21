@@ -1,6 +1,6 @@
 <?php
 
-namespace Mell\Bundle\RestApiBundle;
+namespace Mell\Bundle\RestApiBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
