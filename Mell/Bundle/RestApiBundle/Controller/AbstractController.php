@@ -61,7 +61,7 @@ abstract class AbstractController extends Controller
             $this->getDtoManager()->createDto(
                 $entity,
                 $this->getDtoType(),
-                $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE,
+                $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
                 $this->getAllowedExpands()
             )
         );
@@ -97,7 +97,12 @@ abstract class AbstractController extends Controller
         $this->getEntityManager()->flush();
 
         return $this->serializeResponse(
-            $this->getDtoManager()->createDto($entity, $this->getDtoType(), $this->getAllowedExpands())
+            $this->getDtoManager()->createDto(
+                $entity,
+                $this->getDtoType(),
+                DtoInterface::DTO_GROUP_READ,
+                $this->getAllowedExpands()
+            )
         );
     }
 
