@@ -19,6 +19,7 @@ class ApiEvent extends Event
     public function __construct($data, $action)
     {
         $this->data = $data;
+        $this->action = $action;
     }
 
     /**
