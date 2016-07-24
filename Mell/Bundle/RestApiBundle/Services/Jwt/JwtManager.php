@@ -17,7 +17,7 @@ class JwtManager implements JwtManagerInterface
     public function decode(array $payload, $privateKey, $ttl = 86400, $algorithm = [JwtManagerInterface::ALG_DEFAULT])
     {
         $now = new \DateTime();
-        $jws = new JWS($algorithm);
+        $jws = new JWS(['alg' => $algorithm]);
         $jws->setPayload(array_merge($payload, ['exp' => $now->getTimestamp() + $ttl]));
         $jws->sign($privateKey);
 
