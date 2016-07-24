@@ -8,7 +8,9 @@
             "email": "55jeka@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "namshi/jose": "6.0.*"
+    },
     "autoload": {
         "psr-4": {
             "": ""
