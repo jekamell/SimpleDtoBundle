@@ -11,10 +11,10 @@ class JwtManager implements JwtManagerInterface
      * @param array $payload
      * @param resource $privateKey
      * @param int $ttl
-     * @param string $algorithm
+     * @param array $algorithm
      * @return string
      */
-    public function decode(array $payload, $privateKey, $ttl = 86400, $algorithm = 'RS256')
+    public function decode(array $payload, $privateKey, $ttl = 86400, $algorithm = [JwtManagerInterface::ALG_DEFAULT])
     {
         $now = new \DateTime();
         $jws = new JWS($algorithm);
