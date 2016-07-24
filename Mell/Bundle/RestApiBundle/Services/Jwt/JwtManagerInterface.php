@@ -10,10 +10,10 @@ interface JwtManagerInterface
      * @param array $payload
      * @param resource $privateKey
      * @param integer $ttl
-     * @param array $algorithm
+     * @param string $algorithm
      * @return string
      */
-    public function decode(array $payload, $privateKey, $ttl, $algorithm = [self::ALG_DEFAULT]);
+    public function decode(array $payload, $privateKey, $ttl, $algorithm = self::ALG_DEFAULT);
 
     /**
      * @param string $token
