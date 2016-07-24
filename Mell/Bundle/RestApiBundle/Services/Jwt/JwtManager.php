@@ -1,11 +1,11 @@
 <?php
 
-namespace Mell\Mell\Bundle\RestApiBundle\Services;
+namespace Mell\Mell\Bundle\RestApiBundle\Services\Jwt;
 
 use Namshi\JOSE\JWS;
 use Namshi\JOSE\SimpleJWS;
 
-class JwtManager
+class JwtManager implements JwtManagerInterface
 {
     /**
      * @param array $payload
