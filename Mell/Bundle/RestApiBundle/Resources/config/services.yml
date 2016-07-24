@@ -47,3 +47,6 @@ services:
         arguments:
             - "@file_locator"
             - "%mell_rest_api.dto_config_path%"
+
+    mell_rest_api.jwt_manager:
+        class: Mell\Bundle\RestApiBundle\Services\Jwt\JwtManager

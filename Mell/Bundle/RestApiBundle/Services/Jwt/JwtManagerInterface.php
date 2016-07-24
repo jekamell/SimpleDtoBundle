@@ -1,6 +1,6 @@
 <?php
 
-namespace Mell\Mell\Bundle\RestApiBundle\Services\Jwt;
+namespace Mell\Bundle\RestApiBundle\Services\Jwt;
 
 interface JwtManagerInterface
 {
