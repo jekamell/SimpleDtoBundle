@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "namshi/jose": "6.0.*"
+        "namshi/jose": "6.*"
     },
     "autoload": {
         "psr-4": {
