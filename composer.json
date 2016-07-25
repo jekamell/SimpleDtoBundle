@@ -1,7 +1,8 @@
 {
-    "name": "jekamell/rest-api-bundle",
-    "description": "Provide base functionality to build restful api",
+    "name": "jekamell/simple-dto-bundle",
+    "description": "Allow to configure dto objects in easy way, and split persistence and representative application layers",
     "license": "MIT",
+    "keywords": ["dto", "data transfer object", "rest", "restful"],
     "type": "library",
     "authors": [
         { "name": "Evgeniy Malykhin", "email": "55jeka@gmail.com" }
