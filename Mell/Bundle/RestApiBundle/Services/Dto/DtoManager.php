@@ -45,28 +45,23 @@ class DtoManager
      * @param $entity
      * @param string $dtoType
      * @param string $group
-     * @param array $allowedExpands
+     * @param array $fields
+     * @param array $expands
      * @return DtoInterface
      */
-    public function createDto($entity, $dtoType, $group, array $allowedExpands = [])
+    public function createDto($entity, $dtoType, $group, array $fields = [], array $expands = [])
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
-        $requestedFields = $this->requestManager->getFields();
-        $requestedExpands = $this->requestManager->getExpands();
-
         $dtoData = [];
-        foreach ($dtoConfig[$dtoType]['fields'] as $field => $options) {
-            $this->processField($entity, $dtoData, $group, $field, $options, $requestedFields);
-        }
-
+        $this->processFields($entity, $dtoData, $fields, $dtoConfig[$dtoType]['fields'], $group);
         $this->processExpands(
             $entity,
             $dtoData,
-            $dtoConfig[$dtoType],
-            $requestedExpands,
-            $allowedExpands
+            $expands,
+            isset($dtoConfig[$dtoType]['expands']) ? isset($dtoConfig[$dtoType]['expands']) : [],
+            $group
         );
 
         return new Dto($dtoData);
@@ -75,14 +70,15 @@ class DtoManager
     /**
      * @param array $collection
      * @param $dtoType
-     * @param array $allowedExpands
+     * @param $group
+     * @param array $expands
      * @return DtoInterface
      */
-    public function createDtoCollection(array $collection, $dtoType, $group, array $allowedExpands = [])
+    public function createDtoCollection(array $collection, $dtoType, $group, array $expands = [])
     {
         $data = [];
         foreach ($collection as $item) {
-            $data[] = $this->createDto($item, $dtoType, $group, $allowedExpands);
+            $data[] = $this->createDto($item, $dtoType, $group, $expands);
         }
 
         return new DtoCollection($data, $this->configurator->getCollectionKey());
@@ -120,55 +116,49 @@ class DtoManager
     }
 
     /**
-     * @param $data
-     * @param array $dtoData
-     * @param $group
-     * @param string $field
-     * @param array $options
-     * @param array $requestedFields
+     * @param $entity
+     * @param array $dtoData Predefined dto data
+     * @param array $fields Required fields
+     * @param array $config Fields configuration
+     * @param string $group Dto group
      */
-    protected function processField($data, array &$dtoData, $group,  $field, array $options, array $requestedFields)
-    {
-        if (!empty($requestedFields) && !in_array($field, $requestedFields)) {
-            return;
+    protected function processFields($entity,array $dtoData, array $fields, array $config, $group) {
+        /** @var array $options */
+        foreach ($config as $field => $options) {
+            // field was not required (@see dtoManager::getRequiredFields)
+            if (!empty($fields) && !in_array($field, $fields)) {
+                continue;
+            }
+            // field is not allowed for specified group
+            if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
+                continue;
+            }
+            $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+            $value = call_user_func([$entity, $getter]);
+            $dtoData[$field] = $this->castValueType($options['type'], $value);
         }
-        if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
-            return;
-        }
-
-        $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
-        $value = call_user_func([$data, $getter]);
-        $dtoData[$field] = $this->castValueType($options['type'], $value);
     }
 
     /**
-     * @param $data
-     * @param array $dtoData
-     * @param $dtoConfig
-     * @param array $requestedExpands
-     * @param array $allowedExpands
+     * @param $entity
+     * @param array $dtoData Predefined dto data
+     * @param array $expands Required expands
+     * @param array $config Expands configuration
+     * @param string $group Dto group
      */
-    protected function processExpands(
-        $data,
-        array &$dtoData,
-        $dtoConfig,
-        array $requestedExpands,
-        array $allowedExpands
-    ) {
-        // process _expands param
-        if (empty($requestedExpands) || empty($dtoConfig['expands'])) {
+    protected function processExpands($entity, array &$dtoData, array $expands, array $config, $group)
+    {
+        if (empty($config)) {
             return;
         }
-
-        $expandsConfig = $dtoConfig['expands'];
-        $this->validateExpands($expandsConfig, $requestedExpands);
-        foreach (array_intersect($requestedExpands, $allowedExpands) as $requestedExpand) {
-            $expandConfig = $expandsConfig[$requestedExpand];
+        $this->validateExpands($config, $expands);
+        foreach ($expands as $expand) {
+            $expandConfig = $config[$expand];
             $expandGetter = !empty($expandConfig['getter'])
                 ? $expandConfig['getter']
-                : $this->dtoHelper->getFieldGetter($requestedExpand);
-            $expandObject = call_user_func([$data, $expandGetter]);
-            $dtoData['_expands'][$requestedExpand][] = $this->createDto($expandObject, $expandConfig['type'], []);
+                : $this->dtoHelper->getFieldGetter($expand);
+            $expandObject = call_user_func([$entity, $expandGetter]);
+            $dtoData['_expands'][$expand][] = $this->createDto($expandObject, $expandConfig['type'], $group, []);
         }
     }
 
@@ -193,12 +183,12 @@ class DtoManager
     }
 
     /**
-     * @param array $expandsConfig
-     * @param array $requestedExpands
+     * @param array $config
+     * @param array $expands
      */
-    protected function validateExpands(array $expandsConfig, array $requestedExpands)
+    protected function validateExpands(array $config, array $expands)
     {
-        return $this->dtoValidator->validateExpands($expandsConfig, $requestedExpands);
+        return $this->dtoValidator->validateExpands($config, $expands);
     }
 
     /**

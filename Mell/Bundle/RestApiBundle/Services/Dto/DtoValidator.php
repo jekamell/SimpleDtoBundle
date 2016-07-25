@@ -48,14 +48,18 @@ class DtoValidator
     }
 
     /**
-     * @param array $expandsConfig
-     * @param array $requestedExpands
+     * @param array $config
+     * @param array $expands
+     * @throws DtoException
      */
-    public function validateExpands(array $expandsConfig, array $requestedExpands)
+    public function validateExpands(array $config, array $expands)
     {
-        foreach ($requestedExpands as $requestedExpand) {
-            if (!array_key_exists($requestedExpand, $expandsConfig)) {
-                throw new BadRequestHttpException(sprintf('Invalid expands required: %s', $requestedExpand));
+        foreach ($expands as $expand) {
+            if (!array_key_exists($expand, $config)) {
+                throw new BadRequestHttpException(sprintf('Invalid expands required: %s', $expand));
+            }
+            if (!isset($config[$expand]['type'])) {
+                throw new DtoException(sprintf('Expand type should be defined: %s', $expand));
             }
         }
     }
