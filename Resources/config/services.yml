@@ -1,0 +1,61 @@
+parameters:
+    simple_dto.param_fields: "_fields"
+    simple_dto.param_expands: "_expands"
+    simple_dto.param_limit: "_limit"
+    simple_dto.param_offset: "_offset"
+    simple_dto.param_sort: "_sort"
+
+    simple_dto.date_format: "Y-m-d"
+    simple_dto.date_time_format: "c" # ISO 8601
+
+    simple_dto.collection_key: "_collection"
+
+    simple_dto.dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
+    simple_dto.jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
+
+services:
+    simple_dto.request_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager
+        arguments:
+            - "@request_stack"
+            - "%simple_dto.param_fields%"
+            - "%simple_dto.param_expands%"
+            - "%simple_dto.param_limit%"
+            - "%simple_dto.param_offset%"
+            - "%simple_dto.param_sort%"
+
+    simple_dto.dto_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@simple_dto.dto_validator"
+            - "@simple_dto.dto_helper"
+            - "@simple_dto.dto_manager_configurator"
+
+    simple_dto.dto_validator:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoValidator
+        arguments: ["@simple_dto.dto_helper"]
+
+    simple_dto.dto_manager_configurator:
+        class: Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator
+        arguments:
+            - "%simple_dto.dto_config_path%"
+            - "%simple_dto.collection_key%"
+            - "%simple_dto.date_format%"
+            - "%simple_dto.date_time_format%"
+
+    simple_dto.dto_helper:
+        class: Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper
+        arguments:
+            - "@file_locator"
+            - "%simple_dto.dto_config_path%"
+
+    simple_dto.jwt_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Jwt\JwtManager
+
+    simple_dto.security.authenticator.api_key_authenticator:
+        class: Mell\Bundle\SimpleDtoBundle\Security\Authenticator\ApiKeyAuthenticator
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - "@simple_dto.jwt_manager"
+            - "%simple_dto.jwt_public_path%"
