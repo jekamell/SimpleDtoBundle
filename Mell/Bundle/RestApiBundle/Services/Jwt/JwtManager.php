@@ -34,7 +34,7 @@ class JwtManager implements JwtManagerInterface
         try {
             /** @var SimpleJWS $jws */
             $jws = SimpleJWS::load($token);
-            if (!$jws->isValid($publicKey)) {
+            if ($jws->isValid($publicKey)) {
 
                 return $jws->getPayload();
             }
