@@ -1,17 +1,17 @@
 parameters:
-    param_fields: "_fields"
-    param_expands: "_expands"
-    param_limit: "_limit"
-    param_offset: "_offset"
-    param_sort: "_sort"
+    mell_rest_api.param_fields: "_fields"
+    mell_rest_api.param_expands: "_expands"
+    mell_rest_api.param_limit: "_limit"
+    mell_rest_api.param_offset: "_offset"
+    mell_rest_api.param_sort: "_sort"
 
-    date_format: "Y-m-d"
-    date_time_format: "c" # ISO 8601
+    mell_rest_api.date_format: "Y-m-d"
+    mell_rest_api.date_time_format: "c" # ISO 8601
 
-    collection_key: "_collection"
+    mell_rest_api.collection_key: "_collection"
 
-    dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
-    jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
+    mell_rest_api.dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
+    mell_rest_api.jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
 
 services:
     mell_rest_api.request_manager:
