@@ -139,6 +139,6 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
      */
     private function getPublicKey()
     {
-        return openssl_pkey_get_public($this->publicKeyPath);
+        return openssl_pkey_get_public(file_get_contents($this->publicKeyPath));
     }
 }
