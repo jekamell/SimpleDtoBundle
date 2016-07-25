@@ -17,6 +17,8 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
     const HEADER_AUTH = 'Authorization';
 
+    const MESSAGE_AUTH_FAILED = 'Authentication failed';
+
     /** @var EntityManager */
     protected $entityManager;
     /** @var JwtManagerInterface */
@@ -46,7 +48,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
      */
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        return new JsonResponse(null, Response::HTTP_UNAUTHORIZED);
+        return new JsonResponse(['_error' => self::MESSAGE_AUTH_FAILED], Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -99,7 +101,7 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new JsonResponse(null, Response::HTTP_UNAUTHORIZED);
+        return new JsonResponse(['_error' => self::MESSAGE_AUTH_FAILED], Response::HTTP_UNAUTHORIZED);
     }
 
     /**
