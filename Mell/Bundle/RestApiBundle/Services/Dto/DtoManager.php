@@ -60,7 +60,7 @@ class DtoManager
             $entity,
             $dtoData,
             $expands,
-            isset($dtoConfig[$dtoType]['expands']) ? isset($dtoConfig[$dtoType]['expands']) : [],
+            isset($dtoConfig[$dtoType]['expands']) ? $dtoConfig[$dtoType]['expands'] : [],
             $group
         );
 
@@ -71,14 +71,15 @@ class DtoManager
      * @param array $collection
      * @param $dtoType
      * @param $group
+     * @param array $fields
      * @param array $expands
      * @return DtoInterface
      */
-    public function createDtoCollection(array $collection, $dtoType, $group, array $expands = [])
+    public function createDtoCollection(array $collection, $dtoType, $group, array $fields = [], array $expands = [])
     {
         $data = [];
         foreach ($collection as $item) {
-            $data[] = $this->createDto($item, $dtoType, $group, $expands);
+            $data[] = $this->createDto($item, $dtoType, $group, $fields, $expands);
         }
 
         return new DtoCollection($data, $this->configurator->getCollectionKey());
@@ -122,7 +123,7 @@ class DtoManager
      * @param array $config Fields configuration
      * @param string $group Dto group
      */
-    protected function processFields($entity,array $dtoData, array $fields, array $config, $group) {
+    protected function processFields($entity,array &$dtoData, array $fields, array $config, $group) {
         /** @var array $options */
         foreach ($config as $field => $options) {
             // field was not required (@see dtoManager::getRequiredFields)
@@ -133,6 +134,7 @@ class DtoManager
             if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
                 continue;
             }
+
             $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
             $value = call_user_func([$entity, $getter]);
             $dtoData[$field] = $this->castValueType($options['type'], $value);
@@ -158,6 +160,10 @@ class DtoManager
                 ? $expandConfig['getter']
                 : $this->dtoHelper->getFieldGetter($expand);
             $expandObject = call_user_func([$entity, $expandGetter]);
+
+            if ($expandObject) {
+                continue;
+            }
             $dtoData['_expands'][$expand][] = $this->createDto($expandObject, $expandConfig['type'], $group, []);
         }
     }

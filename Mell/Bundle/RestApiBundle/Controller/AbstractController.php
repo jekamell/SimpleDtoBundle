@@ -136,7 +136,8 @@ abstract class AbstractController extends Controller
                 $queryBuilder->getQuery()->getResult(),
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
-                $this->getAllowedExpands()
+                $this->get('mell_rest_api.request_manager')->getFields(),
+                array_intersect($this->get('mell_rest_api.request_manager')->getExpands(), $this->getAllowedExpands())
             )
         );
     }
