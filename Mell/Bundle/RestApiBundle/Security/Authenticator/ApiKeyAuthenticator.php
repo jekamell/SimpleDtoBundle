@@ -4,6 +4,7 @@ namespace Mell\Bundle\RestApiBundle\Security\Authenticator;
 
 use Doctrine\ORM\EntityManager;
 use Mell\Bundle\RestApiBundle\Services\Jwt\JwtManagerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -141,6 +142,10 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
      */
     private function getPublicKey()
     {
+        if (!is_file($this->publicKeyPath)) {
+            throw new FileNotFoundException($this->publicKeyPath);
+        }
+
         return openssl_pkey_get_public(file_get_contents($this->publicKeyPath));
     }
 }
