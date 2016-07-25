@@ -47,6 +47,10 @@ class Configuration implements ConfigurationInterface
                     ->isRequired()
                     ->info('Path to dto config. Alias can be used: @AppBundle/Resources/config/dto.yml')
                     ->end()
+                ->scalarNode('jwt_public_path')
+                    ->isRequired()
+                    ->info('Path to jwt public key. Alias can be used: "%kernel.root_dir%/app/config/jwt_public.pem"')
+                    ->end()
             ->end();
 
         return $treeBuilder;
