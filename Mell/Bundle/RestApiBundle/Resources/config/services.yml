@@ -50,3 +50,9 @@ services:
 
     mell_rest_api.jwt_manager:
         class: Mell\Bundle\RestApiBundle\Services\Jwt\JwtManager
+
+    mell_rest_api.security.authenticator.api_key_authenticator:
+         class: Mell\Bundle\RestApiBundle\Security\Authenticator\ApiKeyAuthenticator
+         arguments:
+             - "@doctrine.orm.entity_manager"
+             - "@mell_rest_api.jwt_manager"
