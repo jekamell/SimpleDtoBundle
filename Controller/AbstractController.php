@@ -45,16 +45,16 @@ abstract class AbstractController extends Controller
         );
         $event = new ApiEvent($entity, 'create');
 
-        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_validate', $event);
+        $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_persist', $event);
+        $this->getEventDispatcher()->dispatch('simple_dto.pre_persist', $event);
         $this->getEntityManager()->persist($entity);
 
-        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_flush', $event);
+        $this->getEventDispatcher()->dispatch('simple_dto.pre_flush', $event);
         $this->getEntityManager()->flush();
 
         return $this->serializeResponse(
@@ -87,13 +87,13 @@ abstract class AbstractController extends Controller
         );
         $event = new ApiEvent($entity, 'update');
 
-        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_validate', $event);
+        $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        $this->getEventDispatcher()->dispatch('mell_rest_api.pre_flush', $event);
+        $this->getEventDispatcher()->dispatch('simple_dto.pre_flush', $event);
         $this->getEntityManager()->flush();
 
         return $this->serializeResponse(
@@ -118,8 +118,8 @@ abstract class AbstractController extends Controller
                 $entity,
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->get('mell_rest_api.request_manager')->getFields(),
-                array_intersect($this->get('mell_rest_api.request_manager')->getExpands(), $this->getAllowedExpands())
+                $this->get('simple_dto.request_manager')->getFields(),
+                array_intersect($this->get('simple_dto.request_manager')->getExpands(), $this->getAllowedExpands())
             )
         );
     }
@@ -136,8 +136,8 @@ abstract class AbstractController extends Controller
                 $queryBuilder->getQuery()->getResult(),
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
-                $this->get('mell_rest_api.request_manager')->getFields(),
-                array_intersect($this->get('mell_rest_api.request_manager')->getExpands(), $this->getAllowedExpands())
+                $this->get('simple_dto.request_manager')->getFields(),
+                array_intersect($this->get('simple_dto.request_manager')->getExpands(), $this->getAllowedExpands())
             )
         );
     }
@@ -184,7 +184,7 @@ abstract class AbstractController extends Controller
      */
     protected function getDtoManager()
     {
-        return $this->get('mell_rest_api.dto_manager');
+        return $this->get('simple_dto.dto_manager');
     }
 
     /**
