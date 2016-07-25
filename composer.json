@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Mell\\Bundle\\SimpleDtoBundle": ""
+            "Mell\\Bundle\\SimpleDtoBundle\\": ""
         }
     }
 }
