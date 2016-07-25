@@ -2,6 +2,7 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
@@ -73,16 +74,25 @@ class DtoManager
      * @param $group
      * @param array $fields
      * @param array $expands
+     * @param string $collectionKey
      * @return DtoInterface
      */
-    public function createDtoCollection(array $collection, $dtoType, $group, array $fields = [], array $expands = [])
-    {
+    public function createDtoCollection(
+        array $collection,
+        $dtoType, $group,
+        array $fields = [],
+        array $expands = [],
+        $collectionKey = null
+    ) {
         $data = [];
         foreach ($collection as $item) {
             $data[] = $this->createDto($item, $dtoType, $group, $fields, $expands);
         }
 
-        return new DtoCollection($data, $this->configurator->getCollectionKey());
+        return new DtoCollection(
+            $data,
+            $collectionKey !== null ? $collectionKey : $this->configurator->getCollectionKey()
+        );
     }
 
     /**
@@ -159,8 +169,11 @@ class DtoManager
             if (!$expandObject = call_user_func([$entity, $expandGetter])) {
                 continue;
             }
-            // TODO: collection support
-            $dtoData['_expands'][$expand] = $this->createDto($expandObject, $expandConfig['type'], $group, []);
+            if (is_array($expandObject) || $expandObject instanceof ArrayCollection) {
+                $dtoData['_expands'][$expand] = $this->createDtoCollection($expandObject, $expandConfig['type'], $group, []);
+            } else {
+                $dtoData['_expands'][$expand] = $this->createDto($expandObject, $expandConfig['type'], $group, []);
+            }
         }
     }
 
