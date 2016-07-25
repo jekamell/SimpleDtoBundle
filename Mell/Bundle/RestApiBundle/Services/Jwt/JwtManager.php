@@ -43,4 +43,17 @@ class JwtManager implements JwtManagerInterface
 
         return [];
     }
+
+    /**
+     * @param string $token
+     * @param resource $publicKey
+     * @return bool
+     */
+    public function isValid($token, $publicKey)
+    {
+        /** @var SimpleJWS $jws */
+        $jws = SimpleJWS::load($token);
+
+        return $jws->isValid($publicKey);
+    }
 }
