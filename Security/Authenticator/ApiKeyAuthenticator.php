@@ -3,7 +3,7 @@
 namespace Mell\Bundle\SimpleDtoBundle\Security\Authenticator;
 
 use Doctrine\ORM\EntityManager;
-use Mell\Bundle\RestApiBundle\Services\Jwt\JwtManagerInterface;
+use Mell\Bundle\SimpleDtoBundle\Services\Jwt\JwtManagerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

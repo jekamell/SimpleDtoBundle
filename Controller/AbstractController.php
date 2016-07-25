@@ -3,9 +3,9 @@
 namespace Mell\Bundle\SimpleDtoBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
-use Mell\Bundle\RestApiBundle\Model\Dto;
-use Mell\Bundle\RestApiBundle\Model\DtoInterface;
-use Mell\Bundle\RestApiBundle\Event\ApiEvent;
+use Mell\Bundle\SimpleDtoBundle\Model\Dto;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
+use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -180,7 +180,7 @@ abstract class AbstractController extends Controller
     }
 
     /**
-     * @return \Mell\Bundle\RestApiBundle\Services\Dto\DtoManager|object
+     * @return \Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
      */
     protected function getDtoManager()
     {
