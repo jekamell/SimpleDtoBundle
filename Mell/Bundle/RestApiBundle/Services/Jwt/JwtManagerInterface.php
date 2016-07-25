@@ -21,4 +21,11 @@ interface JwtManagerInterface
      * @return array
      */
     public function encode($token, $publicKey);
+
+    /**
+     * @param string $token
+     * @param resource $publicKey
+     * @return bool
+     */
+    public function isValid($token, $publicKey);
 }
