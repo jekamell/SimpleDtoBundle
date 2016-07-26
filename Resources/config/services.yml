@@ -64,3 +64,5 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Services\Parser\ApiDocParser\DtoParser
         arguments:
             - "@simple_dto.dto_manager"
+        tags:
+            - { name: nelmio_api_doc.extractor.parser }

@@ -1,6 +1,9 @@
 <?php
 
 namespace Mell\Bundle\SimpleDtoBundle\Services\Parser\ApiDocParser;
+use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManagerInterface;
+use Nelmio\ApiDocBundle\DataTypes;
+use Nelmio\ApiDocBundle\Parser\ParserInterface;
 
 /**
  * Support metadata parsing from dto configuration
