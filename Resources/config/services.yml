@@ -59,3 +59,8 @@ services:
             - "@doctrine.orm.entity_manager"
             - "@simple_dto.jwt_manager"
             - "%simple_dto.jwt_public_path%"
+
+    simple_dto.doc.parser.dto_parser:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Parser\ApiDocParser\DtoParser
+        arguments:
+            - "@simple_dto.dto_manager"
