@@ -43,9 +43,10 @@ abstract class AbstractController extends Controller
             $this->getDtoType(),
             $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE
         );
-        $event = new ApiEvent($entity, 'create');
 
+        $event = new ApiEvent($entity, 'create');
         $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
+
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
@@ -85,9 +86,10 @@ abstract class AbstractController extends Controller
             $this->getDtoType(),
             $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE
         );
-        $event = new ApiEvent($entity, 'update');
 
+        $event = new ApiEvent($entity, 'update');
         $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
+
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
@@ -96,14 +98,7 @@ abstract class AbstractController extends Controller
         $this->getEventDispatcher()->dispatch('simple_dto.pre_flush', $event);
         $this->getEntityManager()->flush();
 
-        return $this->serializeResponse(
-            $this->getDtoManager()->createDto(
-                $entity,
-                $this->getDtoType(),
-                DtoInterface::DTO_GROUP_READ,
-                $this->getAllowedExpands()
-            )
-        );
+        return $this->readResource($entity);
     }
 
     /**
@@ -169,7 +164,7 @@ abstract class AbstractController extends Controller
     {
         if ($data instanceof ConstraintViolationListInterface) {
             // TODO: handle validation error
-            return new Response('', Response::HTTP_UNPROCESSABLE_ENTITY, ['Content-Type' => 'application/json']);
+            return new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY, ['Content-Type' => 'application/json']);
         }
 
         return new Response(
