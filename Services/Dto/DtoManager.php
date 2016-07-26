@@ -9,6 +9,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DtoManager
 {
@@ -109,6 +110,9 @@ class DtoManager
 
         $fieldsConfig = $dtoConfig[$dtoType]['fields'];
         foreach ($dto->getRawData() as $property => $value) {
+            if (!isset($fieldsConfig[$property])) {
+                throw new BadRequestHttpException(sprintf('%s: field "%s" is not defined', $dtoType, $property));
+            }
             if (!empty($fieldsConfig[$property]['readonly'])) {
                 continue;
             }
