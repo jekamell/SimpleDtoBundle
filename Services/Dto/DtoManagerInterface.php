@@ -44,8 +44,14 @@ interface DtoManagerInterface
     public function createEntityFromDto($entity, DtoInterface $dto, $dtoType, $group);
 
     /**
-     * @param string $config
+     * @param string $dtoType
      * @return bool
      */
-    public function hasConfig($config);
+    public function hasConfig($dtoType);
+
+    /**
+     * @param string $dtoType
+     * @return array
+     */
+    public function getConfig($dtoType);
 }

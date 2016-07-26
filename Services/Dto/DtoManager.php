@@ -3,6 +3,7 @@
 namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mell\Bundle\SimpleDtoBundle\Exceptions\DtoException;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
@@ -131,12 +132,26 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
-     * @param string $config DtoConfig name (UserDto as example)
+     * @param string $dtoType DtoConfig name (UserDto as example)
      * @return bool
      */
-    public function hasConfig($config)
+    public function hasConfig($dtoType)
     {
-        return array_key_exists($config, $this->dtoHelper->getDtoConfig());
+        return array_key_exists($dtoType, $this->dtoHelper->getDtoConfig());
+    }
+
+    /**
+     * @param string $dtoType
+     * @return mixed
+     * @throws DtoException
+     */
+    public function getConfig($dtoType)
+    {
+        if ($this->hasConfig($dtoType)) {
+            return $this->dtoHelper->getDtoConfig()[$dtoType];
+        }
+
+        throw new DtoException(sprintf('Dto config not found: %s', $dtoType));
     }
 
     /**
