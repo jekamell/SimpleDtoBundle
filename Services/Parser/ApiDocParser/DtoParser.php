@@ -53,14 +53,24 @@ class DtoParser implements ParserInterface
     {
         $data = [];
         foreach ($this->dtoManager->getConfig($item['class'])['fields'] as $field => $config) {
-            $data[$field] = [
-                'dataType' => $this->typeMap[$config['type']],
-                'required' => !empty($config['required']),
-                'description' => !empty($config['description']) ? $config['description'] : $field,
-                'readonly' => !empty($config['readonly'])
-            ];
+            $data[$field] = $this->getPropertyPayload($config, $field);
         }
 
         return $data;
+    }
+
+    /**
+     * @param array $config
+     * @param string $field
+     * @return array
+     */
+    public function getPropertyPayload(array $config, $field)
+    {
+        return [
+            'dataType' => $this->typeMap[$config['type']],
+            'required' => !empty($config['required']),
+            'description' => !empty($config['description']) ? $config['description'] : $field,
+            'readonly' => !empty($config['readonly'])
+        ];
     }
 }
