@@ -131,6 +131,15 @@ class DtoManager
     }
 
     /**
+     * @param string $config DtoConfig name (UserDto as example)
+     * @return bool
+     */
+    public function hasConfig($config)
+    {
+        return array_key_exists($config, $this->dtoHelper->getDtoConfig());
+    }
+
+    /**
      * @param $entity
      * @param array $dtoData Predefined dto data
      * @param array $fields Required fields
