@@ -2,7 +2,7 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
-class DtoCollection implements DtoInterface
+class DtoCollection implements DtoCollectionInterface
 {
     /** @var array */
     protected $data;

@@ -11,7 +11,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class DtoManager
+class DtoManager implements DtoManagerInterface
 {
     /** @var RequestManager */
     protected $requestManager;
