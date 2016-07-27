@@ -1,6 +1,6 @@
 <?php
 
-namespace Mell\Bundle\SimpleDtoBundle\Services\Parser\ApiDocParser;
+namespace Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManagerInterface;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
@@ -53,6 +53,9 @@ class DtoParser implements ParserInterface
     {
         $data = [];
         foreach ($this->dtoManager->getConfig($item['class'])['fields'] as $field => $config) {
+            if (!empty($config['groups']) && empty(array_intersect($item['groups'], $config['groups']))) {
+                continue;
+            }
             $data[$field] = $this->getPropertyPayload($config, $field);
         }
 
