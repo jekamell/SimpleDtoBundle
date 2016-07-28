@@ -14,11 +14,12 @@ parameters:
     simple_dto.jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
 
 services:
+    # DTO related services
     simple_dto.request_manager_configrator:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator
         arguments:
             - "%simple_dto.param_fields%"
-            - "%simple_dto.param_expands"
+            - "%simple_dto.param_expands%"
             - "%simple_dto.param_limit%"
             - "%simple_dto.param_offset%"
             - "%simple_dto.param_sort%"
@@ -56,6 +57,7 @@ services:
             - "@file_locator"
             - "%simple_dto.dto_config_path%"
 
+    # Security related services
     simple_dto.jwt_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Jwt\JwtManager
 
@@ -66,9 +68,17 @@ services:
             - "@simple_dto.jwt_manager"
             - "%simple_dto.jwt_public_path%"
 
+    # Api docs related services
     simple_dto.doc.parser.dto_parser:
         class: Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser
         arguments:
             - "@simple_dto.dto_manager"
         tags:
             - { name: nelmio_api_doc.extractor.parser }
+
+    simple_dto.doc.param_handler:
+        class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ParamsHandler
+        arguments:
+            - "@simple_dto.request_manager_configrator"
+        tags:
+            - { name: nelmio_api_doc.extractor.handler }
