@@ -40,6 +40,18 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param RequestStack $stack
+     * @param $expected
+     * @dataProvider getLimitProvider
+     * @group limit
+     */
+    public function testGetLimit(RequestStack $stack, $expected)
+    {
+        $manager = new RequestManager($stack, $this->getConfigurator());
+        $this->assertEquals($expected, $manager->getLimit());
+    }
+
+    /**
      * @return array
      */
     public function getFieldsProvider()
@@ -70,6 +82,16 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             [$this->createStack(null, 'foo,foo,foo'), ['foo']],
             [$this->createStack(null, 'foo, bar'), ['foo', 'bar']],
             [$this->createStack(null, 'foo, bar,    baz'), ['foo', 'bar', 'baz']],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getLimitProvider()
+    {
+        return [
+            [$this->createStack(), 0],
         ];
     }
 
