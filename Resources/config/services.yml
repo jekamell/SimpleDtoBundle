@@ -14,15 +14,21 @@ parameters:
     simple_dto.jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
 
 services:
-    simple_dto.request_manager:
-        class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager
+    simple_dto.request_manager_configrator:
+        class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator
         arguments:
-            - "@request_stack"
             - "%simple_dto.param_fields%"
-            - "%simple_dto.param_expands%"
+            - "%simple_dto.param_expands"
             - "%simple_dto.param_limit%"
             - "%simple_dto.param_offset%"
             - "%simple_dto.param_sort%"
+
+    simple_dto.request_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
+        arguments:
+            - "@request_stack"
+            - "@simple_dto.request_manager_configrator"
+
 
     simple_dto.dto_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager

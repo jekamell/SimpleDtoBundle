@@ -63,7 +63,8 @@ abstract class AbstractController extends Controller
                 $entity,
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->getAllowedExpands()
+                $this->get('simple_dto.request_manager')->getFields(),
+                array_intersect($this->get('simple_dto.request_manager')->getExpands(), $this->getAllowedExpands())
             )
         );
     }

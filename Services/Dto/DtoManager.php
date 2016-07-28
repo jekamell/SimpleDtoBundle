@@ -9,7 +9,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
-use Mell\Bundle\SimpleDtoBundle\Services\RequestManager;
+use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DtoManager implements DtoManagerInterface
@@ -161,7 +161,8 @@ class DtoManager implements DtoManagerInterface
      * @param array $config Fields configuration
      * @param string $group Dto group
      */
-    protected function processFields($entity,array &$dtoData, array $fields, array $config, $group) {
+    protected function processFields($entity,array &$dtoData, array $fields, array $config, $group)
+    {
         /** @var array $options */
         foreach ($config as $field => $options) {
             // field was not required (@see dtoManager::getRequiredFields)
