@@ -7,6 +7,12 @@ use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurat
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * TODO: test wrong sort direction format
+ *
+ * Class RequestManagerTest
+ * @package Mell\Bundle\SimpleDtoBundle\Tests\Services\RequestManager
+ */
 class RequestManagerTest extends \PHPUnit_Framework_TestCase
 {
     const PARAM_FIELDS = '_fields';
