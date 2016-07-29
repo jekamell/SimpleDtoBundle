@@ -5,8 +5,6 @@ namespace Mell\Bundle\SimpleDtoBundle\Model;
 class DtoManagerConfigurator
 {
     /** @var string */
-    protected $configPath;
-    /** @var string */
     protected $collectionKey;
     /** @var string */
     protected $formatDate;
@@ -15,33 +13,15 @@ class DtoManagerConfigurator
 
     /**
      * DtoConfigurator constructor.
-     * @param string $configPath
      * @param string $collectionKey
      * @param string $formatDate
      * @param string $formatDateTime
      */
-    public function __construct($configPath, $collectionKey, $formatDate, $formatDateTime)
+    public function __construct($collectionKey, $formatDate, $formatDateTime)
     {
-        $this->configPath = $configPath;
         $this->collectionKey = $collectionKey;
         $this->formatDate = $formatDate;
         $this->formatDateTime = $formatDateTime;
-    }
-
-    /**
-     * @return string
-     */
-    public function getConfigPath()
-    {
-        return $this->configPath;
-    }
-
-    /**
-     * @param string $configPath
-     */
-    public function setConfigPath($configPath)
-    {
-        $this->configPath = $configPath;
     }
 
     /**

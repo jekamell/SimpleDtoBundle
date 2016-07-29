@@ -45,7 +45,6 @@ services:
     simple_dto.dto_manager_configurator:
         class: Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator
         arguments:
-            - "%simple_dto.dto_config_path%"
             - "%simple_dto.collection_key%"
             - "%simple_dto.date_format%"
             - "%simple_dto.date_time_format%"
