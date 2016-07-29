@@ -52,6 +52,19 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param RequestStack $stack
+     * @param $expected
+     * @dataProvider getOffsetProvider
+     * @group offset
+     */
+    public function testGetOffset(RequestStack $stack, $expected)
+    {
+        $manager = new RequestManager($stack, $this->getConfigurator());
+        $this->assertEquals($expected, $manager->getOffset());
+    }
+
+
+    /**
      * @return array
      */
     public function getFieldsProvider()
@@ -92,6 +105,24 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [$this->createStack(), 0],
+            [$this->createStack(null, null, 100), 100],
+            [$this->createStack(null, null, "100"), 0],
+            [$this->createStack(null, null, "foo"), 0],
+            [$this->createStack(null, null, "100foo"), 0],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getOffsetProvider()
+    {
+        return [
+            [$this->createStack(), 0],
+            [$this->createStack(null, null, null, 100), 100],
+            [$this->createStack(null, null, null, "100"), 0],
+            [$this->createStack(null, null, null, "foo"), 0],
+            [$this->createStack(null, null, null, "100foo"), 0],
         ];
     }
 
