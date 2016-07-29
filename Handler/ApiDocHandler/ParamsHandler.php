@@ -32,7 +32,7 @@ class ParamsHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
+        if (!in_array(Request::METHOD_GET, $route->getMethods())) {
             return;
         }
 
