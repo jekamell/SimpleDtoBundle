@@ -106,13 +106,14 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [$this->createStack(), []],
-            [$this->createStack(null, 'foo'), ['foo']], // _expands=foo
-            [$this->createStack(null, 'foo,bar'), ['foo', 'bar']],
-            [$this->createStack(null, 'foo,bar,foo'), ['foo', 'bar']],
-            [$this->createStack(null, 'foo,bar,baz'), ['foo', 'bar', 'baz']],
-            [$this->createStack(null, 'foo,foo,foo'), ['foo']],
-            [$this->createStack(null, 'foo, bar'), ['foo', 'bar']],
-            [$this->createStack(null, 'foo, bar,    baz'), ['foo', 'bar', 'baz']],
+            [$this->createStack(null, 'foo'), ['foo' => []]], // _expands=foo
+            [$this->createStack(null, 'foo,bar'), ['foo' => [], 'bar' => []]],
+            [$this->createStack(null, 'foo,bar,foo'), ['foo' => [], 'bar' => []]],
+            [$this->createStack(null, 'foo,bar,baz'), ['foo' => [], 'bar' => [], 'baz' => []]],
+            [$this->createStack(null, 'foo,foo,foo'), ['foo' => []]],
+            [$this->createStack(null, 'foo, bar'), ['foo' => [], 'bar' => []]],
+            [$this->createStack(null, 'foo, bar,    baz'), ['foo' => [], 'bar' => [], 'baz' => []]],
+            // expands with fields
         ];
     }
 

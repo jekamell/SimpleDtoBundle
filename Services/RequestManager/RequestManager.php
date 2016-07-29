@@ -55,7 +55,13 @@ class RequestManager
     public function getExpands()
     {
         if ($expandsStr = $this->request->get($this->requestManagerConfiguration->getExpandsParam())) {
-            return array_unique(array_map('trim', explode(',', $expandsStr)));
+
+            $expands = [];
+            foreach (array_unique(array_map('trim', explode(',', $expandsStr))) as $expand) {
+                $expands[$expand] = [];
+            }
+
+            return $expands;
         }
 
         return [];
