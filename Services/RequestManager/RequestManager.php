@@ -53,7 +53,8 @@ class RequestManager
      */
     public function getLimit()
     {
-        return $this->request->get($this->requestManagerConfiguration->getLimitParam(), 0);
+        $limit = $this->request->get($this->requestManagerConfiguration->getLimitParam(), 0);
+        return is_int($limit) ? $limit : 0;
     }
 
     /**
@@ -61,7 +62,8 @@ class RequestManager
      */
     public function getOffset()
     {
-        return $this->request->get($this->requestManagerConfiguration->getOffsetParam(), 0);
+        $offset = $this->request->get($this->requestManagerConfiguration->getOffsetParam(), 0);
+        return is_int($offset) ? $offset : 0;
     }
 
     /**
