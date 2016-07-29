@@ -14,8 +14,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DtoManager implements DtoManagerInterface
 {
-    /** @var RequestManager */
-    protected $requestManager;
     /** @var DtoValidator */
     protected $dtoValidator;
     /** @var DtoHelper */
@@ -25,18 +23,15 @@ class DtoManager implements DtoManagerInterface
 
     /**
      * DtoManager constructor.
-     * @param RequestManager $requestManager
      * @param DtoValidator $dtoValidator
      * @param DtoHelper $dtoHelper
      * @param DtoManagerConfigurator $configurator
      */
     public function __construct(
-        RequestManager $requestManager,
         DtoValidator $dtoValidator,
         DtoHelper $dtoHelper,
         DtoManagerConfigurator $configurator
     ) {
-        $this->requestManager = $requestManager;
         $this->dtoValidator = $dtoValidator;
         $this->dtoHelper = $dtoHelper;
         $this->configurator = $configurator;
@@ -81,7 +76,8 @@ class DtoManager implements DtoManagerInterface
      */
     public function createDtoCollection(
         array $collection,
-        $dtoType, $group,
+        $dtoType,
+        $group,
         array $fields = [],
         array $expands = [],
         $collectionKey = null
@@ -123,7 +119,7 @@ class DtoManager implements DtoManagerInterface
             $value = $this->castValueType($fieldsConfig[$property]['type'], $value, false);
             $setter = isset($fieldsConfig[$property]['setter'])
                 ? $fieldsConfig[$property]['setter']
-                :  $this->dtoHelper->getFieldSetter($property);
+                : $this->dtoHelper->getFieldSetter($property);
 
             call_user_func([$entity, $setter], $value);
         }
@@ -161,7 +157,7 @@ class DtoManager implements DtoManagerInterface
      * @param array $config Fields configuration
      * @param string $group Dto group
      */
-    protected function processFields($entity,array &$dtoData, array $fields, array $config, $group)
+    protected function processFields($entity, array &$dtoData, array $fields, array $config, $group)
     {
         /** @var array $options */
         foreach ($config as $field => $options) {
@@ -199,7 +195,12 @@ class DtoManager implements DtoManagerInterface
                 continue;
             }
             if (is_array($expandObject) || $expandObject instanceof ArrayCollection) {
-                $dtoData['_expands'][$expand] = $this->createDtoCollection($expandObject, $expandConfig['type'], $group, []);
+                $dtoData['_expands'][$expand] = $this->createDtoCollection(
+                    $expandObject,
+                    $expandConfig['type'],
+                    $group,
+                    []
+                );
             } else {
                 $dtoData['_expands'][$expand] = $this->createDto($expandObject, $expandConfig['type'], $group, []);
             }
@@ -238,6 +239,7 @@ class DtoManager implements DtoManagerInterface
     /**
      * @param string $type
      * @param mixed $value
+     * @param bool $raw
      * @return mixed
      */
     protected function castValueType($type, $value, $raw = true)

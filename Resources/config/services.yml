@@ -34,7 +34,6 @@ services:
     simple_dto.dto_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
         arguments:
-            - "@simple_dto.request_manager"
             - "@simple_dto.dto_validator"
             - "@simple_dto.dto_helper"
             - "@simple_dto.dto_manager_configurator"
