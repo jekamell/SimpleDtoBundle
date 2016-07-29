@@ -4,9 +4,14 @@ namespace Mell\Bundle\SimpleDtoBundle\Services\RequestManager;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class RequestManager
 {
+    const SORT_DIRECTION_DEFAULT = self::SORT_DIRECTION_ACS;
+    const SORT_DIRECTION_ACS = 'asc';
+    const SORT_DIRECTION_DESC = 'desc';
+
     /** @var Request */
     protected $request;
     /** @var RequestManagerConfigurator */
@@ -22,6 +27,14 @@ class RequestManager
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->requestManagerConfiguration = $requestManagerConfiguration;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAllowedSortDirections()
+    {
+        return [self::SORT_DIRECTION_ACS, self::SORT_DIRECTION_DESC];
     }
 
     /**
@@ -72,9 +85,37 @@ class RequestManager
     public function getSort()
     {
         if ($sortStr = $this->request->get($this->requestManagerConfiguration->getSortParam())) {
-            return array_unique(array_map('trim', explode(',', $sortStr)));
+            $sortParts = array_unique(array_map('trim', explode(',', $sortStr)));
+            $sort = [];
+            foreach ($sortParts as $sortItem) {
+                $itemParts = explode('.', $sortItem);
+                if (count($itemParts) === 1) {
+                    $sort[$itemParts[0]] = self::SORT_DIRECTION_DEFAULT;
+                } else {
+                    $this->validateDirection($itemParts[1]);
+                    $sort[$itemParts[0]] = $itemParts[1];
+                }
+            }
+
+            return $sort;
         }
 
         return [];
+    }
+
+    /**
+     * @param $direction
+     */
+    private function validateDirection($direction)
+    {
+        if (!in_array($direction, static::getAllowedSortDirections())) {
+            throw new BadRequestHttpException(
+                sprintf(
+                    'Direction should be one of: %s. "%s" given',
+                    implode(',', static::getAllowedSortDirections()),
+                    $direction
+                )
+            );
+        }
     }
 }
