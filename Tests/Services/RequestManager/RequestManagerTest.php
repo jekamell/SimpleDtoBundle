@@ -63,6 +63,18 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $manager->getOffset());
     }
 
+    /**
+     * @param RequestStack $stack
+     * @param $expected
+     * @dataProvider getSortProvider
+     * @group sort
+     */
+    public function testGetSort(RequestStack $stack, $expected)
+    {
+        $manager = new RequestManager($stack, $this->getConfigurator());
+        $this->assertEquals($expected, $manager->getSort());
+    }
+
 
     /**
      * @return array
@@ -105,7 +117,7 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [$this->createStack(), 0],
-            [$this->createStack(null, null, 100), 100],
+            [$this->createStack(null, null, 100), 100], // _limit=100
             [$this->createStack(null, null, "100"), 0],
             [$this->createStack(null, null, "foo"), 0],
             [$this->createStack(null, null, "100foo"), 0],
@@ -119,10 +131,25 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [$this->createStack(), 0],
-            [$this->createStack(null, null, null, 100), 100],
+            [$this->createStack(null, null, null, 100), 100], // _offset=100
             [$this->createStack(null, null, null, "100"), 0],
             [$this->createStack(null, null, null, "foo"), 0],
             [$this->createStack(null, null, null, "100foo"), 0],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getSortProvider()
+    {
+        return [
+            [$this->createStack(), []],
+            [$this->createStack(null, null, null, null, 'title'), ['title' => 'asc']], // _sort=title
+            [$this->createStack(null, null, null, null, 'title.asc'), ['title' => 'asc']],
+            [$this->createStack(null, null, null, null, 'title.asc,slug.desc'), ['title' => 'asc', 'slug' => 'desc']],
+            [$this->createStack(null, null, null, null, 'title.asc, title.desc'), ['title' => 'desc']],
+            [$this->createStack(null, null, null, null, 'title.desc, title'), ['title' => 'asc']],
         ];
     }
 
