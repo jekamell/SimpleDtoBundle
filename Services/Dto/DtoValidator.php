@@ -23,7 +23,7 @@ class DtoValidator
     }
 
     /**
-     * TODO: description
+     * Validate dto configuration and passed data
      *
      * @param DtoInterface $dto
      * @param $config
@@ -33,7 +33,6 @@ class DtoValidator
     {
         $this->validateDtoExist($config, $dtoType);
         $this->validateDtoFields($dto, $config[$dtoType], $dtoType);
-
     }
 
     /**
@@ -65,7 +64,7 @@ class DtoValidator
     }
 
     /**
-     * TODO: description
+     * Validate passed data
      *
      * @param DtoInterface $dto
      * @param array $config
@@ -128,7 +127,8 @@ class DtoValidator
                 throw new DtoException(
                     sprintf(
                         '%s: Unsupported field type: %s. User one of: %s',
-                        $type, $options['type'],
+                        $type,
+                        $options['type'],
                         implode(',', Dto::getAvailableTypes())
                     )
                 );
