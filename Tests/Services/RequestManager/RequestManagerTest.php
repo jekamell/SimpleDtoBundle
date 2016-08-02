@@ -114,6 +114,21 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             [$this->createStack(null, 'foo, bar'), ['foo' => [], 'bar' => []]],
             [$this->createStack(null, 'foo, bar,    baz'), ['foo' => [], 'bar' => [], 'baz' => []]],
             // expands with fields
+            [$this->createStack(
+                null,
+                'foo(f1,f2,f3),bar,baz(q1,a2,z3)'),
+                ['foo' => ['f1', 'f2', 'f3'], 'bar' => [], 'baz' => ['q1', 'a2', 'z3']]
+            ],
+            [$this->createStack(
+                null,
+                'foo,bar(field1,field2,field3),baz'),
+                ['foo' => [], 'bar' => ['field1','field2','field3'], 'baz' => []]
+            ],
+            [$this->createStack(
+                null,
+                'foo,bar(field1,field2,field3),baz(foo,bar,baz)'),
+                ['foo' => [], 'bar' => ['field1','field2','field3'], 'baz' => ['foo', 'bar', 'baz']]
+            ],
         ];
     }
 
