@@ -55,9 +55,15 @@ class RequestManager
     public function getExpands()
     {
         if ($expandsStr = $this->request->get($this->requestManagerConfiguration->getExpandsParam())) {
+            preg_match_all(
+                '~(?P<expand>\w+)(?P<fields>\(.*?\))?~x',
+                str_replace(' ', '', $expandsStr),
+                $result,
+                PREG_SET_ORDER
+            );
             $expands = [];
-            foreach (array_unique(array_map('trim', explode(',', $expandsStr))) as $expand) {
-                $expands[$expand] = [];
+            foreach ($result as $item) {
+                $expands[$item['expand']] = isset($item['fields']) ? explode(',', trim($item['fields'], '()')) : [];
             }
 
             return $expands;
