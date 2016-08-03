@@ -44,7 +44,7 @@ abstract class AbstractController extends Controller
             $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE
         );
 
-        $event = new ApiEvent($entity, 'create');
+        $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
         $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
 
         $errors = $this->get('validator')->validate($entity);
@@ -88,7 +88,7 @@ abstract class AbstractController extends Controller
             $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE
         );
 
-        $event = new ApiEvent($entity, 'update');
+        $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
         $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
 
         $errors = $this->get('validator')->validate($entity);

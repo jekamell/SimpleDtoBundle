@@ -6,6 +6,11 @@ use Symfony\Component\EventDispatcher\Event;
 
 class ApiEvent extends Event
 {
+    const ACTION_CREATE = 'create';
+    const ACTION_UPDATE = 'update';
+    const ACTION_READ = 'read';
+    const ACTION_DELETE = 'delete';
+
     /** @var array */
     protected $data;
     /** @var string */
