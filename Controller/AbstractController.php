@@ -62,7 +62,10 @@ abstract class AbstractController extends Controller
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
                 $this->get('simple_dto.request_manager')->getFields(),
-                array_intersect($this->get('simple_dto.request_manager')->getExpands(), $this->getAllowedExpands())
+                array_intersect_key(
+                    $this->get('simple_dto.request_manager')->getExpands(),
+                    array_flip($this->getAllowedExpands())
+                )
             )
         );
     }
@@ -113,7 +116,10 @@ abstract class AbstractController extends Controller
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
                 $this->get('simple_dto.request_manager')->getFields(),
-                array_intersect($this->get('simple_dto.request_manager')->getExpands(), $this->getAllowedExpands())
+                array_intersect_key(
+                    $this->get('simple_dto.request_manager')->getExpands(),
+                    array_flip($this->getAllowedExpands())
+                )
             )
         );
     }
@@ -147,7 +153,10 @@ abstract class AbstractController extends Controller
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
                 $this->get('simple_dto.request_manager')->getFields(),
-                array_intersect($this->get('simple_dto.request_manager')->getExpands(), $this->getAllowedExpands())
+                array_intersect_key(
+                    $this->get('simple_dto.request_manager')->getExpands(),
+                    array_flip($this->getAllowedExpands())
+                )
             )
         );
     }
