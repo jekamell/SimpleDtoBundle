@@ -17,13 +17,11 @@ abstract class AbstractController extends Controller
     const FORMAT_JSON = 'json';
 
     /** @return string */
-    protected abstract function getDtoType();
-
+    abstract protected function getDtoType();
     /** @return string */
-    protected abstract function getEntityAlias();
-
+    abstract protected function getEntityAlias();
     /** @return array */
-    protected abstract function getAllowedExpands();
+    abstract protected function getAllowedExpands();
 
     /**
      * @param Request $request
@@ -118,6 +116,22 @@ abstract class AbstractController extends Controller
                 array_intersect($this->get('simple_dto.request_manager')->getExpands(), $this->getAllowedExpands())
             )
         );
+    }
+
+    /**
+     * @param $entity
+     * @return Response
+     */
+    protected function deleteResource($entity)
+    {
+        $this->getEntityManager()->remove($entity);
+
+        $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
+        $this->getEventDispatcher()->dispatch('simple_dto.pre_flush', $event);
+
+        $this->getEntityManager()->flush();
+
+        return new Response('', Response::HTTP_NO_CONTENT, ['Content-Type' => 'application/json']);
     }
 
     /**
