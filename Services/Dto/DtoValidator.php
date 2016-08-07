@@ -2,6 +2,7 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 
+use ArrayAccess;
 use Mell\Bundle\SimpleDtoBundle\Exceptions\DtoException;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
@@ -53,7 +54,7 @@ class DtoValidator
      */
     public function validateExpands(array $config, array $expands)
     {
-        foreach ($expands as $expand) {
+        foreach ($expands as $expand => $fields) {
             if (!array_key_exists($expand, $config)) {
                 throw new BadRequestHttpException(sprintf('Invalid expands required: %s', $expand));
             }
@@ -102,6 +103,10 @@ class DtoValidator
     {
         if (empty($config['fields'])) {
             throw new DtoException(sprintf('Fields definition not found: %s', $type));
+        }
+
+        if (is_array($object) || $object instanceof ArrayAccess) {
+            $object = $object[0];
         }
 
         foreach ($config['fields'] as $field => $options) {
