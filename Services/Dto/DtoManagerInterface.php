@@ -27,7 +27,7 @@ interface DtoManagerInterface
      * @return DtoCollectionInterface
      */
     public function createDtoCollection(
-        array $collection,
+        $collection,
         $dtoType, $group,
         array $fields = [],
         array $expands = [],

@@ -74,7 +74,7 @@ class DtoManager implements DtoManagerInterface
      * @return DtoInterface
      */
     public function createDtoCollection(
-        array $collection,
+        $collection,
         $dtoType,
         $group,
         array $fields = [],
@@ -185,7 +185,7 @@ class DtoManager implements DtoManagerInterface
     protected function processExpands($entity, array &$dtoData, array $expands, array $config, $group)
     {
         $this->validateExpands($config, $expands);
-        foreach ($expands as $expand) {
+        foreach ($expands as $expand => $fields) {
             $expandConfig = $config[$expand];
             $expandGetter = !empty($expandConfig['getter'])
                 ? $expandConfig['getter']
@@ -193,12 +193,14 @@ class DtoManager implements DtoManagerInterface
             if (!$expandObject = call_user_func([$entity, $expandGetter])) {
                 continue;
             }
-            if (is_array($expandObject) || $expandObject instanceof ArrayCollection) {
+            if (is_array($expandObject) || $expandObject instanceof \ArrayAccess) {
                 $dtoData['_expands'][$expand] = $this->createDtoCollection(
                     $expandObject,
                     $expandConfig['type'],
                     $group,
-                    []
+                    $fields,
+                    [],
+                    false // do not add collection key
                 );
             } else {
                 $dtoData['_expands'][$expand] = $this->createDto($expandObject, $expandConfig['type'], $group, []);
