@@ -203,7 +203,7 @@ class DtoManager implements DtoManagerInterface
                     false // do not add collection key
                 );
             } else {
-                $dtoData['_expands'][$expand] = $this->createDto($expandObject, $expandConfig['type'], $group, []);
+                $dtoData['_expands'][$expand] = $this->createDto($expandObject, $expandConfig['type'], $group, $fields);
             }
         }
     }
