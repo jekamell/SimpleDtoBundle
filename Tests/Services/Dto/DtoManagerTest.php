@@ -38,122 +38,122 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
 
         return [
             // test common dto fields
-            [
-                $this->generateUser(['email' => 'mail@email.com']),
-                'UserDto',
-                'read',
-                [],
-                [],
-                new Dto(
-                    [
-                        'id' => 0,
-                        'addressId' => 0,
-                        'firstname' => '',
-                        'lastname' => '',
-                        'active' => true,
-                        'roles' => [],
-                        'email' => 'mail@email.com',
-                    ]
-                )
-            ],
-            [
-                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                'UserDto',
-                'read',
-                [],
-                [],
-                new Dto(
-                    [
-                        'id' => 1,
-                        'addressId' => 1,
-                        'firstname' => 'Ivan',
-                        'lastname' => 'Ivanov',
-                        'active' => true,
-                        'roles' => [],
-                        'email' => 'mail@email.com',
-                    ]
-                )
-            ],
+//            [
+//                $this->generateUser(['email' => 'mail@email.com']),
+//                'UserDto',
+//                'read',
+//                [],
+//                [],
+//                new Dto(
+//                    [
+//                        'id' => 0,
+//                        'addressId' => 0,
+//                        'firstname' => '',
+//                        'lastname' => '',
+//                        'active' => true,
+//                        'roles' => [],
+//                        'email' => 'mail@email.com',
+//                    ]
+//                )
+//            ],
+//            [
+//                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
+//                'UserDto',
+//                'read',
+//                [],
+//                [],
+//                new Dto(
+//                    [
+//                        'id' => 1,
+//                        'addressId' => 1,
+//                        'firstname' => 'Ivan',
+//                        'lastname' => 'Ivanov',
+//                        'active' => true,
+//                        'roles' => [],
+//                        'email' => 'mail@email.com',
+//                    ]
+//                )
+//            ],
             // test groups
-            [
-                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                'UserDto',
-                'create',
-                [],
-                [],
-                new Dto(
-                    [
-                        'id' => 1,
-                        'addressId' => 1,
-                        'firstname' => 'Ivan',
-                        'lastname' => 'Ivanov',
-                        'password' => 'password',
-                        'active' => true,
-                        'roles' => [],
-                        'email' => 'mail@email.com',
-                    ]
-                )
-            ],
-            [
-                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                'UserDto',
-                'update',
-                [],
-                [],
-                new Dto(
-                    [
-                        'id' => 1,
-                        'addressId' => 1,
-                        'firstname' => 'Ivan',
-                        'lastname' => 'Ivanov',
-                        'password' => 'password',
-                        'active' => true,
-                        'roles' => [],
-                        'email' => 'mail@email.com',
-                    ]
-                )
-            ],
+//            [
+//                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
+//                'UserDto',
+//                'create',
+//                [],
+//                [],
+//                new Dto(
+//                    [
+//                        'id' => 1,
+//                        'addressId' => 1,
+//                        'firstname' => 'Ivan',
+//                        'lastname' => 'Ivanov',
+//                        'password' => 'password',
+//                        'active' => true,
+//                        'roles' => [],
+//                        'email' => 'mail@email.com',
+//                    ]
+//                )
+//            ],
+//            [
+//                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
+//                'UserDto',
+//                'update',
+//                [],
+//                [],
+//                new Dto(
+//                    [
+//                        'id' => 1,
+//                        'addressId' => 1,
+//                        'firstname' => 'Ivan',
+//                        'lastname' => 'Ivanov',
+//                        'password' => 'password',
+//                        'active' => true,
+//                        'roles' => [],
+//                        'email' => 'mail@email.com',
+//                    ]
+//                )
+//            ],
             // test fields
-            [
-                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                'UserDto',
-                'read',
-                ['id', 'email'],
-                [],
-                new Dto(
-                    [
-                        'id' => 1,
-                        'email' => 'mail@email.com',
-                    ]
-                )
-            ],
-            [
-                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                'UserDto',
-                'read',
-                ['id', 'email', 'password'],
-                [],
-                new Dto(
-                    [
-                        'id' => 1,
-                        'email' => 'mail@email.com',
-                    ]
-                )
-            ],
-            [
-                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                'UserDto',
-                'create',
-                ['id', 'email', 'password'],
-                [],
-                new Dto(
-                    [
-                        'id' => 1,
-                        'email' => 'mail@email.com',
-                        'password' => 'password',
-                    ]
-                )
-            ],
+//            [
+//                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
+//                'UserDto',
+//                'read',
+//                ['id', 'email'],
+//                [],
+//                new Dto(
+//                    [
+//                        'id' => 1,
+//                        'email' => 'mail@email.com',
+//                    ]
+//                )
+//            ],
+//            [
+//                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
+//                'UserDto',
+//                'read',
+//                ['id', 'email', 'password'],
+//                [],
+//                new Dto(
+//                    [
+//                        'id' => 1,
+//                        'email' => 'mail@email.com',
+//                    ]
+//                )
+//            ],
+//            [
+//                $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
+//                'UserDto',
+//                'create',
+//                ['id', 'email', 'password'],
+//                [],
+//                new Dto(
+//                    [
+//                        'id' => 1,
+//                        'email' => 'mail@email.com',
+//                        'password' => 'password',
+//                    ]
+//                )
+//            ],
             // test expands
             [
                 $this->generateUser(
@@ -163,7 +163,7 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 'UserDto',
                 'create',
                 ['id'],
-                ['address'],
+                ['address' => []],
                 new Dto(
                     [
                         'id' => 1,
