@@ -115,6 +115,18 @@ class RequestManager
     }
 
     /**
+     * @return string
+     */
+    public function getLocale()
+    {
+        if ($localeStr = $this->request->get($this->requestManagerConfiguration->getLocaleParam())) {
+            return $localeStr;
+        }
+
+        return $this->request->headers->get($this->requestManagerConfiguration->getLocaleHeader());
+    }
+
+    /**
      * @param $direction
      */
     private function validateDirection($direction)

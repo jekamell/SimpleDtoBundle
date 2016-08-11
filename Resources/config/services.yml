@@ -4,6 +4,8 @@ parameters:
     simple_dto.param_limit: "_limit"
     simple_dto.param_offset: "_offset"
     simple_dto.param_sort: "_sort"
+    simple_dto.param_locale: "_locale"
+    simple_dto.header_locale: "Accept-Language"
 
     simple_dto.date_format: "Y-m-d"
     simple_dto.date_time_format: "c" # ISO 8601
@@ -23,6 +25,8 @@ services:
             - "%simple_dto.param_limit%"
             - "%simple_dto.param_offset%"
             - "%simple_dto.param_sort%"
+            - "%simple_dto.param_locale%"
+            - "%%simple_dto.header_locale%"
 
     simple_dto.request_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager

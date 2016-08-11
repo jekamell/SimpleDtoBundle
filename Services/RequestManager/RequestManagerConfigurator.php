@@ -14,6 +14,10 @@ class RequestManagerConfigurator
     protected $offsetParam;
     /** @var string */
     protected $sortParam;
+    /** @var string */
+    protected $localeHeader;
+    /** @var string */
+    protected $localeParam;
 
     /**
      * RequestManagerConfiguration constructor.
@@ -22,14 +26,25 @@ class RequestManagerConfigurator
      * @param string $limitParam
      * @param string $offsetParam
      * @param string $sortParam
+     * @param string $localeHeader
+     * @param string $localeParam
      */
-    public function __construct($fieldsParam, $expandsParam, $limitParam, $offsetParam, $sortParam)
-    {
+    public function __construct(
+        $fieldsParam,
+        $expandsParam,
+        $limitParam,
+        $offsetParam,
+        $sortParam,
+        $localeHeader,
+        $localeParam
+    ) {
         $this->fieldsParam = $fieldsParam;
         $this->expandsParam = $expandsParam;
         $this->limitParam = $limitParam;
         $this->offsetParam = $offsetParam;
         $this->sortParam = $sortParam;
+        $this->localeHeader = $localeHeader;
+        $this->localeParam = $localeParam;
     }
 
     /**
@@ -70,5 +85,37 @@ class RequestManagerConfigurator
     public function getSortParam()
     {
         return $this->sortParam;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocaleHeader()
+    {
+        return $this->localeHeader;
+    }
+
+    /**
+     * @param string $localeHeader
+     */
+    public function setLocaleHeader($localeHeader)
+    {
+        $this->localeHeader = $localeHeader;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocaleParam()
+    {
+        return $this->localeParam;
+    }
+
+    /**
+     * @param string $localeParam
+     */
+    public function setLocaleParam($localeParam)
+    {
+        $this->localeParam = $localeParam;
     }
 }
