@@ -20,6 +20,8 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     const PARAM_LIMIT = '_limit';
     const PARAM_OFFSET = '_offset';
     const PARAM_SORT = '_sort';
+    const PARAM_LOCALE = '_locale';
+    const HEADER_LOCALE = 'Accept-Language';
 
     /**
      * @param RequestStack $stack
@@ -79,6 +81,18 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = new RequestManager($stack, $this->getConfigurator());
         $this->assertEquals($expected, $manager->getSort());
+    }
+
+    /**
+     * @param RequestStack $stack
+     * @param $expected
+     * @dataProvider getLocaleProvider
+     * @group locale
+     */
+    public function testGetLocale(RequestStack $stack, $expected)
+    {
+        $manager = new RequestManager($stack, $this->getConfigurator());
+        $this->assertEquals($expected, $manager->getLocale());
     }
 
 
@@ -176,6 +190,21 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return array
+     */
+    public function getLocaleProvider()
+    {
+        return [
+            [$this->createStack(), null],
+            [$this->createStack(null, null, null, null, null, 'en_US'), 'en_US'],
+            [$this->createStack(null, null, null, null, null, 'en_GB'), 'en_GB'],
+            [$this->createStack(null, null, null, null, null, 'ru_RU'), 'ru_RU'],
+            [$this->createStack(null, null, null, null, null, 'en_US', 'en_US'), 'en_US'],
+            [$this->createStack(null, null, null, null, null, 'en_US', 'ru_RU'), 'en_US'],
+        ];
+    }
+
+    /**
      * @return RequestManagerConfigurator
      */
     private function getConfigurator()
@@ -185,7 +214,9 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             self::PARAM_EXPANDS,
             self::PARAM_LIMIT,
             self::PARAM_OFFSET,
-            self::PARAM_SORT
+            self::PARAM_SORT,
+            self::HEADER_LOCALE,
+            self::PARAM_LOCALE
         );
     }
 
@@ -195,6 +226,8 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
      * @param string|null $limitStr
      * @param string|null $offsetStr
      * @param string|null $sortStr
+     * @param string|null $localeStr
+     * @param string|null $localeHeader
      * @return RequestStack
      */
     private function createStack(
@@ -202,7 +235,9 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
         $expandsStr = null,
         $limitStr = null,
         $offsetStr = null,
-        $sortStr = null
+        $sortStr = null,
+        $localeStr = null,
+        $localeHeader = null
     ) {
         $query = [
             self::PARAM_FIELDS => $fieldsStr,
@@ -210,9 +245,12 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             self::PARAM_LIMIT => $limitStr,
             self::PARAM_OFFSET => $offsetStr,
             self::PARAM_SORT => $sortStr,
+            self::PARAM_LOCALE => $localeStr,
         ];
         $request = new Request(array_filter($query, function ($v) { return !empty($v); }));
-
+        if ($localeHeader) {
+            $request->headers->add([self::HEADER_LOCALE => $localeHeader]);
+        }
 
         $stack = $this->createMock(RequestStack::class);
         $stack->method('getCurrentRequest')->willReturn($request);
