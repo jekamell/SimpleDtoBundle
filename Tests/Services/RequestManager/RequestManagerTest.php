@@ -197,10 +197,13 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [$this->createStack(), null],
             [$this->createStack(null, null, null, null, null, 'en_US'), 'en_US'],
+            [$this->createStack(null, null, null, null, null, null, [self::HEADER_LOCALE => 'en_US']), 'en_US'],
             [$this->createStack(null, null, null, null, null, 'en_GB'), 'en_GB'],
             [$this->createStack(null, null, null, null, null, 'ru_RU'), 'ru_RU'],
-            [$this->createStack(null, null, null, null, null, 'en_US', 'en_US'), 'en_US'],
-            [$this->createStack(null, null, null, null, null, 'en_US', 'ru_RU'), 'en_US'],
+            [$this->createStack(null, null, null, null, null, 'en_US', [self::HEADER_LOCALE => 'en_US']), 'en_US'],
+            [$this->createStack(null, null, null, null, null, 'en_US', [self::HEADER_LOCALE => 'ru_RU']), 'en_US'],
+            [$this->createStack(null, null, null, null, null, 'en_US', [self::HEADER_LOCALE => 'ru_RU']), 'en_US'],
+            [$this->createStack(null, null, null, null, null, null, ['accept-language' => ['ru_RU','en_US']]), 'ru_RU'],
         ];
     }
 
@@ -215,8 +218,8 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             self::PARAM_LIMIT,
             self::PARAM_OFFSET,
             self::PARAM_SORT,
-            self::HEADER_LOCALE,
-            self::PARAM_LOCALE
+            self::PARAM_LOCALE,
+            self::HEADER_LOCALE
         );
     }
 
@@ -227,7 +230,7 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
      * @param string|null $offsetStr
      * @param string|null $sortStr
      * @param string|null $localeStr
-     * @param string|null $localeHeader
+     * @param array $headers
      * @return RequestStack
      */
     private function createStack(
@@ -237,7 +240,7 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
         $offsetStr = null,
         $sortStr = null,
         $localeStr = null,
-        $localeHeader = null
+        array $headers = null
     ) {
         $query = [
             self::PARAM_FIELDS => $fieldsStr,
@@ -248,8 +251,10 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             self::PARAM_LOCALE => $localeStr,
         ];
         $request = new Request(array_filter($query, function ($v) { return !empty($v); }));
-        if ($localeHeader) {
-            $request->headers->add([self::HEADER_LOCALE => $localeHeader]);
+        if ($headers) {
+            foreach ($headers as $header => $value) {
+                $request->headers->set($header, $value);
+            }
         }
 
         $stack = $this->createMock(RequestStack::class);

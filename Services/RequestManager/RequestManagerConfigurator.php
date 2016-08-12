@@ -26,8 +26,8 @@ class RequestManagerConfigurator
      * @param string $limitParam
      * @param string $offsetParam
      * @param string $sortParam
+     * * @param string $localeParam
      * @param string $localeHeader
-     * @param string $localeParam
      */
     public function __construct(
         $fieldsParam,
@@ -35,8 +35,8 @@ class RequestManagerConfigurator
         $limitParam,
         $offsetParam,
         $sortParam,
-        $localeHeader,
-        $localeParam
+        $localeParam,
+        $localeHeader
     ) {
         $this->fieldsParam = $fieldsParam;
         $this->expandsParam = $expandsParam;
