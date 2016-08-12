@@ -26,7 +26,7 @@ services:
             - "%simple_dto.param_offset%"
             - "%simple_dto.param_sort%"
             - "%simple_dto.param_locale%"
-            - "%%simple_dto.header_locale%"
+            - "%simple_dto.header_locale%"
 
     simple_dto.request_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
