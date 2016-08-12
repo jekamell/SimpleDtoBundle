@@ -2,24 +2,36 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
+use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 abstract class AbstractController extends Controller
 {
     const FORMAT_JSON = 'json';
+    const EVENT_PRE_VALIDATE = 'simple_dto.pre_validate';
+    const EVENT_PRE_PERSIST = 'simple_dto.pre_persist';
+    const EVENT_PRE_FLUSH = 'simple_dto.pre_flush';
+    const EVENT_POST_READ = 'simple_dto.post_read';
+    const EVENT_PRE_COLLECTION_LOAD = 'simple_dto.pre_collection_load';
+    const EVENT_POST_COLLECTION_LOAD = 'simple_dto.post_collection_load';
 
     /** @return string */
     abstract protected function getDtoType();
+
     /** @return string */
     abstract protected function getEntityAlias();
+
     /** @return array */
     abstract protected function getAllowedExpands();
 
@@ -43,17 +55,17 @@ abstract class AbstractController extends Controller
         );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
-        $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
+        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        $this->getEventDispatcher()->dispatch('simple_dto.pre_persist', $event);
+        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_PERSIST, $event);
         $this->getEntityManager()->persist($entity);
 
-        $this->getEventDispatcher()->dispatch('simple_dto.pre_flush', $event);
+        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_FLUSH, $event);
         $this->getEntityManager()->flush();
 
         return $this->serializeResponse(
@@ -90,14 +102,14 @@ abstract class AbstractController extends Controller
         );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
-        $this->getEventDispatcher()->dispatch('simple_dto.pre_validate', $event);
+        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        $this->getEventDispatcher()->dispatch('simple_dto.pre_flush', $event);
+        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_FLUSH, $event);
         $this->getEntityManager()->flush();
 
         return $this->readResource($entity);
@@ -110,6 +122,9 @@ abstract class AbstractController extends Controller
      */
     protected function readResource($entity, $dtoGroup = null)
     {
+        $event = new ApiEvent($entity, ApiEvent::ACTION_READ);
+        $this->getEventDispatcher()->dispatch(self::EVENT_POST_READ, $event);
+
         return $this->serializeResponse(
             $this->getDtoManager()->createDto(
                 $entity,
@@ -133,7 +148,7 @@ abstract class AbstractController extends Controller
         $this->getEntityManager()->remove($entity);
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
-        $this->getEventDispatcher()->dispatch('simple_dto.pre_flush', $event);
+        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_FLUSH, $event);
 
         $this->getEntityManager()->flush();
 
@@ -147,9 +162,17 @@ abstract class AbstractController extends Controller
      */
     protected function listResources(QueryBuilder $queryBuilder, $dtoGroup = null)
     {
+        $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST);
+        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_COLLECTION_LOAD, $event);
+
+        $collection = $queryBuilder->getQuery()->getResult();
+
+        $event = new ApiEvent($collection, ApiEvent::ACTION_LIST);
+        $this->getEventDispatcher()->dispatch(self::EVENT_POST_COLLECTION_LOAD, $event);
+
         return $this->serializeResponse(
             $this->getDtoManager()->createDtoCollection(
-                $queryBuilder->getQuery()->getResult(),
+                $collection,
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
                 $this->get('simple_dto.request_manager')->getFields(),
@@ -162,7 +185,7 @@ abstract class AbstractController extends Controller
     }
 
     /**
-     * @return \Doctrine\ORM\EntityManager
+     * @return EntityManager
      */
     protected function getEntityManager()
     {
@@ -199,7 +222,7 @@ abstract class AbstractController extends Controller
     }
 
     /**
-     * @return \Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
+     * @return DtoManager
      */
     protected function getDtoManager()
     {
@@ -207,7 +230,7 @@ abstract class AbstractController extends Controller
     }
 
     /**
-     * @return object|\Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher|\Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
+     * @return object|ContainerAwareEventDispatcher|TraceableEventDispatcher
      */
     protected function getEventDispatcher()
     {

@@ -10,6 +10,7 @@ class ApiEvent extends Event
     const ACTION_UPDATE = 'update';
     const ACTION_READ = 'read';
     const ACTION_DELETE = 'delete';
+    const ACTION_LIST = 'list';
 
     /** @var array */
     protected $data;
