@@ -1,6 +1,7 @@
 # SimpleDtoBundle documentation
 
 - Installation
+- Configuration
 - Dto configuration
 - Dto embedding
 - Dto fields filtering
