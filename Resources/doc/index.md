@@ -1,6 +1,6 @@
 # SimpleDtoBundle documentation
 
-- Installation
+- [Installation](https://github.com/jekamell/SimpleDtoBundle/blob/master/Resources/doc/installation.md)
 - Configuration
 - Dto configuration
 - Dto embedding
