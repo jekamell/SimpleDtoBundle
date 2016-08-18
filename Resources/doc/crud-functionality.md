@@ -4,6 +4,7 @@
 SimpleDtoBundle comes with **AbstractController** where base _CRUD_ functions are implemented.
 
 User AbstractController methods for:
+
 | Method         | Description                                                                                |
 |----------------|--------------------------------------------------------------------------------------------|
 | createResource | Create resource. Dto data extracted from request body content and appends to passed entity |
