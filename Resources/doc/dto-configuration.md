@@ -81,5 +81,6 @@ Fields sections is a collection of blocks:
 Expands section is collection of blocks:
 
 |Field       | Required | Description                         |
+|------------|----------|-------------------------------------|
 | type       | Yes      | Expand type (one of dto item)       |
 | getter     | No       | Field getter to access expand value |
