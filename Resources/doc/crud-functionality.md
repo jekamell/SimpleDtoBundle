@@ -14,7 +14,7 @@ User AbstractController methods for:
 | listResources  | Read collection of resources                                                               |
 
 
-Simple example of UserController for demonstrate base crud actions
+### Simple example of UserController for demonstrate base crud actions
 
 ```php
 <?php
