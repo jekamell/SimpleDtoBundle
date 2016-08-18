@@ -1,5 +1,5 @@
 # SimpleDtoBundle documentation
-## Base crud functionality
+## Base CRUD functionality
 
 SimpleDtoBundle comes with **AbstractController** where base _CRUD_ functions are implemented.
 
