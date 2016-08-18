@@ -28,7 +28,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->scalarNode('param_expands')
                     ->defaultvalue('_expands')
-                    ->info('Get param for require embedded objects')
+                    ->info('_expands')
                     ->end()
                 ->scalarNode('param_limit')
                     ->defaultValue('_limit')
