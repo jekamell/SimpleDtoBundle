@@ -39,7 +39,7 @@ class ApiDocHandler implements HandlerInterface
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
         $this->processParams($annotation);
-        $this->processExpands($method, $annotation);
+        $this->processExpands($method, $annotation, $route);
     }
 
     /**
@@ -54,9 +54,14 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @param \ReflectionMethod $method
      * @param ApiDoc $annotation
+     * @param Route $route
      */
-    protected function processExpands(\ReflectionMethod $method, ApiDoc $annotation)
+    protected function processExpands(\ReflectionMethod $method, ApiDoc $annotation, Route $route)
     {
+        if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
+            return;
+        }
+
         $class = new $method->class;
         if (method_exists($class, self::METHOD_EXPANDS)) {
             $expands = call_user_func([$class, self::METHOD_EXPANDS]);
