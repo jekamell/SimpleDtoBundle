@@ -10,10 +10,12 @@ use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 abstract class AbstractController extends Controller
@@ -210,8 +212,7 @@ abstract class AbstractController extends Controller
     protected function serializeResponse($data, $statusCode = Response::HTTP_OK, $format = self::FORMAT_JSON)
     {
         if ($data instanceof ConstraintViolationListInterface) {
-            // TODO: handle validation error
-            return new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY, ['Content-Type' => 'application/json']);
+            return $this->handleValidationError($data);
         }
 
         return new Response(
@@ -219,6 +220,25 @@ abstract class AbstractController extends Controller
             $statusCode,
             ['Content-Type' => 'application/json']
         );
+    }
+
+    /**
+     * @param ConstraintViolationListInterface $data
+     * @return JsonResponse
+     */
+    protected function handleValidationError(ConstraintViolationListInterface $data)
+    {
+        $errors = [];
+        /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
+        foreach ($data as $violation) {
+            if ($violation->getPropertyPath()) {
+                $errors[$violation->getPropertyPath()] = $violation->getMessage();
+            } else {
+                $errors['_error'] = $violation->getMessage();
+            }
+        }
+
+        return new JsonResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
