@@ -6,7 +6,7 @@ You can require to sort ouput collection by adding ```_sort``` GET param:
 GET http://my-awesome-api.com/api/v1/users?_sort=id.desc
 ```
 
-```
+```json
 [
     {
         "id": 3,
