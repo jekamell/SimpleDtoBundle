@@ -29,13 +29,13 @@ abstract class AbstractController extends Controller
     const EVENT_POST_COLLECTION_LOAD = 'simple_dto.post_collection_load';
 
     /** @return string */
-    abstract protected function getDtoType();
+    abstract public function getDtoType();
 
     /** @return string */
-    abstract protected function getEntityAlias();
+    abstract public function getEntityAlias();
 
     /** @return array */
-    abstract protected function getAllowedExpands();
+    abstract public function getAllowedExpands();
 
     /**
      * @param Request $request
