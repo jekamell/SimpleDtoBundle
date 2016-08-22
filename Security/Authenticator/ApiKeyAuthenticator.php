@@ -76,7 +76,6 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
     public function checkCredentials($credentials, UserInterface $user)
     {
         if (!empty($credentials) && isset($credentials['token'])) {
-
             return $this->jwtManager->isValid($credentials['token'], $this->getPublicKey());
         }
     }
@@ -89,7 +88,12 @@ class ApiKeyAuthenticator extends AbstractGuardAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
+        // TODO: dynamic repository name support
         if ($payload = $this->getPayload($credentials['token'])) {
+            $repository = $this->entityManager->getRepository('AppBundle:User');
+            if ($repository instanceof UserProviderInterface) {
+                return $repository->loadUserByUsername($payload['username']);
+            }
 
             return $this->entityManager->getRepository('AppBundle:User')->findOneBy(['email' => $payload['username']]);
         }
