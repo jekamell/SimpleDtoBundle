@@ -154,9 +154,10 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [$this->createStack(), 0],
             [$this->createStack(null, null, 100), 100], // _limit=100
-            [$this->createStack(null, null, "100"), 0],
+            [$this->createStack(null, null, "100"), 100],
             [$this->createStack(null, null, "foo"), 0],
-            [$this->createStack(null, null, "100foo"), 0],
+            [$this->createStack(null, null, "100foo"), 100],
+            [$this->createStack(null, null, "100foo200"), 100],
         ];
     }
 
@@ -168,9 +169,10 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [$this->createStack(), 0],
             [$this->createStack(null, null, null, 100), 100], // _offset=100
-            [$this->createStack(null, null, null, "100"), 0],
+            [$this->createStack(null, null, null, "100"), 100],
             [$this->createStack(null, null, null, "foo"), 0],
-            [$this->createStack(null, null, null, "100foo"), 0],
+            [$this->createStack(null, null, null, "100foo"), 100],
+            [$this->createStack(null, null, null, "100foo200"), 100],
         ];
     }
 
