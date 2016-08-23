@@ -49,6 +49,11 @@ class ApiDocHandler implements HandlerInterface
     {
         $annotation->addParameter($this->requestManagerConfigurator->getFieldsParam(), $this->getFieldsParams());
         $annotation->addParameter($this->requestManagerConfigurator->getExpandsParam(), $this->getExpandsParams());
+        $output = $annotation->getOutput();
+        if (!empty($output['collection'])) {
+            $annotation->addParameter($this->requestManagerConfigurator->getLimitParam(), $this->getLimitParams());
+            $annotation->addParameter($this->requestManagerConfigurator->getOffsetParam(), $this->getOffsetParams());
+        }
     }
 
     /**
@@ -92,6 +97,30 @@ class ApiDocHandler implements HandlerInterface
             'dataType' => 'string',
             'required' => false,
             'description' => 'Required expands',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getLimitParams()
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => 'Collection limit',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getOffsetParams()
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => 'Collection offset',
         ];
     }
 }
