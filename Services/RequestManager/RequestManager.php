@@ -129,6 +129,16 @@ class RequestManager
     }
 
     /**
+     * @return string
+     */
+    public function isLinksRequired()
+    {
+        $linksStr = $this->request->get($this->requestManagerConfiguration->getLinksParam());
+
+        return $linksStr !== null;
+    }
+
+    /**
      * @param $direction
      */
     private function validateDirection($direction)
