@@ -9,6 +9,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
+use Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\DtoBuilderInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DtoManager implements DtoManagerInterface
@@ -19,6 +20,8 @@ class DtoManager implements DtoManagerInterface
     protected $dtoHelper;
     /** @var DtoManagerConfigurator */
     protected $configurator;
+    /** @var DtoBuilderInterface[] */
+    protected $builders = [];
 
     /**
      * DtoManager constructor.
@@ -48,20 +51,16 @@ class DtoManager implements DtoManagerInterface
      */
     public function createDto($entity, $dtoType, $group, array $fields = [], array $expands = [])
     {
+
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
-        $dtoData = [];
-        $this->processFields($entity, $dtoData, $fields, $dtoConfig[$dtoType]['fields'], $group);
-        $this->processExpands(
-            $entity,
-            $dtoData,
-            $expands,
-            isset($dtoConfig[$dtoType]['expands']) ? $dtoConfig[$dtoType]['expands'] : [],
-            $group
-        );
+        $dto = new Dto([], $entity);
+        foreach ($this->builders as $builder) {
+            $builder->build($entity, $dto, $dtoConfig, $dtoType, $group);
+        }
 
-        return new Dto($dtoData);
+        return $dto;
     }
 
     /**
@@ -147,6 +146,14 @@ class DtoManager implements DtoManagerInterface
         }
 
         throw new DtoException(sprintf('Dto config not found: %s', $dtoType));
+    }
+
+    /**
+     * @param DtoBuilderInterface $builder
+     */
+    public function addBuilder(DtoBuilderInterface $builder)
+    {
+        $this->builders[] = $builder;
     }
 
     /**

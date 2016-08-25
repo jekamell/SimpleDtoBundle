@@ -4,6 +4,8 @@ namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 class DtoCollection implements DtoCollectionInterface
 {
+    /** @var mixed */
+    private $originalData;
     /** @var array */
     protected $data;
     /** @var string */
@@ -39,5 +41,35 @@ class DtoCollection implements DtoCollectionInterface
         }
 
         return $this->collectionKey ? [$this->collectionKey => $data] : $data;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOriginalData()
+    {
+        return $this->originalData;
+    }
+
+    /**
+     * @param mixed $originalData
+     * @return DtoCollectionInterface
+     */
+    public function setOriginalData($originalData)
+    {
+        $this->originalData = $originalData;
+
+        return $this;
+    }
+
+    /**
+     * @param array $data
+     * @return DtoInterface
+     */
+    public function append(array $data)
+    {
+        $this->data[] = $data;
+
+        return $this;
     }
 }

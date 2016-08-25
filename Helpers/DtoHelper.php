@@ -2,9 +2,14 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Helpers;
 
+use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class DtoHelper
+ * @package Mell\Bundle\SimpleDtoBundle\Helpers
+ */
 class DtoHelper
 {
     /** @var  FileLocator */
@@ -13,16 +18,24 @@ class DtoHelper
     protected $configPath;
     /** @var array */
     protected $dtoConfig;
+    /** @var string */
+    protected $formatDate;
+    /** @var string */
+    protected $formatDateTime;
 
     /**
      * DtoHelper constructor.
      * @param FileLocator $fileLocator
      * @param string $configPath
+     * @param $formatDate
+     * @param $formatDateTime
      */
-    public function __construct(FileLocator $fileLocator, $configPath)
+    public function __construct(FileLocator $fileLocator, $configPath, $formatDate, $formatDateTime)
     {
         $this->fileLocator = $fileLocator;
         $this->configPath = $configPath;
+        $this->formatDate = $formatDate;
+        $this->formatDateTime = $formatDateTime;
     }
 
     /**
@@ -55,5 +68,52 @@ class DtoHelper
         }
 
         return $this->dtoConfig;
+    }
+
+    /**
+     * @param string $type
+     * @param mixed $value
+     * @param bool $raw
+     * @return mixed
+     */
+    public function castValueType($type, $value, $raw = true)
+    {
+        switch ($type) {
+            case DtoInterface::TYPE_INTEGER:
+                $value = intval($value);
+                break;
+            case DtoInterface::TYPE_FLOAT:
+                $value = floatval($value);
+                break;
+            case DtoInterface::TYPE_STRING:
+                $value = (string)$value;
+                break;
+            case DtoInterface::TYPE_BOOLEAN:
+                $value = boolval($value);
+                break;
+            case DtoInterface::TYPE_ARRAY:
+                $value = (array)$value;
+                break;
+            case DtoInterface::TYPE_DATE:
+                if (!$value instanceof \DateTime) {
+                    $value = new \DateTime($value);
+                }
+                if ($raw) {
+                    $value = $value->format($this->formatDate);
+                }
+                break;
+            case DtoInterface::TYPE_DATE_TIME:
+                if (!$value instanceof \DateTime) {
+                    $value = new \DateTime($value);
+                }
+                if ($raw) {
+                    $value = $value->format($this->formatDateTime);
+                }
+                break;
+            default:
+                $value = null;
+        }
+
+        return $value;
     }
 }

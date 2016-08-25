@@ -5,6 +5,7 @@ parameters:
     simple_dto.param_offset: "_offset"
     simple_dto.param_sort: "_sort"
     simple_dto.param_locale: "_locale"
+    simple_dto.param_links: "_showLinks"
     simple_dto.header_locale: "Accept-Language"
 
     simple_dto.date_format: "Y-m-d"
@@ -14,6 +15,9 @@ parameters:
 
     simple_dto.dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
     simple_dto.jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
+
+    simple_dto.hateoas_enabled: false
+
 
 services:
     # DTO related services
@@ -26,7 +30,8 @@ services:
             - "%simple_dto.param_offset%"
             - "%simple_dto.param_sort%"
             - "%simple_dto.param_locale%"
-            - "%simple_dto.header_locale%"
+            - "%simple_dto.param_locale%"
+            - "%simple_dto.param_links%"
 
     simple_dto.request_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
@@ -58,6 +63,44 @@ services:
         arguments:
             - "@file_locator"
             - "%simple_dto.dto_config_path%"
+            - "%simple_dto.date_format%"
+            - "%simple_dto.date_time_format%"
+
+    simple_dto.builder.fields_builder:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\FieldsBuilder
+        public: false
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@simple_dto.dto_helper"
+        tags:
+            - { name: simple_dto.dto_builder  }
+
+    simple_dto.builder.expands_builder:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\ExpandsBuilder
+        public: false
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@simple_dto.dto_validator"
+            - "@simple_dto.dto_helper"
+        tags:
+            - { name: simple_dto.dto_builder  }
+
+    simple_dto.builder.links_builder:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\LinksBuilder
+        public: false
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@router"
+            - "@security.expression_language"
+            - "@simple_dto.dto_helper"
+            - "@security.token_storage"
+            - "@security.authentication.trust_resolver"
+            - "@security.authorization_checker"
+            - "@request_stack"
+            - "%simple_dto.hateoas_enabled%"
+
+        tags:
+            - { name: simple_dto.dto_builder  }
 
     # Security related services
     simple_dto.jwt_manager:
