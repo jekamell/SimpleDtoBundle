@@ -18,6 +18,31 @@ interface DtoInterface extends \JsonSerializable
     const DTO_GROUP_DELETE = 'delete';
     const DTO_GROUP_LIST = 'list';
 
-    /** @return array */
+    /**
+     * Return plain dto data
+     *
+     * @return array
+     */
     public function getRawData();
+
+    /**
+     * Set dto source
+     *
+     * @param $data
+     * @return DtoInterface
+     */
+    public function setOriginalData($data);
+
+    /**
+     * get dto source
+     *
+     * @return DtoInterface
+     */
+    public function getOriginalData();
+
+    /**
+     * @param array $data
+     * @return DtoInterface
+     */
+    public function append(array $data);
 }
