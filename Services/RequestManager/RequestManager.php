@@ -78,7 +78,8 @@ class RequestManager
     public function getLimit()
     {
         $limit = $this->request->get($this->requestManagerConfiguration->getLimitParam(), 0);
-        return is_int($limit) ? $limit : 0;
+
+        return (int)$limit;
     }
 
     /**
@@ -87,7 +88,8 @@ class RequestManager
     public function getOffset()
     {
         $offset = $this->request->get($this->requestManagerConfiguration->getOffsetParam(), 0);
-        return is_int($offset) ? $offset : 0;
+
+        return (int)$offset;
     }
 
     /**
@@ -124,6 +126,16 @@ class RequestManager
         }
 
         return $this->request->headers->get($this->requestManagerConfiguration->getLocaleHeader());
+    }
+
+    /**
+     * @return string
+     */
+    public function isLinksRequired()
+    {
+        $linksStr = $this->request->get($this->requestManagerConfiguration->getLinksParam());
+
+        return $linksStr !== null;
     }
 
     /**

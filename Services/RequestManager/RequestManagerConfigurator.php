@@ -11,6 +11,8 @@ class RequestManagerConfigurator
     /** @var string */
     protected $limitParam;
     /** @var string */
+    protected $linksParam;
+    /** @var string */
     protected $offsetParam;
     /** @var string */
     protected $sortParam;
@@ -26,8 +28,10 @@ class RequestManagerConfigurator
      * @param string $limitParam
      * @param string $offsetParam
      * @param string $sortParam
-     * * @param string $localeParam
+     * @param string $sortParam
+     * * * @param string $localeParam
      * @param string $localeHeader
+     * @param $linksParam
      */
     public function __construct(
         $fieldsParam,
@@ -36,7 +40,8 @@ class RequestManagerConfigurator
         $offsetParam,
         $sortParam,
         $localeParam,
-        $localeHeader
+        $localeHeader,
+        $linksParam
     ) {
         $this->fieldsParam = $fieldsParam;
         $this->expandsParam = $expandsParam;
@@ -45,6 +50,7 @@ class RequestManagerConfigurator
         $this->sortParam = $sortParam;
         $this->localeHeader = $localeHeader;
         $this->localeParam = $localeParam;
+        $this->linksParam = $linksParam;
     }
 
     /**
@@ -117,5 +123,21 @@ class RequestManagerConfigurator
     public function setLocaleParam($localeParam)
     {
         $this->localeParam = $localeParam;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinksParam()
+    {
+        return $this->linksParam;
+    }
+
+    /**
+     * @param string $linksParam
+     */
+    public function setLinksParam($linksParam)
+    {
+        $this->linksParam = $linksParam;
     }
 }
