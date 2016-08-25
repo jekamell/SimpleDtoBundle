@@ -8,6 +8,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
+use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,6 +28,9 @@ abstract class AbstractController extends Controller
     const EVENT_POST_READ = 'simple_dto.post_read';
     const EVENT_PRE_COLLECTION_LOAD = 'simple_dto.pre_collection_load';
     const EVENT_POST_COLLECTION_LOAD = 'simple_dto.post_collection_load';
+
+    const LIST_LIMIT_DEFAULT = 100;
+    const LIST_LIMIT_MAX = 1000;
 
     /** @return string */
     abstract public function getDtoType();
@@ -167,6 +171,9 @@ abstract class AbstractController extends Controller
         $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST);
         $this->getEventDispatcher()->dispatch(self::EVENT_PRE_COLLECTION_LOAD, $event);
 
+        $this->processLimit($queryBuilder);
+        $this->processOffset($queryBuilder);
+
         $collection = $queryBuilder->getQuery()->getResult();
 
         $event = new ApiEvent($collection, ApiEvent::ACTION_LIST);
@@ -242,6 +249,26 @@ abstract class AbstractController extends Controller
     }
 
     /**
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function processLimit(QueryBuilder $queryBuilder)
+    {
+        $limit = $this->getRequestManager()->getLimit() ? : static::LIST_LIMIT_DEFAULT;
+        $queryBuilder->setMaxResults(min($limit, static::LIST_LIMIT_MAX));
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function processOffset(QueryBuilder $queryBuilder)
+    {
+        $offset = $this->getRequestManager()->getOffset();
+        if (!empty($offset)) {
+            $queryBuilder->setFirstResult($offset);
+        }
+    }
+
+    /**
      * @return DtoManager
      */
     protected function getDtoManager()
@@ -255,5 +282,13 @@ abstract class AbstractController extends Controller
     protected function getEventDispatcher()
     {
         return $this->get('event_dispatcher');
+    }
+
+    /**
+     * @return RequestManager|object
+     */
+    protected function getRequestManager()
+    {
+        return $this->get('simple_dto.request_manager');
     }
 }
