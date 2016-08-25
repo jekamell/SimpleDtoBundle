@@ -125,5 +125,6 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler
         arguments:
             - "@simple_dto.request_manager_configrator"
+            - "%simple_dto.hateoas_enabled%"
         tags:
             - { name: nelmio_api_doc.extractor.handler }

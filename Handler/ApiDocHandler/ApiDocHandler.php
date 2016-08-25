@@ -16,16 +16,21 @@ class ApiDocHandler implements HandlerInterface
 {
     const METHOD_EXPANDS = 'getAllowedExpands';
     const COLOR_TAG_EXPANDS = '#0f6ab4';
+
     /** @var RequestManagerConfigurator */
     protected $requestManagerConfigurator;
+    /** @var bool */
+    protected $hateoasEnabled;
 
     /**
      * ParamsHandler constructor.
      * @param RequestManagerConfigurator $requestManagerConfigurator
+     * @param $hateoasEnabled
      */
-    public function __construct(RequestManagerConfigurator $requestManagerConfigurator)
+    public function __construct(RequestManagerConfigurator $requestManagerConfigurator, $hateoasEnabled)
     {
         $this->requestManagerConfigurator = $requestManagerConfigurator;
+        $this->hateoasEnabled = $hateoasEnabled;
     }
 
     /**
@@ -38,15 +43,19 @@ class ApiDocHandler implements HandlerInterface
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        $this->processParams($annotation);
+        $this->processParams($annotation, $route);
         $this->processExpands($method, $annotation, $route);
+        $this->processShowLinks($annotation, $route);
     }
 
     /**
      * @param ApiDoc $annotation
      */
-    protected function processParams(ApiDoc $annotation)
+    protected function processParams(ApiDoc $annotation, Route $route)
     {
+        if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
+            return;
+        }
         $annotation->addParameter($this->requestManagerConfigurator->getFieldsParam(), $this->getFieldsParams());
         $annotation->addParameter($this->requestManagerConfigurator->getExpandsParam(), $this->getExpandsParams());
     }
@@ -72,6 +81,20 @@ class ApiDocHandler implements HandlerInterface
     }
 
     /**
+     * @param ApiDoc $annotation
+     * @param Route $route
+     */
+    protected function processShowLinks(ApiDoc $annotation, Route $route)
+    {
+        if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
+            return;
+        }
+        if ($this->hateoasEnabled) {
+            $annotation->addParameter($this->requestManagerConfigurator->getLinksParam(), $this->getLinksParams());
+        }
+    }
+
+    /**
      * @return array
      */
     private function getFieldsParams()
@@ -92,6 +115,18 @@ class ApiDocHandler implements HandlerInterface
             'dataType' => 'string',
             'required' => false,
             'description' => 'Required expands',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getLinksParams()
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => 'Require HATEOAS links',
         ];
     }
 }
