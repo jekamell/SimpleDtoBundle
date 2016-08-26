@@ -55,7 +55,7 @@ services:
     simple_dto.dto_links_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
         arguments:
-            - "@security.expression_language"
+            - "@sensio_framework_extra.security.expression_language.default"
             - "@router"
             - "@simple_dto.dto_helper"
 
