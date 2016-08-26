@@ -52,6 +52,13 @@ services:
         arguments:
             - "@simple_dto.dto_helper"
 
+    simple_dto.dto_links_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
+        arguments:
+            - "@security.expression_language"
+            - "@router"
+            - "@simple_dto.dto_helper"
+
     simple_dto.dto_validator:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoValidator
         arguments: ["@simple_dto.dto_helper"]
@@ -97,6 +104,16 @@ services:
         tags:
             - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
 
+    simple_dto.event_listener.links_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoLinksListener
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@simple_dto.dto_links_manager"
+            - "@simple_dto.dto_helper"
+        calls:
+            - ['setContainer', ["@service_container"]]
+        tags:
+            - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
 
     # Security related services
     simple_dto.jwt_manager:
