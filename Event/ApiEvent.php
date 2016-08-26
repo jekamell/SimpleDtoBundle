@@ -15,6 +15,7 @@ class ApiEvent extends Event
     const ACTION_READ = 'read';
     const ACTION_DELETE = 'delete';
     const ACTION_LIST = 'list';
+    const ACTION_CREATE_DTO = 'create_dto';
 
     const EVENT_PRE_VALIDATE = 'simple_dto.pre_validate';
     const EVENT_PRE_COLLECTION_LOAD = 'simple_dto.pre_collection_load';

@@ -2,17 +2,20 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Exceptions\DtoException;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
-use Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\DtoBuilderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+/**
+ * Class DtoManager
+ * @package Mell\Bundle\SimpleDtoBundle\Services\Dto
+ */
 class DtoManager implements DtoManagerInterface
 {
     /** @var DtoValidator */
@@ -23,8 +26,6 @@ class DtoManager implements DtoManagerInterface
     protected $configurator;
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
-    /** @var DtoBuilderInterface[] */
-    protected $builders = [];
 
     /**
      * DtoManager constructor.
@@ -45,7 +46,6 @@ class DtoManager implements DtoManagerInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-
     /**
      * Convert entity to dto
      *
@@ -53,18 +53,37 @@ class DtoManager implements DtoManagerInterface
      * @param string $dtoType
      * @param string $group
      * @param array $fields
-     * @param array $expands
      * @return DtoInterface
      */
-    public function createDto($entity, $dtoType, $group, array $fields = [], array $expands = [])
+    public function createDto($entity, $dtoType, $group, array $fields)
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
         $dto = new Dto($dtoType, [], $entity);
-        foreach ($this->builders as $builder) {
-            $builder->build($entity, $dto, $dtoConfig, $dtoType, $group);
+
+        $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_ENCODE, $event);
+
+        $fieldsConfig = $dtoConfig[$dtoType]['fields'];
+        /** @var array $options */
+        foreach ($fieldsConfig as $field => $options) {
+            // field was not required (@see dtoManager::getRequiredFields)
+            if (!empty($fields) && !in_array($field, $fields)) {
+                continue;
+            }
+            // field is not allowed for specified group
+            if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
+                continue;
+            }
+
+            $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+            $value = call_user_func([$entity, $getter]);
+            $dto->append([$field => $this->dtoHelper->castValueType($options['type'], $value)]);
         }
+
+        $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_ENCODE, $event);
 
         return $dto;
     }
@@ -86,16 +105,12 @@ class DtoManager implements DtoManagerInterface
         array $expands = [],
         $collectionKey = null
     ) {
-        $data = [];
+        $dtoCollection = new DtoCollection($dtoType, [], $collection, $this->processCollectionKey($collectionKey));
         foreach ($collection as $item) {
-            $data[] = $this->createDto($item, $dtoType, $group, $fields, $expands);
+            $dtoCollection->append($this->createDto($item, $dtoType, $group, $fields));
         }
 
-        return new DtoCollection(
-            $dtoType,
-            $data,
-            $collectionKey !== null ? $collectionKey : $this->configurator->getCollectionKey()
-        );
+        return $dtoCollection;
     }
 
     /**
@@ -153,14 +168,6 @@ class DtoManager implements DtoManagerInterface
         }
 
         throw new DtoException(sprintf('Dto config not found: %s', $dtoType));
-    }
-
-    /**
-     * @param DtoBuilderInterface $builder
-     */
-    public function addBuilder(DtoBuilderInterface $builder)
-    {
-        $this->builders[] = $builder;
     }
 
     /**
@@ -296,5 +303,14 @@ class DtoManager implements DtoManagerInterface
         }
 
         return $value;
+    }
+
+    /**
+     * @param $collectionKey
+     * @return string
+     */
+    private function processCollectionKey($collectionKey)
+    {
+        return $collectionKey !== null ? $collectionKey : $this->configurator->getCollectionKey();
     }
 }

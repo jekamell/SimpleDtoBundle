@@ -12,10 +12,9 @@ interface DtoManagerInterface
      * @param string $dtoType
      * @param string $group
      * @param array $fields
-     * @param array $expands
      * @return DtoInterface
      */
-    public function createDto($entity, $dtoType, $group, array $fields = [], array $expands = []);
+    public function createDto($entity, $dtoType, $group, array $fields);
 
     /**
      * @param array $collection

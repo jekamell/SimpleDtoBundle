@@ -9,20 +9,22 @@ class DtoCollection implements DtoCollectionInterface
     /** @var mixed */
     private $originalData;
     /** @var array */
-    protected $data;
+    private $data;
     /** @var string */
-    protected $collectionKey;
+    private $collectionKey;
 
     /**
      * DtoCollection constructor.
      * @param string $type
      * @param DtoInterface[] $data
+     * @param $originalData
      * @param string $collectionKey
      */
-    public function __construct($type, array $data, $collectionKey)
+    public function __construct($type, array $data, $originalData, $collectionKey)
     {
         $this->type = $type;
         $this->data = $data;
+        $this->originalData = $originalData;
         $this->collectionKey = $collectionKey;
     }
 
