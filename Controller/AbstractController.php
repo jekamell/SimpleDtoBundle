@@ -22,12 +22,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 abstract class AbstractController extends Controller
 {
     const FORMAT_JSON = 'json';
-    const EVENT_PRE_VALIDATE = 'simple_dto.pre_validate';
-    const EVENT_PRE_PERSIST = 'simple_dto.pre_persist';
-    const EVENT_PRE_FLUSH = 'simple_dto.pre_flush';
-    const EVENT_POST_READ = 'simple_dto.post_read';
-    const EVENT_PRE_COLLECTION_LOAD = 'simple_dto.pre_collection_load';
-    const EVENT_POST_COLLECTION_LOAD = 'simple_dto.post_collection_load';
 
     const LIST_LIMIT_DEFAULT = 100;
     const LIST_LIMIT_MAX = 1000;
@@ -61,17 +55,17 @@ abstract class AbstractController extends Controller
         );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
-        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_VALIDATE, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_PERSIST, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_PERSIST, $event);
         $this->getEntityManager()->persist($entity);
 
-        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_FLUSH, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
         $this->getEntityManager()->flush();
 
         return $this->serializeResponse(
@@ -108,14 +102,14 @@ abstract class AbstractController extends Controller
         );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
-        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_VALIDATE, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
             return $this->serializeResponse($errors);
         }
 
-        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_FLUSH, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
         $this->getEntityManager()->flush();
 
         return $this->readResource($entity);
@@ -129,7 +123,7 @@ abstract class AbstractController extends Controller
     protected function readResource($entity, $dtoGroup = null)
     {
         $event = new ApiEvent($entity, ApiEvent::ACTION_READ);
-        $this->getEventDispatcher()->dispatch(self::EVENT_POST_READ, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_READ, $event);
 
         return $this->serializeResponse(
             $this->getDtoManager()->createDto(
@@ -154,7 +148,7 @@ abstract class AbstractController extends Controller
         $this->getEntityManager()->remove($entity);
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
-        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_FLUSH, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
 
         $this->getEntityManager()->flush();
 
@@ -169,7 +163,7 @@ abstract class AbstractController extends Controller
     protected function listResources(QueryBuilder $queryBuilder, $dtoGroup = null)
     {
         $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST);
-        $this->getEventDispatcher()->dispatch(self::EVENT_PRE_COLLECTION_LOAD, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_COLLECTION_LOAD, $event);
 
         $this->processLimit($queryBuilder);
         $this->processOffset($queryBuilder);
@@ -177,7 +171,7 @@ abstract class AbstractController extends Controller
         $collection = $queryBuilder->getQuery()->getResult();
 
         $event = new ApiEvent($collection, ApiEvent::ACTION_LIST);
-        $this->getEventDispatcher()->dispatch(self::EVENT_POST_COLLECTION_LOAD, $event);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_COLLECTION_LOAD, $event);
 
         return $this->serializeResponse(
             $this->getDtoManager()->createDtoCollection(
