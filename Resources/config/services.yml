@@ -47,6 +47,11 @@ services:
             - "@simple_dto.dto_manager_configurator"
             - "@event_dispatcher"
 
+    simple_dto.dto_expands_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager
+        arguments:
+            - "@simple_dto.dto_helper"
+
     simple_dto.dto_validator:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoValidator
         arguments: ["@simple_dto.dto_helper"]
@@ -66,25 +71,6 @@ services:
             - "%simple_dto.date_format%"
             - "%simple_dto.date_time_format%"
 
-    simple_dto.builder.fields_builder:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\FieldsBuilder
-        public: false
-        arguments:
-            - "@simple_dto.request_manager"
-            - "@simple_dto.dto_helper"
-        tags:
-            - { name: simple_dto.dto_builder  }
-
-    simple_dto.builder.expands_builder:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\ExpandsBuilder
-        public: false
-        arguments:
-            - "@simple_dto.request_manager"
-            - "@simple_dto.dto_validator"
-            - "@simple_dto.dto_helper"
-        tags:
-            - { name: simple_dto.dto_builder  }
-
     simple_dto.builder.links_builder:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\LinksBuilder
         public: false
@@ -101,6 +87,16 @@ services:
 
         tags:
             - { name: simple_dto.dto_builder  }
+
+    simple_dto.event_listener.expands_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoExpandsListener
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@simple_dto.dto_helper"
+            - "@simple_dto.dto_expands_manager"
+        tags:
+            - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
+
 
     # Security related services
     simple_dto.jwt_manager:

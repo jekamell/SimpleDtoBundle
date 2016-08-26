@@ -47,11 +47,12 @@ abstract class AbstractController extends Controller
             throw new BadRequestHttpException('Missing json data');
         }
 
+        $dto = new Dto($this->getDtoType(), null, $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE);
         $entity = $this->getDtoManager()->createEntityFromDto(
             $entity,
-            new Dto($data),
+            $dto,
             $this->getDtoType(),
-            $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE
+            $dto->getGroup()
         );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
@@ -73,11 +74,7 @@ abstract class AbstractController extends Controller
                 $entity,
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->get('simple_dto.request_manager')->getFields(),
-                array_intersect_key(
-                    $this->get('simple_dto.request_manager')->getExpands(),
-                    array_flip($this->getAllowedExpands())
-                )
+                $this->get('simple_dto.request_manager')->getFields()
             )
         );
     }
@@ -94,11 +91,12 @@ abstract class AbstractController extends Controller
             throw new BadRequestHttpException('Missing json data');
         }
 
+        $dto = new Dto($this->getDtoType(), $entity, $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE);
         $entity = $this->getDtoManager()->createEntityFromDto(
             $entity,
-            new Dto($data),
+            $dto,
             $this->getDtoType(),
-            $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE
+            $dto->getGroup()
         );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
@@ -130,11 +128,7 @@ abstract class AbstractController extends Controller
                 $entity,
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->get('simple_dto.request_manager')->getFields(),
-                array_intersect_key(
-                    $this->get('simple_dto.request_manager')->getExpands(),
-                    array_flip($this->getAllowedExpands())
-                )
+                $this->get('simple_dto.request_manager')->getFields()
             )
         );
     }
@@ -178,11 +172,7 @@ abstract class AbstractController extends Controller
                 $collection,
                 $this->getDtoType(),
                 $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
-                $this->get('simple_dto.request_manager')->getFields(),
-                array_intersect_key(
-                    $this->get('simple_dto.request_manager')->getExpands(),
-                    array_flip($this->getAllowedExpands())
-                )
+                $this->get('simple_dto.request_manager')->getFields()
             )
         );
     }

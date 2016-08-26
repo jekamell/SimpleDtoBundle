@@ -60,7 +60,7 @@ class DtoManager implements DtoManagerInterface
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
-        $dto = new Dto($dtoType, [], $entity);
+        $dto = new Dto($dtoType, $entity, $group, []);
 
         $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_ENCODE, $event);
@@ -105,7 +105,7 @@ class DtoManager implements DtoManagerInterface
         array $expands = [],
         $collectionKey = null
     ) {
-        $dtoCollection = new DtoCollection($dtoType, [], $collection, $this->processCollectionKey($collectionKey));
+        $dtoCollection = new DtoCollection($dtoType, $collection, $this->processCollectionKey($collectionKey), $group);
         foreach ($collection as $item) {
             $dtoCollection->append($this->createDto($item, $dtoType, $group, $fields));
         }
