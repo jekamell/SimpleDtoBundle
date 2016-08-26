@@ -154,34 +154,6 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
 //                    ]
 //                )
 //            ],
-            // test expands
-            [
-                $this->generateUser(
-                    ['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password'],
-                    ['id' => 1, 'country' => 'Ukraine', 'city' => 'Dnipro', 'street' => 'Mechnikova']
-                ),
-                'UserDto',
-                'create',
-                ['id'],
-                ['address' => []],
-                new Dto(
-                    [
-                        'id' => 1,
-                        '_expands' => [
-                            'address' => new Dto(
-                                [
-                                    'id' => 1,
-                                    'country' => 'Ukraine',
-                                    'city' => 'Dnipro',
-                                    'street' => 'Mechnikova'
-                                ]
-                            )
-                        ]
-                    ]
-                )
-            ],
-            // TODO: test collections
-            // TODO: test expands with fields
         ];
     }
 
@@ -190,7 +162,7 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function getDtoHelper()
     {
-        return new DtoHelper(new FileLocator(), __DIR__ . '/' . 'dto.yml');
+        return new DtoHelper(new FileLocator(), __DIR__ . '/' . 'dto.yml', 'Y-m-d', 'c');
     }
 
     /**
