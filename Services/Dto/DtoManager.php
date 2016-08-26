@@ -10,6 +10,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\DtoBuilderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DtoManager implements DtoManagerInterface
@@ -20,6 +21,8 @@ class DtoManager implements DtoManagerInterface
     protected $dtoHelper;
     /** @var DtoManagerConfigurator */
     protected $configurator;
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
     /** @var DtoBuilderInterface[] */
     protected $builders = [];
 
@@ -28,16 +31,20 @@ class DtoManager implements DtoManagerInterface
      * @param DtoValidator $dtoValidator
      * @param DtoHelper $dtoHelper
      * @param DtoManagerConfigurator $configurator
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         DtoValidator $dtoValidator,
         DtoHelper $dtoHelper,
-        DtoManagerConfigurator $configurator
+        DtoManagerConfigurator $configurator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->dtoValidator = $dtoValidator;
         $this->dtoHelper = $dtoHelper;
         $this->configurator = $configurator;
+        $this->eventDispatcher = $eventDispatcher;
     }
+
 
     /**
      * Convert entity to dto
@@ -51,11 +58,10 @@ class DtoManager implements DtoManagerInterface
      */
     public function createDto($entity, $dtoType, $group, array $fields = [], array $expands = [])
     {
-
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
-        $dto = new Dto([], $entity);
+        $dto = new Dto($dtoType, [], $entity);
         foreach ($this->builders as $builder) {
             $builder->build($entity, $dto, $dtoConfig, $dtoType, $group);
         }
@@ -86,6 +92,7 @@ class DtoManager implements DtoManagerInterface
         }
 
         return new DtoCollection(
+            $dtoType,
             $data,
             $collectionKey !== null ? $collectionKey : $this->configurator->getCollectionKey()
         );

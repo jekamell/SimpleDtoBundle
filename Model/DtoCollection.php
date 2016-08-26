@@ -4,6 +4,8 @@ namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 class DtoCollection implements DtoCollectionInterface
 {
+    /** @var string */
+    private $type;
     /** @var mixed */
     private $originalData;
     /** @var array */
@@ -13,11 +15,13 @@ class DtoCollection implements DtoCollectionInterface
 
     /**
      * DtoCollection constructor.
+     * @param string $type
      * @param DtoInterface[] $data
      * @param string $collectionKey
      */
-    public function __construct(array $data, $collectionKey)
+    public function __construct($type, array $data, $collectionKey)
     {
+        $this->type = $type;
         $this->data = $data;
         $this->collectionKey = $collectionKey;
     }
@@ -69,6 +73,25 @@ class DtoCollection implements DtoCollectionInterface
     public function append(array $data)
     {
         $this->data[] = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
 
         return $this;
     }

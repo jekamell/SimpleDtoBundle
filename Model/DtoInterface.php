@@ -29,20 +29,31 @@ interface DtoInterface extends \JsonSerializable
      * Set dto source
      *
      * @param $data
-     * @return DtoInterface
+     * @return $this
      */
     public function setOriginalData($data);
 
     /**
      * get dto source
      *
-     * @return DtoInterface
+     * @return $this
      */
     public function getOriginalData();
 
     /**
      * @param array $data
-     * @return DtoInterface
+     * @return $this
      */
     public function append(array $data);
+
+    /**
+     * @return $this
+     */
+    public function getType();
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setType($type);
 }

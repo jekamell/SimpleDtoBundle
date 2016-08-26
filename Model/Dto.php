@@ -2,21 +2,28 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
+/**
+ * Class Dto
+ * @package Mell\Bundle\SimpleDtoBundle\Model
+ */
 class Dto implements DtoInterface
 {
-    /** @var mixed */
-    private $originData;
-
+    /** @var string */
+    private $type;
     /** @var array */
     private $data;
+    /** @var object|array */
+    private $originData;
 
     /**
      * Dto constructor.
+     * @param string $type
      * @param array $data
      * @param object $originalData
      */
-    public function __construct(array $data = [], $originalData = null)
+    public function __construct($type, array $data = [], $originalData = null)
     {
+        $this->type = $type;
         $this->data = $data;
         $this->originData = $originalData;
     }
@@ -56,7 +63,7 @@ class Dto implements DtoInterface
      * Set dto source
      *
      * @param $data
-     * @return DtoInterface
+     * @return $this
      */
     public function setOriginalData($data)
     {
@@ -77,11 +84,30 @@ class Dto implements DtoInterface
 
     /**
      * @param array $data
-     * @return DtoInterface
+     * @return $this
      */
     public function append(array $data)
     {
         $this->data = array_merge($this->data, $data);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
 
         return $this;
     }
