@@ -14,18 +14,22 @@ class Dto implements DtoInterface
     private $data;
     /** @var object|array */
     private $originData;
+    /** @var string */
+    private $group;
 
     /**
      * Dto constructor.
      * @param string $type
-     * @param array $data
      * @param object $originalData
+     * @param string|null $group
+     * @param array $data
      */
-    public function __construct($type, array $data = [], $originalData = null)
+    public function __construct($type, $originalData, $group = null, array $data = [])
     {
         $this->type = $type;
         $this->data = $data;
         $this->originData = $originalData;
+        $this->group = $group;
     }
 
     /**
@@ -86,9 +90,13 @@ class Dto implements DtoInterface
      * @param array $data
      * @return $this
      */
-    public function append(array $data)
+    public function append($data)
     {
-        $this->data = array_merge($this->data, $data);
+        if (is_array($data)) {
+            $this->data = array_merge($this->data, $data);
+        } else {
+            $this->data[] = $data;
+        }
 
         return $this;
     }
@@ -108,6 +116,25 @@ class Dto implements DtoInterface
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param string $group
+     * @return $this
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
 
         return $this;
     }

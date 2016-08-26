@@ -11,21 +11,25 @@ class DtoCollection implements DtoCollectionInterface
     /** @var array */
     private $data;
     /** @var string */
+    private $group;
+    /** @var string */
     private $collectionKey;
 
     /**
      * DtoCollection constructor.
      * @param string $type
-     * @param DtoInterface[] $data
      * @param $originalData
      * @param string $collectionKey
+     * @param null $group
+     * @param DtoInterface[] $data
      */
-    public function __construct($type, array $data, $originalData, $collectionKey)
+    public function __construct($type, $originalData, $collectionKey, $group = null, array $data = [])
     {
         $this->type = $type;
         $this->data = $data;
         $this->originalData = $originalData;
         $this->collectionKey = $collectionKey;
+        $this->group = $group;
     }
 
     /** @return array */
@@ -69,12 +73,16 @@ class DtoCollection implements DtoCollectionInterface
     }
 
     /**
-     * @param array $data
+     * @param $data
      * @return DtoInterface
      */
-    public function append(array $data)
+    public function append($data)
     {
-        $this->data[] = $data;
+        if (is_array($data)) {
+            $this->data = array_merge($this->data, $data);
+        } else {
+            $this->data[] = $data;
+        }
 
         return $this;
     }
@@ -94,6 +102,25 @@ class DtoCollection implements DtoCollectionInterface
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param string $group
+     * @return $this
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
 
         return $this;
     }

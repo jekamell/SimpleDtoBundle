@@ -41,13 +41,13 @@ interface DtoInterface extends \JsonSerializable
     public function getOriginalData();
 
     /**
-     * @param array $data
+     * @param array|DtoInterface $data
      * @return $this
      */
-    public function append(array $data);
+    public function append($data);
 
     /**
-     * @return $this
+     * @return string
      */
     public function getType();
 
@@ -56,4 +56,15 @@ interface DtoInterface extends \JsonSerializable
      * @return $this
      */
     public function setType($type);
+
+    /**
+     * @return string|null
+     */
+    public function getGroup();
+
+    /**
+     * @param string $group
+     * @return $this
+     */
+    public function setGroup($group);
 }
