@@ -114,6 +114,7 @@ services:
             - ['setContainer', ["@service_container"]]
         tags:
             - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
+            - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
 
     # Security related services
     simple_dto.jwt_manager:

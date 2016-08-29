@@ -112,14 +112,14 @@ class DtoManager implements DtoManagerInterface
     ) {
         $dtoCollection = new DtoCollection($dtoType, $collection, $this->processCollectionKey($collectionKey), $group);
         $event = new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION);
-        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_COLLECTION_DECODE, $event);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_COLLECTION_ENCODE, $event);
 
         foreach ($collection as $item) {
             $dtoCollection->append($this->createDto($item, $dtoType, $group, $fields, false));
         }
 
         $event = new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION);
-        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_COLLECTION_DECODE, $event);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_COLLECTION_ENCODE, $event);
 
         return $dtoCollection;
     }

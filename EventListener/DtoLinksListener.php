@@ -4,6 +4,7 @@ namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
@@ -54,7 +55,29 @@ class DtoLinksListener implements ContainerAwareInterface
 
         $this->setExpressionLangVars();
 
-        $this->linksManager->processLinks($dto, $this->dtoHelper->getDtoConfig());
+        $this->processDtoLinks($dto);
+    }
+
+    /**
+     * @param ApiEvent $apiEvent
+     */
+    public function onPostDtoCollectionEncode(ApiEvent $apiEvent)
+    {
+        $dto = $apiEvent->getData();
+        if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO_COLLECTION
+            || !$dto instanceof DtoCollectionInterface
+        ) {
+            return;
+        }
+
+        if (!$this->requestManager->isLinksRequired()) {
+            return;
+        }
+
+        $this->setExpressionLangVars();
+        foreach ($dto as $dtoItem) {
+            $this->processDtoLinks($dtoItem);
+        }
     }
 
     /**
@@ -80,5 +103,13 @@ class DtoLinksListener implements ContainerAwareInterface
         ];
 
         $this->linksManager->setExpressionVars($vars);
+    }
+
+    /**
+     * @param $dto
+     */
+    private function processDtoLinks($dto)
+    {
+        $this->linksManager->processLinks($dto, $this->dtoHelper->getDtoConfig());
     }
 }

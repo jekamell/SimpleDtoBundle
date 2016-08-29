@@ -28,8 +28,8 @@ class ApiEvent extends Event
     const EVENT_POST_DTO_ENCODE = 'simple_dto.post_dto_encode';
     const EVENT_PRE_DTO_DECODE = 'simple_dto.pre_dto_decode';
     const EVENT_POST_DTO_DECODE = 'simple_dto.post_dto_decode';
-    const EVENT_PRE_DTO_COLLECTION_DECODE = 'simple_dto.pre_dto_collection_decode';
-    const EVENT_POST_DTO_COLLECTION_DECODE = 'simple_dto.post_dto_collection_decode';
+    const EVENT_PRE_DTO_COLLECTION_ENCODE = 'simple_dto.pre_dto_collection_encode';
+    const EVENT_POST_DTO_COLLECTION_ENCODE = 'simple_dto.post_dto_collection_encode';
 
 
     /** @var array */

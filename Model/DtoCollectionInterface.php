@@ -2,7 +2,7 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
-interface DtoCollectionInterface extends DtoInterface
+interface DtoCollectionInterface extends DtoInterface, \Iterator, \Countable
 {
 
 }

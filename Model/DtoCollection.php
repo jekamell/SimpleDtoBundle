@@ -124,4 +124,58 @@ class DtoCollection implements DtoCollectionInterface
 
         return $this;
     }
+
+    /**
+     * Return the current element
+     * @return DtoInterface.
+     */
+    public function current()
+    {
+        return current($this->data);
+    }
+
+    /**
+     * Move forward to next element
+     * @return DtoInterface
+     */
+    public function next()
+    {
+        return next($this->data);
+    }
+
+    /**
+     * Return the key of the current element
+     * @return int|null
+     */
+    public function key()
+    {
+        return key($this->data);
+    }
+
+    /**
+     * Checks if current position is valid
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     */
+    public function valid()
+    {
+        return $this->key() !== null && $this->data[$this->key()] instanceof DtoInterface;
+    }
+
+    /**
+     * Rewind the Iterator to the first element
+     * @return void Any returned value is ignored.
+     */
+    public function rewind()
+    {
+        reset($this->data);
+    }
+
+    /**
+     * Count elements of an object
+     * @return int The custom count as an integer.
+     */
+    public function count()
+    {
+        return count($this->data);
+    }
 }
