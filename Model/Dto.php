@@ -93,7 +93,7 @@ class Dto implements DtoInterface
     public function append($data)
     {
         if (is_array($data)) {
-            $this->data = array_merge($this->data, $data);
+            $this->data = array_merge_recursive($this->data, $data);
         } else {
             $this->data[] = $data;
         }
