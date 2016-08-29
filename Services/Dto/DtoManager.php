@@ -49,21 +49,24 @@ class DtoManager implements DtoManagerInterface
     /**
      * Convert entity to dto
      *
-     * @param $entity
+     * @param object $entity
      * @param string $dtoType
      * @param string $group
      * @param array $fields
+     * @param bool $trowEvents
      * @return DtoInterface
      */
-    public function createDto($entity, $dtoType, $group, array $fields)
+    public function createDto($entity, $dtoType, $group, array $fields, $trowEvents = true)
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
         $dto = new Dto($dtoType, $entity, $group, []);
 
-        $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
-        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_ENCODE, $event);
+        if ($trowEvents) {
+            $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
+            $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_ENCODE, $event);
+        }
 
         $fieldsConfig = $dtoConfig[$dtoType]['fields'];
         /** @var array $options */
@@ -82,8 +85,10 @@ class DtoManager implements DtoManagerInterface
             $dto->append([$field => $this->dtoHelper->castValueType($options['type'], $value)]);
         }
 
-        $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
-        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_ENCODE, $event);
+        if ($trowEvents) {
+            $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
+            $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_ENCODE, $event);
+        }
 
         return $dto;
     }
@@ -106,9 +111,15 @@ class DtoManager implements DtoManagerInterface
         $collectionKey = null
     ) {
         $dtoCollection = new DtoCollection($dtoType, $collection, $this->processCollectionKey($collectionKey), $group);
+        $event = new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_COLLECTION_DECODE, $event);
+
         foreach ($collection as $item) {
-            $dtoCollection->append($this->createDto($item, $dtoType, $group, $fields));
+            $dtoCollection->append($this->createDto($item, $dtoType, $group, $fields, false));
         }
+
+        $event = new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_COLLECTION_DECODE, $event);
 
         return $dtoCollection;
     }
