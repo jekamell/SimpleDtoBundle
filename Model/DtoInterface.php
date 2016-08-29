@@ -36,7 +36,7 @@ interface DtoInterface extends \JsonSerializable
     /**
      * get dto source
      *
-     * @return $this
+     * @return mixed
      */
     public function getOriginalData();
 
