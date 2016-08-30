@@ -78,23 +78,6 @@ services:
             - "%simple_dto.date_format%"
             - "%simple_dto.date_time_format%"
 
-    simple_dto.builder.links_builder:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\Builder\LinksBuilder
-        public: false
-        arguments:
-            - "@simple_dto.request_manager"
-            - "@router"
-            - "@security.expression_language"
-            - "@simple_dto.dto_helper"
-            - "@security.token_storage"
-            - "@security.authentication.trust_resolver"
-            - "@security.authorization_checker"
-            - "@request_stack"
-            - "%simple_dto.hateoas_enabled%"
-
-        tags:
-            - { name: simple_dto.dto_builder  }
-
     simple_dto.event_listener.expands_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoExpandsListener
         arguments:
@@ -103,6 +86,7 @@ services:
             - "@simple_dto.dto_expands_manager"
         tags:
             - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
+            - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
 
     simple_dto.event_listener.links_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoLinksListener
