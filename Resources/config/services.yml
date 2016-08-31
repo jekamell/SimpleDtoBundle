@@ -18,6 +18,8 @@ parameters:
 
     simple_dto.hateoas_enabled: false
 
+    simple_dto.auth_entity_alias: ~
+    simple_dto.auth_username_fields: ~
 
 services:
     # DTO related services
@@ -103,12 +105,29 @@ services:
     # Security related services
     simple_dto.jwt_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Jwt\JwtManager
+    simple_dto.security.provider.abstract_user_provider:
+        class: Mell\Bundle\SimpleDtoBundle\Security\Provider\AbstractUserProvider
+        abstract: true
+        calls:
+            - ['setJwtManager', ["@simple_dto.jwt_manager"]]
+            - ['setPublicKeyPath', ["%simple_dto.jwt_public_path%"]]
+    simple_dto.security.provider.bearer_client_provider:
+        class: Mell\Bundle\SimpleDtoBundle\Security\Provider\BearerClientProvider
+        parent: simple_dto.security.provider.abstract_user_provider
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - "%simple_dto.auth_entity_alias%"
+            - "%simple_dto.auth_username_fields%"
+    simple_dto.security.provider.trusted_client_provider:
+        class: Mell\Bundle\SimpleDtoBundle\Security\Provider\TrustedClientProvider
+        parent: simple_dto.security.provider.abstract_user_provider
+        arguments:
+            - "%simple_dto.trusted_clients%"
 
     simple_dto.security.authenticator.api_key_authenticator:
         class: Mell\Bundle\SimpleDtoBundle\Security\Authenticator\ApiKeyAuthenticator
         arguments:
-            - "@doctrine.orm.entity_manager"
-            - "@simple_dto.jwt_manager"
+            - ["@simple_dto.security.provider.bearer_client_provider", "@simple_dto.security.provider.trusted_client_provider"]
             - "%simple_dto.jwt_public_path%"
 
     # Api docs related services

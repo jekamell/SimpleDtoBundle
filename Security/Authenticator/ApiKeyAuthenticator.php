@@ -2,154 +2,104 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Security\Authenticator;
 
-use Doctrine\ORM\EntityManager;
-use Mell\Bundle\SimpleDtoBundle\Services\Jwt\JwtManagerInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Mell\Bundle\SimpleDtoBundle\Security\Model\UserCredentials;
+use Mell\Bundle\SimpleDtoBundle\Security\Provider\AbstractUserProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
 
-class ApiKeyAuthenticator extends AbstractGuardAuthenticator
+/**
+ * Class ApiKeyAuthenticator
+ * @package Mell\Bundle\SimpleDtoBundle\Security\Authenticator
+ */
+class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, AuthenticationFailureHandlerInterface
 {
     const HEADER_AUTH = 'Authorization';
 
-    const MESSAGE_AUTH_FAILED = 'Authentication failed';
-
-    /** @var EntityManager */
-    protected $entityManager;
-    /** @var JwtManagerInterface */
-    protected $jwtManager;
-    /** @var string */
-    protected $publicKeyPath;
-    /** @var array */
-    protected $payload;
+    /** @var AbstractUserProvider[] */
+    protected $providers = [];
 
     /**
      * ApiKeyAuthenticator constructor.
-     * @param EntityManager $entityManager
-     * @param JwtManagerInterface $jwtManager
-     * @param string $publicKeyPath
+     * @param UserProviderInterface[] $providers
      */
-    public function __construct(EntityManager $entityManager, JwtManagerInterface $jwtManager, $publicKeyPath)
+    public function __construct(array $providers)
     {
-        $this->entityManager = $entityManager;
-        $this->jwtManager = $jwtManager;
-        $this->publicKeyPath = $publicKeyPath;
+        $this->providers = $providers;
     }
 
     /**
-     * @param Request $request The request that resulted in an AuthenticationException
-     * @param AuthenticationException $authException The exception that started the authentication process
-     * @return Response
-     */
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        return new JsonResponse(['_error' => self::MESSAGE_AUTH_FAILED], Response::HTTP_UNAUTHORIZED);
-    }
-
-    /**
-     * @param Request $request
-     * @return mixed|null
-     */
-    public function getCredentials(Request $request)
-    {
-        $authHeader = $request->headers->get(self::HEADER_AUTH);
-        if (preg_match('/^(Bearer)\sToken=(.*)$/', $authHeader, $m)) {
-            return [
-                'type' => $m[1],
-                'token' => $m[2],
-            ];
-        }
-    }
-
-    /**
-     * @param mixed $credentials
-     * @param UserInterface $user
-     * @return bool
-     * @throws AuthenticationException
-     */
-    public function checkCredentials($credentials, UserInterface $user)
-    {
-        if (!empty($credentials) && isset($credentials['token'])) {
-            return $this->jwtManager->isValid($credentials['token'], $this->getPublicKey());
-        }
-    }
-
-    /**
-     * @param mixed $credentials
+     * @param TokenInterface $token
      * @param UserProviderInterface $userProvider
-     * @return UserInterface|null
-     * @throws AuthenticationException
+     * @param string $providerKey
+     * @return PreAuthenticatedToken
      */
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey)
     {
-        // TODO: dynamic repository name support
-        if ($payload = $this->getPayload($credentials['token'])) {
-            $repository = $this->entityManager->getRepository('AppBundle:User');
-            if ($repository instanceof UserProviderInterface) {
-                return $repository->loadUserByUsername($payload['username']);
+        $apiKey = $token->getCredentials()->getToken();
+        foreach ($this->providers as $userProvider) {
+            if (!$userProvider->supportToken($token)) {
+                continue;
             }
 
-            return $this->entityManager->getRepository('AppBundle:User')->findOneBy(['email' => $payload['username']]);
+            $payload = $userProvider->getPayload($apiKey);
+            if (!isset($payload['username']) || !($user = $userProvider->loadUserByUsername($payload['username']))) {
+                throw new AuthenticationException(sprintf('User %s was not found', $payload['username'] ?? ''));
+            }
+
+            return new PreAuthenticatedToken(
+                $user,
+                $apiKey,
+                $providerKey,
+                $user->getRoles()
+            );
         }
     }
 
     /**
+     * @param TokenInterface $token
+     * @param $providerKey
+     * @return bool
+     */
+    public function supportsToken(TokenInterface $token, $providerKey)
+    {
+        return $token instanceof PreAuthenticatedToken && $token->getProviderKey() === $providerKey;
+    }
+
+    /**
+     * @param Request $request
+     * @param $providerKey
+     * @return PreAuthenticatedToken
+     */
+    public function createToken(Request $request, $providerKey)
+    {
+        $header = $request->headers->get(self::HEADER_AUTH);
+        if (preg_match('/^(Bearer|Trusted)\sToken=(.*)/', $header, $m)) {
+            $credentials = new UserCredentials($m[2], $m[1]); //token, type
+
+            return new PreAuthenticatedToken('anon.', $credentials, $providerKey);
+        }
+
+        throw new AuthenticationException('Failed to find authorization credentials');
+    }
+
+    /**
+     * This is called when an interactive authentication attempt fails. This is
+     * called by authentication listeners inheriting from
+     * AbstractAuthenticationListener.
+     *
      * @param Request $request
      * @param AuthenticationException $exception
-     * @return Response|null
+     * @return Response The response to return, never null
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new JsonResponse(['_error' => self::MESSAGE_AUTH_FAILED], Response::HTTP_UNAUTHORIZED);
-    }
-
-    /**
-     * @param Request $request
-     * @param TokenInterface $token
-     * @param string $providerKey The provider (i.e. firewall) key
-     * @return Response|null
-     */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
-    {
-        // continue current request
-    }
-
-    /**
-     * @return bool
-     */
-    public function supportsRememberMe()
-    {
-        return false;
-    }
-
-    /**
-     * @param $token
-     * @return array
-     */
-    protected function getPayload($token)
-    {
-        if (empty($this->payload)) {
-            $this->payload = $this->jwtManager->encode($token, $this->getPublicKey());
-        }
-
-        return $this->payload;
-    }
-
-    /**
-     * @return resource
-     */
-    private function getPublicKey()
-    {
-        if (!is_file($this->publicKeyPath)) {
-            throw new FileNotFoundException($this->publicKeyPath);
-        }
-
-        return openssl_pkey_get_public(file_get_contents($this->publicKeyPath));
+        return new JsonResponse(['_error' => $exception->getMessage()], Response::HTTP_UNAUTHORIZED);
     }
 }
