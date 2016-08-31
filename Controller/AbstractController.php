@@ -47,7 +47,7 @@ abstract class AbstractController extends Controller
             throw new BadRequestHttpException('Missing json data');
         }
 
-        $dto = new Dto($this->getDtoType(), null, $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE);
+        $dto = new Dto($this->getDtoType(), null, $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE, $data);
         $entity = $this->getDtoManager()->createEntityFromDto(
             $entity,
             $dto,
@@ -91,7 +91,7 @@ abstract class AbstractController extends Controller
             throw new BadRequestHttpException('Missing json data');
         }
 
-        $dto = new Dto($this->getDtoType(), $entity, $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE);
+        $dto = new Dto($this->getDtoType(), $entity, $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE, $data);
         $entity = $this->getDtoManager()->createEntityFromDto(
             $entity,
             $dto,
