@@ -50,7 +50,7 @@ class ApiEvent extends Event
     }
 
     /**
-     * @return array
+     * @return mixed
      */
     public function getData()
     {

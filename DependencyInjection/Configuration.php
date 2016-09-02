@@ -54,6 +54,15 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(false)
                     ->info('Whether the HATEOAS option is enabled')
                     ->end()
+                ->scalarNode('auth_entity_alias')
+                    ->info('Entity alias which used for authentication')
+                    ->end()
+                ->scalarNode('auth_username_fields')
+                    ->info('Unique entity field for authenticate user')
+                    ->end()
+                ->variableNode('trusted_clients')
+                    ->info('List of trusted clients in { id: id, name: name } format')
+                    ->end()
             ->end();
 
         return $treeBuilder;
