@@ -23,6 +23,7 @@ class ApiEvent extends Event
     const EVENT_POST_COLLECTION_LOAD = 'simple_dto.post_collection_load';
     const EVENT_PRE_PERSIST = 'simple_dto.pre_persist';
     const EVENT_PRE_FLUSH = 'simple_dto.pre_flush';
+    const EVENT_POST_FLUSH = 'simple_dto.post_flush';
     const EVENT_POST_READ = 'simple_dto.post_read';
     const EVENT_PRE_DTO_ENCODE = 'simple_dto.pre_dto_encode';
     const EVENT_POST_DTO_ENCODE = 'simple_dto.post_dto_encode';
