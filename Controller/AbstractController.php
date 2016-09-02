@@ -69,6 +69,9 @@ abstract class AbstractController extends Controller
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
         $this->getEntityManager()->flush();
 
+        $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
+
         return $this->serializeResponse(
             $this->getDtoManager()->createDto(
                 $entity,
@@ -109,6 +112,8 @@ abstract class AbstractController extends Controller
 
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
         $this->getEntityManager()->flush();
+        $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
         return $this->readResource($entity);
     }
@@ -145,6 +150,8 @@ abstract class AbstractController extends Controller
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
 
         $this->getEntityManager()->flush();
+        $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
+        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
         return new Response('', Response::HTTP_NO_CONTENT, ['Content-Type' => 'application/json']);
     }
