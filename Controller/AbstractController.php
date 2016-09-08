@@ -48,12 +48,7 @@ abstract class AbstractController extends Controller
         }
 
         $dto = new Dto($this->getDtoType(), null, $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE, $data);
-        $entity = $this->getDtoManager()->createEntityFromDto(
-            $entity,
-            $dto,
-            $this->getDtoType(),
-            $dto->getGroup()
-        );
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, $dto);
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
@@ -95,12 +90,7 @@ abstract class AbstractController extends Controller
         }
 
         $dto = new Dto($this->getDtoType(), $entity, $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE, $data);
-        $entity = $this->getDtoManager()->createEntityFromDto(
-            $entity,
-            $dto,
-            $this->getDtoType(),
-            $dto->getGroup()
-        );
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, $dto);
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
@@ -244,7 +234,7 @@ abstract class AbstractController extends Controller
      */
     protected function processLimit(QueryBuilder $queryBuilder)
     {
-        $limit = $this->getRequestManager()->getLimit() ? : static::LIST_LIMIT_DEFAULT;
+        $limit = $this->getRequestManager()->getLimit() ?: static::LIST_LIMIT_DEFAULT;
         $queryBuilder->setMaxResults(min($limit, static::LIST_LIMIT_MAX));
     }
 

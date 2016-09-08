@@ -54,7 +54,7 @@ class DtoManager implements DtoManagerInterface
      * @param string $dtoType
      * @param string $group
      * @param array $fields
-     * @param bool $trowEvents
+     * @param bool $throwEvent
      * @return DtoInterface
      */
     public function createDto($entity, $dtoType, $group, array $fields, $throwEvent = true)
@@ -65,7 +65,7 @@ class DtoManager implements DtoManagerInterface
         $dto = new Dto($dtoType, $entity, $group);
 
         if ($throwEvent) {
-            $this->dispatch(new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO), ApiEvent::EVENT_PRE_DTO_ENCODE, $event);
+            $this->dispatch(new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO), ApiEvent::EVENT_PRE_DTO_ENCODE);
         }
 
         $fieldsConfig = $dtoConfig[$dtoType]['fields'];
@@ -120,15 +120,15 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
-     * @param $entity
+     * @param object $entity
      * @param DtoInterface $dto
-     * @param string $dtoType
-     * @param string $group
      * @return object
      */
-    public function createEntityFromDto($entity, DtoInterface $dto, $dtoType, $group)
+    public function createEntityFromDto($entity, DtoInterface $dto)
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
+        $dtoType = $dto->getType();
+        $group = $dto->getGroup();
         $this->validateDto($dto, $dtoConfig, $dtoType);
 
         $fieldsConfig = $dtoConfig[$dtoType]['fields'];

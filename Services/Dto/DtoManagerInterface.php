@@ -21,26 +21,17 @@ interface DtoManagerInterface
      * @param string $dtoType
      * @param $group
      * @param array $fields
-     * @param array $expands
-     * @param string|null $collectionKey
      * @return DtoCollectionInterface
      */
-    public function createDtoCollection(
-        $collection,
-        $dtoType, $group,
-        array $fields = [],
-        array $expands = [],
-        $collectionKey = null
-    );
+    public function createDtoCollection($collection, $dtoType, $group, array $fields = []);
 
     /**
      * @param object $entity
      * @param DtoInterface $dto
-     * @param string $dtoType
-     * @param string $group
      * @return object
+     * @internal param string $group
      */
-    public function createEntityFromDto($entity, DtoInterface $dto, $dtoType, $group);
+    public function createEntityFromDto($entity, DtoInterface $dto);
 
     /**
      * @param string $dtoType
