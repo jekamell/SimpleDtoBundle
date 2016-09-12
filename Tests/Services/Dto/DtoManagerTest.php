@@ -89,6 +89,23 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $dtoType
+     * @param bool $expected
+     * @dataProvider hasConfigProvider
+     * @group hasConfig
+     */
+    public function testHasConfig($dtoType, $expected)
+    {
+        $manager = new DtoManager(
+            $this->getDtoValidator(),
+            $this->getDtoHelper(),
+            $this->getConfigurator(),
+            new EventDispatcher()
+        );
+        $this->assertEquals($expected, $manager->hasConfig($dtoType));
+    }
+
+    /**
      * @return array
      */
     public function createDtoProvider()
@@ -403,6 +420,20 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 new Dto('UserDto', $this->generateUser([]), 'read', ['password' => 'somestrongpassword']),
                 $this->generateUser(['firstname' => 'John', 'lastname' => 'Doe']),
             ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function hasConfigProvider()
+    {
+        return [
+            ['UserDto', true],
+            ['AddressDto', true],
+            ['CompanyDto', false],
+            ['', false],
+            [null, false],
         ];
     }
 
