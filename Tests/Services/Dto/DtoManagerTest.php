@@ -22,7 +22,7 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
      * @param array $fields
      * @param DtoInterface $expected
      * @dataProvider createDtoProvider
-     * @group dtoCreate
+     * @group createDto
      */
     public function testCreateDto(User $entity, $dtoType, $group, array $fields, $expected)
     {
@@ -43,7 +43,7 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
      * @param array $fields
      * @param DtoCollectionInterface $expected
      * @dataProvider createDtoCollectionProvider
-     * @group dtoCollectionCreate
+     * @group createDtoCollection
      */
     public function testCreateDtoCollection(array $collection, $dtoType, $group, array $fields, DtoCollectionInterface $expected)
     {
@@ -62,6 +62,30 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
             $dtoItem = $dtoCollection[$i];
             $this->assertEquals($expectedDto->getRawData(), $dtoItem->getRawData());
         }
+    }
+
+    /**
+     * @param User $entity
+     * @param DtoInterface $dto
+     * @param User $expected
+     * @dataProvider createEntityFromDtoProvider
+     * @group createEntityFromDto
+     */
+    public function testCreateEntityFromDto(User $entity, DtoInterface $dto, User $expected)
+    {
+        $manager = new DtoManager(
+            $this->getDtoValidator(),
+            $this->getDtoHelper(),
+            $this->getConfigurator(),
+            new EventDispatcher()
+        );
+        $entity = $manager->createEntityFromDto($entity, $dto);
+        $this->assertEquals($expected->getEmail(), $entity->getEmail());
+        $this->assertEquals($expected->getPassword(), $entity->getPassword());
+        $this->assertEquals($expected->getFirstname(), $entity->getFirstname());
+        $this->assertEquals($expected->getLastname(), $entity->getLastname());
+        $this->assertEquals($expected->getActive(), $entity->getActive());
+        $this->assertEquals($expected->getRoles(), $entity->getRoles());
     }
 
     /**
@@ -334,6 +358,50 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
 
                     ]
                 )
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function createEntityFromDtoProvider()
+    {
+        return [
+            [ // empty entity, empty dto
+                $this->generateUser([]),
+                new Dto('UserDto', $this->generateUser([]), 'read'),
+                $this->generateUser([])
+            ],
+            [ // empty entity, dto with data
+                $this->generateUser([]),
+                new Dto('UserDto', $this->generateUser([]), 'read', ['email' => 'john.doe@mail.com']),
+                $this->generateUser(['email' => 'john.doe@mail.com'])
+            ],
+            [ // empty entity, dto with data
+                $this->generateUser([]),
+                new Dto('UserDto', $this->generateUser([]), 'read', ['email' => 'john.doe@mail.com', 'firstname' => 'John']),
+                $this->generateUser(['email' => 'john.doe@mail.com', 'firstname' => 'John'])
+            ],
+            [ // object with some data, dto with data that complete object data
+                $this->generateUser(['firstname' => 'John']),
+                new Dto('UserDto', $this->generateUser([]), 'read', ['lastname' => 'Doe']),
+                $this->generateUser(['firstname' => 'John', 'lastname' => 'Doe'])
+            ],
+            [ // object with some data, dto with data that override object data
+                $this->generateUser(['firstname' => 'John']),
+                new Dto('UserDto', $this->generateUser([]), 'read', ['firstname' => 'Johnny']),
+                $this->generateUser(['firstname' => 'Johnny'])
+            ],
+            [ // object with some data, dto with data that override object data partially
+                $this->generateUser(['firstname' => 'John', 'lastname' => 'Doe']),
+                new Dto('UserDto', $this->generateUser([]), 'read', ['firstname' => 'Johnny']),
+                $this->generateUser(['firstname' => 'Johnny', 'lastname' => 'Doe'])
+            ],
+            [ // object with some data, dto with data, that readonly with dto group
+                $this->generateUser(['firstname' => 'John', 'lastname' => 'Doe']),
+                new Dto('UserDto', $this->generateUser([]), 'read', ['password' => 'somestrongpassword']),
+                $this->generateUser(['firstname' => 'John', 'lastname' => 'Doe']),
             ]
         ];
     }
