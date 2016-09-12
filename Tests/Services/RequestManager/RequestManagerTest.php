@@ -22,6 +22,7 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     const PARAM_SORT = '_sort';
     const PARAM_LOCALE = '_locale';
     const HEADER_LOCALE = 'Accept-Language';
+    const PARAM_SHOW_LINKS = '_showLinks';
 
     /**
      * @param RequestStack $stack
@@ -221,7 +222,8 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             self::PARAM_OFFSET,
             self::PARAM_SORT,
             self::PARAM_LOCALE,
-            self::HEADER_LOCALE
+            self::HEADER_LOCALE,
+            self::PARAM_SHOW_LINKS
         );
     }
 
