@@ -49,7 +49,6 @@ class DtoManager implements DtoManagerInterface
 
     /**
      * Convert entity to dto
-     *
      * @param object $entity
      * @param string $dtoType
      * @param string $group
@@ -93,6 +92,7 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
+     * Create collection of dto's by given data
      * @param array $collection
      * @param string $dtoType
      * @param string $group
@@ -120,6 +120,7 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
+     * Convert dto to given entity
      * @param object $entity
      * @param DtoInterface $dto
      * @return object
@@ -151,6 +152,7 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
+     * Whether is dto config exists
      * @param string $dtoType DtoConfig name (UserDto as example)
      * @return bool
      */
@@ -160,6 +162,7 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
+     * Get dto configuration by type
      * @param string $dtoType
      * @return array
      * @throws DtoException
