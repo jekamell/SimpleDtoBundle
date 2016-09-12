@@ -2,6 +2,7 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Tests\Services\Dto;
 
+use Mell\Bundle\SimpleDtoBundle\Exceptions\DtoException;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
@@ -103,6 +104,27 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
             new EventDispatcher()
         );
         $this->assertEquals($expected, $manager->hasConfig($dtoType));
+    }
+
+    /**
+     * @param string $dtoType
+     * @param $expected
+     * @dataProvider getConfigProvider
+     * @group getConfig
+     */
+    public function testGetConfig($dtoType, $expected)
+    {
+        $manager = new DtoManager(
+            $this->getDtoValidator(),
+            $this->getDtoHelper(),
+            $this->getConfigurator(),
+            new EventDispatcher()
+        );
+        try {
+            $this->assertEquals($expected, $manager->getConfig($dtoType));
+        } catch (\Exception $e) {
+            $this->assertEquals($expected, $e);
+        }
     }
 
     /**
@@ -434,6 +456,46 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
             ['CompanyDto', false],
             ['', false],
             [null, false],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigProvider()
+    {
+        return [
+            [
+                'AddressDto',
+                [
+                    'fields' => [
+                        'id' => [
+                            'type' => 'integer',
+                            'readonly' => true,
+                            'description' => 'Identifier',
+                        ],
+                        'country' => [
+                            'type' => 'string',
+                            'required' => true,
+                            'description' => 'Country',
+                        ],
+                        'city' => [
+                            'type' => 'string',
+                            'required' => true,
+                            'description' => 'City',
+                        ],
+                        'street' => [
+                            'type' => 'string',
+                            'required' => true,
+                            'description' => 'Street',
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'CompanyDto',
+                new DtoException('Dto config not found: CompanyDto')
+            ]
         ];
     }
 
