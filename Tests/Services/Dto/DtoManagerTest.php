@@ -4,6 +4,8 @@ namespace Mell\Bundle\SimpleDtoBundle\Tests\Services\Dto;
 
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
@@ -32,6 +34,34 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
         );
         $dto = $manager->createDto($entity, $dtoType, $group, $fields, false);
         $this->assertEquals($expected->getRawData(), $dto->getRawData());
+    }
+
+    /**
+     * @param array $collection
+     * @param $dtoType
+     * @param $group
+     * @param array $fields
+     * @param DtoCollectionInterface $expected
+     * @dataProvider createDtoCollectionProvider
+     * @group dtoCollectionCreate
+     */
+    public function testCreateDtoCollection(array $collection, $dtoType, $group, array $fields, DtoCollectionInterface $expected)
+    {
+        $manager = new DtoManager(
+            $this->getDtoValidator(),
+            $this->getDtoHelper(),
+            $this->getConfigurator(),
+            new EventDispatcher()
+        );
+        $dtoCollection = $manager->createDtoCollection($collection, $dtoType, $group, $fields);
+        $this->assertEquals(count($expected), $dtoCollection->count());
+        foreach ($expected as $i => $dto) {
+            /** @var DtoInterface $expectedDto */
+            $expectedDto = $expected[$i];
+            /** @var DtoInterface $expectedDto */
+            $dtoItem = $dtoCollection[$i];
+            $this->assertEquals($expectedDto->getRawData(), $dtoItem->getRawData());
+        }
     }
 
     /**
@@ -171,6 +201,140 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function createDtoCollectionProvider()
+    {
+        return [
+            [ // empty collection
+                [],
+                'UserDto',
+                'read',
+                [],
+                new DtoCollection('UserDto', [], '_collection', 'read', [])
+            ],
+            [ // collection with one item
+                [$this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe'])],
+                'UserDto',
+                'read',
+                [],
+                new DtoCollection(
+                    'UserDto',
+                    [$this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe'])],
+                    '_collection',
+                    'read',
+                    [
+                        new Dto(
+                            'UserDto',
+                            $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                            'read',
+                            ['id' => 0, 'addressId' => 0, 'email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe', 'active' => true, 'roles' => [], ]
+                        )
+                    ]
+                )
+            ],
+            [ // few items collection
+                [
+                    $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                    $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe']),
+                ],
+                'UserDto',
+                'read',
+                [],
+                new DtoCollection(
+                    'UserDto',
+                    [
+                        $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                        $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe']),
+                    ],
+                    '_collection',
+                    'read',
+                    [
+                        new Dto(
+                            'UserDto',
+                            $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                            'read',
+                            ['id' => 0, 'addressId' => 0, 'email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe', 'active' => true, 'roles' => [], ]
+                        ),
+                        new Dto(
+                            'UserDto',
+                            $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe']),
+                            'read',
+                            ['id' => 0, 'addressId' => 0, 'email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe', 'active' => true, 'roles' => [], ]
+                        ),
+                    ]
+                )
+            ],
+            [ // collection with fields
+                [
+                    $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                    $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe']),
+                ],
+                'UserDto',
+                'read',
+                ['email'],
+                new DtoCollection(
+                    'UserDto',
+                    [
+                        $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                        $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe']),
+                    ],
+                    '_collection',
+                    'read',
+                    [
+                        new Dto(
+                            'UserDto',
+                            $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                            'read',
+                            ['email' => 'john.doe@email.com']
+                        ),
+                        new Dto(
+                            'UserDto',
+                            $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe']),
+                            'read',
+                            ['email' => 'jane.doe@email.com']
+                        ),
+
+                    ]
+                )
+            ],
+            [ // groups
+                [
+                    $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe', 'password' => 'password1']),
+                    $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe', 'password' => 'password2']),
+                ],
+                'UserDto',
+                'read',
+                [],
+                new DtoCollection(
+                    'UserDto',
+                    [
+                        $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe', 'password' => 'password1']),
+                        $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe', 'password' => 'password2']),
+                    ],
+                    '_collection',
+                    'read',
+                    [
+                        new Dto(
+                            'UserDto',
+                            $this->generateUser(['email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe']),
+                            'read',
+                            ['id' => 0, 'addressId' => 0, 'email' => 'john.doe@email.com', 'firstname' => 'John', 'lastname' => 'Doe', 'active' => true, 'roles' => [], ]
+                        ),
+                        new Dto(
+                            'UserDto',
+                            $this->generateUser(['email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe']),
+                            'read',
+                            ['id' => 0, 'addressId' => 0, 'email' => 'jane.doe@email.com', 'firstname' => 'Jane', 'lastname' => 'Doe', 'active' => true, 'roles' => [], ]
+                        ),
+
+                    ]
+                )
+            ]
         ];
     }
 
