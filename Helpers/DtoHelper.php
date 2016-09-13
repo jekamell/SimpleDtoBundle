@@ -78,6 +78,9 @@ class DtoHelper
      */
     public function castValueType($type, $value, $raw = true)
     {
+        if ($value === null) {
+            return $value;
+        }
         switch ($type) {
             case DtoInterface::TYPE_INTEGER:
                 $value = intval($value);
