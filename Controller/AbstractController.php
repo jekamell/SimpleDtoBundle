@@ -5,6 +5,7 @@ namespace Mell\Bundle\SimpleDtoBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
@@ -39,7 +40,7 @@ abstract class AbstractController extends Controller
      * @param Request $request
      * @param $entity
      * @param string|null $dtoGroup
-     * @return Response
+     * @return DtoInterface
      */
     protected function createResource(Request $request, $entity, $dtoGroup = null)
     {
@@ -67,13 +68,11 @@ abstract class AbstractController extends Controller
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
-        return $this->serializeResponse(
-            $this->getDtoManager()->createDto(
-                $entity,
-                $this->getDtoType(),
-                $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->get('simple_dto.request_manager')->getFields()
-            )
+        return $this->getDtoManager()->createDto(
+            $entity,
+            $this->getDtoType(),
+            $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
+            $this->get('simple_dto.request_manager')->getFields()
         );
     }
 
@@ -81,7 +80,7 @@ abstract class AbstractController extends Controller
      * @param Request $request
      * @param $entity
      * @param string|null $dtoGroup
-     * @return Response
+     * @return DtoInterface
      */
     protected function updateResource(Request $request, $entity, $dtoGroup = null)
     {
@@ -97,7 +96,7 @@ abstract class AbstractController extends Controller
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
-            return $this->serializeResponse($errors);
+            return $errors;
         }
 
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
@@ -105,32 +104,29 @@ abstract class AbstractController extends Controller
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
-        return $this->readResource($entity);
+        return $dto;
     }
 
     /**
      * @param $entity
      * @param string|null $dtoGroup
-     * @return Response
+     * @return DtoInterface
      */
     protected function readResource($entity, $dtoGroup = null)
     {
         $event = new ApiEvent($entity, ApiEvent::ACTION_READ);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_READ, $event);
 
-        return $this->serializeResponse(
-            $this->getDtoManager()->createDto(
-                $entity,
-                $this->getDtoType(),
-                $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->get('simple_dto.request_manager')->getFields()
-            )
+        return $this->getDtoManager()->createDto(
+            $entity,
+            $this->getDtoType(),
+            $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
+            $this->get('simple_dto.request_manager')->getFields()
         );
     }
 
     /**
      * @param $entity
-     * @return Response
      */
     protected function deleteResource($entity)
     {
@@ -142,14 +138,12 @@ abstract class AbstractController extends Controller
         $this->getEntityManager()->flush();
         $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
-
-        return new Response('', Response::HTTP_NO_CONTENT, ['Content-Type' => 'application/json']);
     }
 
     /**
      * @param QueryBuilder $queryBuilder
      * @param string $dtoGroup
-     * @return Response
+     * @return DtoCollectionInterface
      */
     protected function listResources(QueryBuilder $queryBuilder, $dtoGroup = null)
     {
@@ -164,13 +158,11 @@ abstract class AbstractController extends Controller
         $event = new ApiEvent($collection, ApiEvent::ACTION_LIST);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_COLLECTION_LOAD, $event);
 
-        return $this->serializeResponse(
-            $this->getDtoManager()->createDtoCollection(
-                $collection,
-                $this->getDtoType(),
-                $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
-                $this->get('simple_dto.request_manager')->getFields()
-            )
+        return $this->getDtoManager()->createDtoCollection(
+            $collection,
+            $this->getDtoType(),
+            $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
+            $this->get('simple_dto.request_manager')->getFields()
         );
     }
 
