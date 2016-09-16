@@ -32,7 +32,7 @@ services:
             - "%simple_dto.param_offset%"
             - "%simple_dto.param_sort%"
             - "%simple_dto.param_locale%"
-            - "%simple_dto.param_locale%"
+            - "%simple_dto.header_locale%"
             - "%simple_dto.param_links%"
 
     simple_dto.request_manager:

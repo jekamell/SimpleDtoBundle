@@ -22,16 +22,15 @@ class RequestManagerConfigurator
     protected $localeParam;
 
     /**
-     * RequestManagerConfiguration constructor.
+     * RequestManagerConfigurator constructor.
      * @param string $fieldsParam
      * @param string $expandsParam
      * @param string $limitParam
      * @param string $offsetParam
      * @param string $sortParam
-     * @param string $sortParam
-     * * * @param string $localeParam
+     * @param string $localeParam
      * @param string $localeHeader
-     * @param $linksParam
+     * @param string $linksParam
      */
     public function __construct(
         $fieldsParam,
