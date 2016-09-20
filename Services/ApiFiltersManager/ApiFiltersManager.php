@@ -23,6 +23,17 @@ class ApiFiltersManager implements ApiFilterManagerInterface
         ApiFilterManagerInterface::OPERATION_ALIAS_MORE_OR_EQUAL_THEN => ApiFilter::OPERATION_MORE_OR_EQUAL_THEN,
         ApiFilterManagerInterface::OPERATION_ALIAS_LESS_OR_EQUAL_THEN => ApiFilter::OPERATION_LESS_OR_EQUAL_THEN,
     ];
+    /** @var array */
+    private $operationSqlOperationMap = [
+        ApiFilter::OPERATION_EQUAL => '=',
+        ApiFilter::OPERATION_NOT_EQUAL => '!=',
+        ApiFilter::OPERATION_MORE_THEN => '>',
+        ApiFilter::OPERATION_LESS_THEN => '<',
+        ApiFilter::OPERATION_MORE_OR_EQUAL_THEN => '>=',
+        ApiFilter::OPERATION_LESS_OR_EQUAL_THEN => '<=',
+        ApiFilter::OPERATION_IN_ARRAY => 'IN',
+        ApiFilter::OPERATION_NOT_IN_ARRAY => 'NOT IN'
+    ];
 
     /**
      * @param string $filtersStr
@@ -61,6 +72,24 @@ class ApiFiltersManager implements ApiFilterManagerInterface
             ApiFilterManagerInterface::OPERATION_ALIAS_LESS_OR_EQUAL_THEN,
             ApiFilterManagerInterface::OPERATION_ALIAS_MORE_OR_EQUAL_THEN,
         ];
+    }
+
+    /**
+     * @param string $operation
+     * @return mixed
+     */
+    public function getSqlOperationByOperation($operation)
+    {
+        return $this->operationSqlOperationMap[$operation];
+    }
+
+    /**
+     * @param string $operation
+     * @return bool
+     */
+    public function isArrayOperation($operation)
+    {
+        return in_array($operation, [ApiFilter::OPERATION_IN_ARRAY, ApiFilter::OPERATION_NOT_IN_ARRAY]);
     }
 
     /**
