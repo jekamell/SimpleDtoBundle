@@ -88,7 +88,6 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->scalarNode('auth_username_fields')
                     ->info('Unique entity field for authenticate user')
-                    ->default
                     ->end()
                 ->variableNode('trusted_clients')
                     ->info('List of trusted clients in { id: id, name: name } format')
