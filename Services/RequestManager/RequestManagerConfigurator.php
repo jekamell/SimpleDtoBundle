@@ -20,6 +20,8 @@ class RequestManagerConfigurator
     protected $localeHeader;
     /** @var string */
     protected $localeParam;
+    /** @var string */
+    protected $apiFilterParam;
 
     /**
      * RequestManagerConfigurator constructor.
@@ -40,7 +42,8 @@ class RequestManagerConfigurator
         $sortParam,
         $localeParam,
         $localeHeader,
-        $linksParam
+        $linksParam,
+        $apiFilterParam
     ) {
         $this->fieldsParam = $fieldsParam;
         $this->expandsParam = $expandsParam;
@@ -50,6 +53,7 @@ class RequestManagerConfigurator
         $this->localeHeader = $localeHeader;
         $this->localeParam = $localeParam;
         $this->linksParam = $linksParam;
+        $this->apiFilterParam = $apiFilterParam;
     }
 
     /**
@@ -138,5 +142,21 @@ class RequestManagerConfigurator
     public function setLinksParam($linksParam)
     {
         $this->linksParam = $linksParam;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiFilterParam(): string
+    {
+        return $this->apiFilterParam;
+    }
+
+    /**
+     * @param string $apiFilterParam
+     */
+    public function setApiFilterParam(string $apiFilterParam)
+    {
+        $this->apiFilterParam = $apiFilterParam;
     }
 }

@@ -139,6 +139,14 @@ class RequestManager
     }
 
     /**
+     * @return string
+     */
+    public function getApiFilters()
+    {
+        return $this->request->get($this->requestManagerConfiguration->getApiFilterParam());
+    }
+
+    /**
      * @param $direction
      */
     private function validateDirection($direction)
