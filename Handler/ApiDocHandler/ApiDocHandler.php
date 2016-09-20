@@ -6,6 +6,7 @@ use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurat
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -46,6 +47,7 @@ class ApiDocHandler implements HandlerInterface
         $this->processParams($annotation, $route);
         $this->processExpands($method, $annotation, $route);
         $this->processShowLinks($annotation, $route);
+        $this->processApiFilters($annotation, $route);
     }
 
     /**
@@ -96,6 +98,21 @@ class ApiDocHandler implements HandlerInterface
         }
         if ($this->hateoasEnabled) {
             $annotation->addParameter($this->requestManagerConfigurator->getLinksParam(), $this->getLinksParams());
+        }
+    }
+
+    /**
+     * @param ApiDoc $annotation
+     * @param Route $route
+     */
+    protected function processApiFilters(ApiDoc $annotation, Route $route)
+    {
+        $filters = $route->getDefault('filters');
+        if ($filters) {
+            $annotation->addParameter(
+                $this->requestManagerConfigurator->getApiFilterParam(),
+                $this->getFiltersParams($filters)
+            );
         }
     }
 
@@ -156,6 +173,19 @@ class ApiDocHandler implements HandlerInterface
             'dataType' => 'string',
             'required' => false,
             'description' => 'Collection offset',
+        ];
+    }
+
+    /**
+     * @param array $filters
+     * @return array
+     */
+    private function getFiltersParams(array $filters = [])
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => sprintf('Api filters. Use one or few of %s', implode(',', $filters))
         ];
     }
 }
