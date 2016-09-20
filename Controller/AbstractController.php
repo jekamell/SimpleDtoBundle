@@ -260,18 +260,18 @@ abstract class AbstractController extends Controller
         $apiFiltersManager = $this->get('simple_dto.api_filter_manager');
 
         /** @var ApiFilter $filter */
-        foreach ($filters as $filter) {
+        foreach ($filters as $i => $filter) {
             $queryBuilder->andWhere(
                 sprintf(
                     current($queryBuilder->getRootAliases()) . '.%s %s %s',
                     $filter->getParam(),
                     $apiFiltersManager->getSqlOperationByOperation($filter->getOperation()),
                     $apiFiltersManager->isArrayOperation($filter->getOperation())
-                        ? '(:' . $filter->getParam() . ')'
-                        : ':' . $filter->getParam()
+                        ? '(:' . $filter->getParam() . $i . ')'
+                        : ':' . $filter->getParam() . $i
                 )
             );
-            $queryBuilder->setParameter($filter->getParam(), $filter->getValue());
+            $queryBuilder->setParameter($filter->getParam() . $i, $filter->getValue());
         }
     }
 
