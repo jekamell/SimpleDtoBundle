@@ -6,7 +6,7 @@ parameters:
 
 services:
     # DTO related services
-    simple_dto.request_manager_configrator:
+    simple_dto.request_manager_configurator:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator
         arguments:
             - "%simple_dto.param_fields%"
@@ -23,7 +23,7 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
         arguments:
             - "@request_stack"
-            - "@simple_dto.request_manager_configrator"
+            - "@simple_dto.request_manager_configurator"
 
     simple_dto.dto_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
@@ -94,6 +94,7 @@ services:
         arguments:
             - "@simple_dto.request_manager"
             - "@simple_dto.api_filter_manager"
+            - "@router"
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
@@ -136,7 +137,7 @@ services:
     simple_dto.doc.param_handler:
         class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler
         arguments:
-            - "@simple_dto.request_manager_configrator"
+            - "@simple_dto.request_manager_configurator"
             - "%simple_dto.hateoas_enabled%"
         tags:
             - { name: nelmio_api_doc.extractor.handler }

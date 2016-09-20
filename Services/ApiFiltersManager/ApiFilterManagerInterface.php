@@ -3,6 +3,7 @@
 namespace Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager;
 
 use Doctrine\Common\Collections\Criteria;
+use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
 
 /**
  * Interface ApiFilterManagerInterface
@@ -19,7 +20,7 @@ interface ApiFilterManagerInterface
 
     /**
      * @param string $filtersStr
-     * @return ApiFilter[]
+     * @return ApiFilterCollectionInterface
      */
     public function parse($filtersStr);
 }
