@@ -4,6 +4,8 @@ namespace Mell\Bundle\SimpleDtoBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Mell\Bundle\SimpleDtoBundle\Model\ApiFilter;
+use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
@@ -40,7 +42,7 @@ abstract class AbstractController extends Controller
      * @param Request $request
      * @param $entity
      * @param string|null $dtoGroup
-     * @return DtoInterface
+     * @return DtoInterface|Response
      */
     protected function createResource(Request $request, $entity, $dtoGroup = null)
     {
@@ -142,16 +144,23 @@ abstract class AbstractController extends Controller
 
     /**
      * @param QueryBuilder $queryBuilder
+     * @param ApiFilterCollectionInterface $filters
      * @param string $dtoGroup
      * @return DtoCollectionInterface
      */
-    protected function listResources(QueryBuilder $queryBuilder, $dtoGroup = null)
-    {
+    protected function listResources(
+        QueryBuilder $queryBuilder,
+        ApiFilterCollectionInterface $filters = null,
+        $dtoGroup = null
+    ) {
         $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_COLLECTION_LOAD, $event);
 
         $this->processLimit($queryBuilder);
         $this->processOffset($queryBuilder);
+        if ($filters) {
+            $this->processFilters($queryBuilder, $filters);
+        }
 
         $collection = $queryBuilder->getQuery()->getResult();
 
@@ -184,7 +193,7 @@ abstract class AbstractController extends Controller
     }
 
     /**
-     * @param DtoInterface $data
+     * @param DtoInterface|ConstraintViolationListInterface $data
      * @param int $statusCode
      * @param string $format
      * @return Response
@@ -238,6 +247,31 @@ abstract class AbstractController extends Controller
         $offset = $this->getRequestManager()->getOffset();
         if (!empty($offset)) {
             $queryBuilder->setFirstResult($offset);
+        }
+    }
+
+    /**
+     * Append filter criteria to query builder
+     * @param QueryBuilder $queryBuilder
+     * @param ApiFilterCollectionInterface $filters
+     */
+    protected function processFilters(QueryBuilder $queryBuilder, ApiFilterCollectionInterface $filters)
+    {
+        $apiFiltersManager = $this->get('simple_dto.api_filter_manager');
+
+        /** @var ApiFilter $filter */
+        foreach ($filters as $filter) {
+            $queryBuilder->andWhere(
+                sprintf(
+                    current($queryBuilder->getRootAliases()) . '.%s %s %s',
+                    $filter->getParam(),
+                    $apiFiltersManager->getSqlOperationByOperation($filter->getOperation()),
+                    $apiFiltersManager->isArrayOperation($filter->getOperation())
+                        ? '(:' . $filter->getParam() . ')'
+                        : ':' . $filter->getParam()
+                )
+            );
+            $queryBuilder->setParameter($filter->getParam(), $filter->getValue());
         }
     }
 
