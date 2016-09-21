@@ -1,7 +1,7 @@
 # SimpleDtoBundle documentation
 ## Dto collection sorting
 
-You can require to sort ouput collection by adding ```_sort``` GET param:
+You can require to sort output collection by adding ```_sort``` GET param:
 ```
 GET http://my-awesome-api.com/api/v1/users?_sort=id.desc
 ```
