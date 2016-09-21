@@ -43,7 +43,7 @@ class ApiFiltersListener
     public function onKernelController(FilterControllerEvent $filterControllerArgumentsEvent)
     {
         $routeParams = $this->router->matchRequest($filterControllerArgumentsEvent->getRequest());
-        if (!$filters = $routeParams['filters'] ?? null) {
+        if (!$filters = $routeParams['_filters'] ?? null) {
             return;
         }
 
