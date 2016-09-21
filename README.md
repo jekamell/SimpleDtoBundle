@@ -11,6 +11,7 @@ Feature list:
  - Dto embedding.
  - Dto fields filtering
  - Dto collection ordering
+ - Dto collection filtering
  - AbstractController with functionality for *Create*/*Read*/*Update*/*Delete*/*List* resources with events system support.
  - Dto configuration parser for [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle).
  - ApiKey based Authenticator (based on [JWT](https://jwt.io/) technology)
