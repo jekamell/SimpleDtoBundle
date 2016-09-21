@@ -58,7 +58,7 @@ abstract class AbstractController extends Controller
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
-            return $this->serializeResponse($errors);
+            return $errors;
         }
 
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_PERSIST, $event);
