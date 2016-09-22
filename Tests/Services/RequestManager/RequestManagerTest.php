@@ -4,6 +4,8 @@ namespace Mell\Bundle\SimpleDtoBundle\Tests\Services\RequestManager;
 
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -13,7 +15,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Class RequestManagerTest
  * @package Mell\Bundle\SimpleDtoBundle\Tests\Services\RequestManager
  */
-class RequestManagerTest extends \PHPUnit_Framework_TestCase
+class RequestManagerTest extends KernelTestCase
 {
     const PARAM_FIELDS = '_fields';
     const PARAM_EXPANDS = '_expands';
@@ -23,6 +25,7 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
     const PARAM_LOCALE = '_locale';
     const HEADER_LOCALE = 'Accept-Language';
     const PARAM_SHOW_LINKS = '_showLinks';
+    const PARAM_FILTERS = '_filters';
 
     /**
      * @param RequestStack $stack
@@ -223,7 +226,8 @@ class RequestManagerTest extends \PHPUnit_Framework_TestCase
             self::PARAM_SORT,
             self::PARAM_LOCALE,
             self::HEADER_LOCALE,
-            self::PARAM_SHOW_LINKS
+            self::PARAM_SHOW_LINKS,
+            self::PARAM_FILTERS
         );
     }
 
