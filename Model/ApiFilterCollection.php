@@ -127,9 +127,23 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
 
     /**
      * @param ApiFilter $apiFilter
+     * @return ApiFilterCollectionInterface
      */
     public function append(ApiFilter $apiFilter)
     {
         $this->data[] = $apiFilter;
+
+        return $this;
+    }
+
+    /**
+     * @param \Closure $closure
+     * @return ApiFilterCollectionInterface
+     */
+    public function filter(\Closure $closure)
+    {
+        $this->data = array_values(array_filter($this->data, $closure));
+
+        return $this;
     }
 }

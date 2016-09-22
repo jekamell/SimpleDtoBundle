@@ -15,7 +15,13 @@ interface ApiFilterCollectionInterface extends \Iterator, \Countable, \ArrayAcce
 
     /**
      * @param ApiFilter $apiFilter
-     * @return void
+     * @return ApiFilterCollectionInterface
      */
     public function append(ApiFilter $apiFilter);
+
+    /**
+     * @param \Closure $closure
+     * @return ApiFilterCollectionInterface
+     */
+    public function filter(\Closure $closure);
 }
