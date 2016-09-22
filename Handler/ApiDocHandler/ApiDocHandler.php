@@ -107,7 +107,7 @@ class ApiDocHandler implements HandlerInterface
      */
     protected function processApiFilters(ApiDoc $annotation, Route $route)
     {
-        $filters = $route->getDefault('filters');
+        $filters = $route->getDefault('_filters');
         if ($filters) {
             $annotation->addParameter(
                 $this->requestManagerConfigurator->getApiFilterParam(),
