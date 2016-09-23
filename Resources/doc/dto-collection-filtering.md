@@ -44,7 +44,7 @@ For SQL context this filter will be represented as:
 ```
 
 ### Applying filters 
-To access required filters you can simple highlight ```ApiFilterCollection``` in controller action and pass it to ```AbstractController::listResources``` method:
+To access required filters you can simple typehint ```ApiFilterCollection``` in controller action and pass it to ```AbstractController::listResources``` method:
 
 ```php
 <?php
