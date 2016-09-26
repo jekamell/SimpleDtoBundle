@@ -42,7 +42,11 @@ class ApiFiltersListener
      */
     public function onKernelController(FilterControllerEvent $filterControllerArgumentsEvent)
     {
-        $routeParams = $this->router->matchRequest($filterControllerArgumentsEvent->getRequest());
+        try {
+            $routeParams = $this->router->matchRequest($filterControllerArgumentsEvent->getRequest());
+        } catch (\Exception $e) {
+            return;
+        }
         if (!$filters = $routeParams['_filters'] ?? null) {
             return;
         }
