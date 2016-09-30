@@ -105,8 +105,8 @@ class DtoValidator
             throw new DtoException(sprintf('Fields definition not found: %s', $type));
         }
 
-        if (is_array($object) || $object instanceof ArrayAccess) {
-            $object = $object[0];
+        if (is_array($object) || ($object instanceof \ArrayAccess && $object instanceof \Iterator)) {
+            $object = $object->current();
         }
 
         foreach ($config['fields'] as $field => $options) {
