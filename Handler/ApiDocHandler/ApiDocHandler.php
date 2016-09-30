@@ -64,6 +64,7 @@ class ApiDocHandler implements HandlerInterface
         if (!empty($output['collection'])) {
             $annotation->addParameter($this->requestManagerConfigurator->getLimitParam(), $this->getLimitParams());
             $annotation->addParameter($this->requestManagerConfigurator->getOffsetParam(), $this->getOffsetParams());
+            $annotation->addParameter($this->requestManagerConfigurator->getSortParam(), $this->getSortParams());
         }
     }
 
@@ -173,6 +174,18 @@ class ApiDocHandler implements HandlerInterface
             'dataType' => 'string',
             'required' => false,
             'description' => 'Collection offset',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getSortParams()
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => 'Collection sorting',
         ];
     }
 
