@@ -158,6 +158,7 @@ abstract class AbstractController extends Controller
 
         $this->processLimit($queryBuilder);
         $this->processOffset($queryBuilder);
+        $this->processSort($queryBuilder);
         if ($filters) {
             $this->processFilters($queryBuilder, $filters);
         }
@@ -247,6 +248,20 @@ abstract class AbstractController extends Controller
         $offset = $this->getRequestManager()->getOffset();
         if (!empty($offset)) {
             $queryBuilder->setFirstResult($offset);
+        }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function processSort(QueryBuilder $queryBuilder)
+    {
+        $sort = $this->getRequestManager()->getSort();
+        if (!empty($sort)) {
+            $rootAliases = $queryBuilder->getRootAliases();
+            foreach ($sort as $param => $direction) {
+                $queryBuilder->addOrderBy(current($rootAliases) . '.' . $param, $direction);
+            }
         }
     }
 
