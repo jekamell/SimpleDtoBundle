@@ -139,6 +139,16 @@ class RequestManager
     }
 
     /**
+     * @return bool
+     */
+    public function isCountRequired()
+    {
+        $countStr = $this->request->get($this->requestManagerConfiguration->getCountParam());
+
+        return $countStr !== null;
+    }
+
+    /**
      * @return string
      */
     public function getApiFilters()

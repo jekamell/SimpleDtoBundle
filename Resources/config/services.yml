@@ -18,6 +18,7 @@ services:
             - "%simple_dto.header_locale%"
             - "%simple_dto.param_links%"
             - "%simple_dto.param_filters%"
+            - "%simple_dto.param_count%"
 
     simple_dto.request_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager

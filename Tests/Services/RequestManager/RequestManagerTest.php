@@ -26,6 +26,7 @@ class RequestManagerTest extends KernelTestCase
     const HEADER_LOCALE = 'Accept-Language';
     const PARAM_SHOW_LINKS = '_showLinks';
     const PARAM_FILTERS = '_filters';
+    const PARAM_COUNT = '_showCount';
 
     /**
      * @param RequestStack $stack
@@ -227,7 +228,8 @@ class RequestManagerTest extends KernelTestCase
             self::PARAM_LOCALE,
             self::HEADER_LOCALE,
             self::PARAM_SHOW_LINKS,
-            self::PARAM_FILTERS
+            self::PARAM_FILTERS,
+            self::PARAM_COUNT
         );
     }
 

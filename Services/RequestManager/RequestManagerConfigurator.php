@@ -22,6 +22,8 @@ class RequestManagerConfigurator
     protected $localeParam;
     /** @var string */
     protected $apiFilterParam;
+    /** @var string */
+    protected $countParam;
 
     /**
      * RequestManagerConfigurator constructor.
@@ -33,6 +35,8 @@ class RequestManagerConfigurator
      * @param string $localeParam
      * @param string $localeHeader
      * @param string $linksParam
+     * @param $apiFilterParam
+     * @param $countParam
      */
     public function __construct(
         $fieldsParam,
@@ -43,7 +47,8 @@ class RequestManagerConfigurator
         $localeParam,
         $localeHeader,
         $linksParam,
-        $apiFilterParam
+        $apiFilterParam,
+        $countParam
     ) {
         $this->fieldsParam = $fieldsParam;
         $this->expandsParam = $expandsParam;
@@ -54,6 +59,7 @@ class RequestManagerConfigurator
         $this->localeParam = $localeParam;
         $this->linksParam = $linksParam;
         $this->apiFilterParam = $apiFilterParam;
+        $this->countParam = $countParam;
     }
 
     /**
@@ -147,7 +153,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getApiFilterParam(): string
+    public function getApiFilterParam()
     {
         return $this->apiFilterParam;
     }
@@ -155,8 +161,24 @@ class RequestManagerConfigurator
     /**
      * @param string $apiFilterParam
      */
-    public function setApiFilterParam(string $apiFilterParam)
+    public function setApiFilterParam($apiFilterParam)
     {
         $this->apiFilterParam = $apiFilterParam;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountParam()
+    {
+        return $this->countParam;
+    }
+
+    /**
+     * @param string $countParam
+     */
+    public function setCountParam($countParam)
+    {
+        $this->countParam = $countParam;
     }
 }
