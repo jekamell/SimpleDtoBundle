@@ -54,9 +54,14 @@ class DtoCollection implements DtoCollectionInterface
             $data[] = $item->jsonSerialize();
         }
 
+        if (!$this->collectionKey) {
+            return $data;
+        }
+
         if ($this->count !== null) {
             $result['_count'] = $this->count;
         }
+
         $result[$this->collectionKey] = $data;
 
         return $result;
