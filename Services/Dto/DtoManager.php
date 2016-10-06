@@ -97,11 +97,19 @@ class DtoManager implements DtoManagerInterface
      * @param string $dtoType
      * @param string $group
      * @param array $fields
+     * @param null|integer $count
      * @return DtoCollectionInterface
      */
-    public function createDtoCollection($collection, $dtoType, $group, array $fields = [])
+    public function createDtoCollection($collection, $dtoType, $group, array $fields = [], $count = null)
     {
-        $dtoCollection = new DtoCollection($dtoType, $collection, $this->configurator->getCollectionKey(), $group);
+        $dtoCollection = new DtoCollection(
+            $dtoType,
+            $collection,
+            $this->configurator->getCollectionKey(),
+            $group,
+            [],
+            $count
+        );
         $this->dispatch(
             new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION),
             ApiEvent::EVENT_PRE_DTO_COLLECTION_ENCODE

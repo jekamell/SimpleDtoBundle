@@ -14,6 +14,8 @@ class DtoCollection implements DtoCollectionInterface
     private $group;
     /** @var string */
     private $collectionKey;
+    /** @var integer */
+    private $count;
 
     /**
      * DtoCollection constructor.
@@ -22,14 +24,16 @@ class DtoCollection implements DtoCollectionInterface
      * @param string $collectionKey
      * @param null $group
      * @param DtoInterface[] $data
+     * @param null $count
      */
-    public function __construct($type, $originalData, $collectionKey, $group = null, array $data = [])
+    public function __construct($type, $originalData, $collectionKey, $group = null, array $data = [], $count = null)
     {
         $this->type = $type;
         $this->data = $data;
         $this->originalData = $originalData;
         $this->collectionKey = $collectionKey;
         $this->group = $group;
+        $this->count = $count;
     }
 
     /** @return array */
@@ -50,7 +54,12 @@ class DtoCollection implements DtoCollectionInterface
             $data[] = $item->jsonSerialize();
         }
 
-        return $this->collectionKey ? [$this->collectionKey => $data] : $data;
+        if ($this->count !== null) {
+            $result['_count'] = $this->count;
+        }
+        $result[$this->collectionKey] = $data;
+
+        return $result;
     }
 
     /**

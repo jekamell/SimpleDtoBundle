@@ -156,12 +156,17 @@ abstract class AbstractController extends Controller
         $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_COLLECTION_LOAD, $event);
 
-        $this->processLimit($queryBuilder);
-        $this->processOffset($queryBuilder);
-        $this->processSort($queryBuilder);
         if ($filters) {
             $this->processFilters($queryBuilder, $filters);
         }
+
+        if ($this->getRequestManager()->isCountRequired()) {
+            $count = $this->getCollectionCount($queryBuilder);
+        }
+
+        $this->processLimit($queryBuilder);
+        $this->processOffset($queryBuilder);
+        $this->processSort($queryBuilder);
 
         $collection = $queryBuilder->getQuery()->getResult();
 
@@ -172,7 +177,8 @@ abstract class AbstractController extends Controller
             $collection,
             $this->getDtoType(),
             $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
-            $this->get('simple_dto.request_manager')->getFields()
+            $this->get('simple_dto.request_manager')->getFields(),
+            $count ?? null
         );
     }
 
@@ -288,6 +294,19 @@ abstract class AbstractController extends Controller
             );
             $queryBuilder->setParameter($filter->getParam() . $i, $filter->getValue());
         }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @return int
+     */
+    protected function getCollectionCount(QueryBuilder $queryBuilder)
+    {
+        $rootAlias = current($queryBuilder->getRootAliases());
+        $builder = clone $queryBuilder;
+        $builder->select('count(' . $rootAlias . ')');
+
+        return (int)$builder->getQuery()->getSingleScalarResult();
     }
 
     /**

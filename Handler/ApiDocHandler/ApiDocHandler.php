@@ -52,6 +52,7 @@ class ApiDocHandler implements HandlerInterface
 
     /**
      * @param ApiDoc $annotation
+     * @param Route $route
      */
     protected function processParams(ApiDoc $annotation, Route $route)
     {
@@ -65,6 +66,7 @@ class ApiDocHandler implements HandlerInterface
             $annotation->addParameter($this->requestManagerConfigurator->getLimitParam(), $this->getLimitParams());
             $annotation->addParameter($this->requestManagerConfigurator->getOffsetParam(), $this->getOffsetParams());
             $annotation->addParameter($this->requestManagerConfigurator->getSortParam(), $this->getSortParams());
+            $annotation->addParameter($this->requestManagerConfigurator->getCountParam(), $this->getCountParams());
         }
     }
 
@@ -186,6 +188,18 @@ class ApiDocHandler implements HandlerInterface
             'dataType' => 'string',
             'required' => false,
             'description' => 'Collection sorting',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getCountParams()
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => 'Require full collection size',
         ];
     }
 
