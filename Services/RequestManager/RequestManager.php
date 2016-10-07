@@ -145,7 +145,7 @@ class RequestManager
     {
         $countStr = $this->request->get($this->requestManagerConfiguration->getCountParam());
 
-        return $countStr !== null;
+        return (bool)$countStr;
     }
 
     /**
