@@ -47,7 +47,7 @@ class ApiFiltersListener
         } catch (\Exception $e) {
             return;
         }
-        if (!$filters = $routeParams['_filters'] ?? null) {
+        if (!$filters = $routeParams['filters'] ?? null) {
             return;
         }
 

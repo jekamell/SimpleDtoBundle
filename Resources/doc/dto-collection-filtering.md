@@ -25,7 +25,7 @@ users_list:
     path: /api/v1/users
     defaults:
         _controller: AppBundle:User:list
-        _filters:
+        filters:
             - id
             - email
             - name

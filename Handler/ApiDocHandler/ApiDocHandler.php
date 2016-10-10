@@ -110,7 +110,7 @@ class ApiDocHandler implements HandlerInterface
      */
     protected function processApiFilters(ApiDoc $annotation, Route $route)
     {
-        $filters = $route->getDefault('_filters');
+        $filters = $route->getDefault('filters');
         if ($filters) {
             $annotation->addParameter(
                 $this->requestManagerConfigurator->getApiFilterParam(),
@@ -212,7 +212,7 @@ class ApiDocHandler implements HandlerInterface
         return [
             'dataType' => 'string',
             'required' => false,
-            'description' => sprintf('Api filters. Use one or few of %s', implode(',', $filters))
+            'description' => sprintf('Api filters. Available: "%s"', implode(',', $filters))
         ];
     }
 }
