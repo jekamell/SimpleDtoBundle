@@ -24,4 +24,11 @@ interface ApiFilterCollectionInterface extends \Iterator, \Countable, \ArrayAcce
      * @return ApiFilterCollectionInterface
      */
     public function filter(\Closure $closure);
+
+    /**
+     * Check if filter by given param exists
+     * @param $param
+     * @return bool
+     */
+    public function exists($param);
 }
