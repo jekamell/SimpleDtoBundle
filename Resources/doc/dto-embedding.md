@@ -88,8 +88,6 @@ UserDto:
 ```
 In this case your repository method should looks like:
 ```php
-
-```
 <?php
 
 namespace AppBundle\Repository;
@@ -114,3 +112,4 @@ class UserRepository extends EntityRepository
         return $addressObjects;
     }
 }
+```
