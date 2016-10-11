@@ -41,6 +41,7 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager
         arguments:
             - "@simple_dto.dto_helper"
+            - "@service_container"
 
     simple_dto.dto_links_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
