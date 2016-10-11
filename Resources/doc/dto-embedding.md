@@ -41,7 +41,7 @@ You can require to embed related object for base CRUD operations. For example if
 GET http://my-awesome-api.com/api/v1/users/1?_expand=address
 ```
 
-```yaml
+```json
 {
   "id": 1,
   "email": "john.doe@mail.com",
