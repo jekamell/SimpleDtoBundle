@@ -135,7 +135,7 @@ class RequestManager
     {
         $linksStr = $this->request->get($this->requestManagerConfiguration->getLinksParam());
 
-        return $linksStr !== null;
+        return (bool)$linksStr;
     }
 
     /**
