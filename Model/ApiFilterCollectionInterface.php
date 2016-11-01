@@ -35,7 +35,7 @@ interface ApiFilterCollectionInterface extends \Iterator, \Countable, \ArrayAcce
     /**
      * Get single filter by param
      * @param $param
-     * @return mixed
+     * @return ApiFilter
      */
     public function getByParam($param);
 }
