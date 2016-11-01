@@ -161,4 +161,19 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
 
         return false;
     }
+
+    /**
+     * @param $param
+     * @return ApiFilter
+     */
+    public function getByParam($param)
+    {
+        foreach ($this->data as $filter) {
+            if ($filter->getParam() === $param) {
+                return $filter;
+            }
+        }
+
+        return null;
+    }
 }
