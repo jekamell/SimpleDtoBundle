@@ -79,6 +79,17 @@ class Dto implements DtoInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function setRawData(array $data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+
+    /**
      * Set dto source
      *
      * @param $data

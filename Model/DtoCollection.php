@@ -43,6 +43,16 @@ class DtoCollection implements DtoCollectionInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function setRawData(array $data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      */
