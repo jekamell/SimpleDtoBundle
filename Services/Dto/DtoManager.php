@@ -10,6 +10,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
+use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -25,6 +26,8 @@ class DtoManager implements DtoManagerInterface
     protected $dtoHelper;
     /** @var DtoManagerConfigurator */
     protected $configurator;
+    /** @var RequestManagerConfigurator */
+    protected $requestConfigurator;
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -33,17 +36,20 @@ class DtoManager implements DtoManagerInterface
      * @param DtoValidator $dtoValidator
      * @param DtoHelper $dtoHelper
      * @param DtoManagerConfigurator $configurator
+     * @param RequestManagerConfigurator $requestManagerConfigurator
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         DtoValidator $dtoValidator,
         DtoHelper $dtoHelper,
         DtoManagerConfigurator $configurator,
+        RequestManagerConfigurator $requestManagerConfigurator,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->dtoValidator = $dtoValidator;
         $this->dtoHelper = $dtoHelper;
         $this->configurator = $configurator;
+        $this->requestConfigurator = $requestManagerConfigurator;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -140,8 +146,16 @@ class DtoManager implements DtoManagerInterface
         $group = $dto->getGroup();
         $this->validateDto($dto, $dtoConfig, $dtoType);
 
+        $systemFields = [
+            $this->requestConfigurator->getExpandsParam(),
+            $this->requestConfigurator->getLinksParam(),
+            $this->requestConfigurator->getFieldsParam()
+        ];
         $fieldsConfig = $dtoConfig[$dtoType]['fields'];
         foreach ($dto->getRawData() as $property => $value) {
+            if (in_array($property, $systemFields)) {
+                continue;
+            }
             if (!isset($fieldsConfig[$property])) {
                 throw new BadRequestHttpException(sprintf('%s: field "%s" is not defined', $dtoType, $property));
             }
