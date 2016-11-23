@@ -94,7 +94,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Unique entity field for authenticate user')
                     ->end()
                 ->variableNode('trusted_clients')
-                    ->info('List of trusted clients in { id: id, name: name } format')
+                    ->info('List of trusted clients in { id: id, name: name, access: [] } format')
                     ->end()
             ->end();
 

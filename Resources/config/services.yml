@@ -143,3 +143,19 @@ services:
             - "%simple_dto.hateoas_enabled%"
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    # Event listeners
+    simple_dto.event_listener.trusted_client_access_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\TrustedClientAccessListener
+        arguments:
+            - "@security.token_storage"
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    simple_dto.event_listener.exception_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\ExceptionListener
+        arguments:
+            - "%kernel.environment%"
+            - "%kernel.debug%"
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }

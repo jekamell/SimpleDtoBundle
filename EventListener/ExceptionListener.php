@@ -1,17 +1,16 @@
 <?php
 
-namespace Mell\Bundle\SimpleDtoBundle\Controller;
+namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 
 /**
- * Class ExceptionController
- * @package Mell\Bundle\SimpleDtoBundle\Controller
+ * Class ExceptionListener
+ * @package Mell\Bundle\SimpleDtoBundle\EventListener
  */
-class ExceptionController extends Controller
+class ExceptionListener
 {
     const ENV_DEV = 'dev';
     const ENV_PROD = 'prod';
@@ -26,13 +25,29 @@ class ExceptionController extends Controller
         Response::HTTP_METHOD_NOT_ALLOWED => 'Method not allowed',
         Response::HTTP_INTERNAL_SERVER_ERROR => 'Server error',
     ];
+    /** @var string */
+    protected $environment;
+    /** @var bool */
+    protected $debug;
 
     /**
-     * @param FlattenException $exception
-     * @return JsonResponse
+     * ExceptionListener constructor.
+     * @param string $environment
+     * @param bool $debug
      */
-    public function showAction(FlattenException $exception)
+    public function __construct($environment, $debug)
     {
+        $this->environment = $environment;
+        $this->debug = $debug;
+    }
+
+    /**
+     * @param GetResponseForExceptionEvent $event
+     */
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+//        $event->getKernel()->getEnvironment();
+        $exception = $event->getException();
         $data = [];
         if ($this->getEnvironment() === self::ENV_PROD) {
             if (isset($this->exceptionCodeMessageMap[$exception->getStatusCode()])) {
@@ -43,28 +58,24 @@ class ExceptionController extends Controller
         } else {
             $data['_error'] = $exception->getMessage();
             if ($this->getDebug()) {
-                $data['_class'] = $exception->getClass();
                 $data['_file'] = $exception->getFile();
                 $data['_line'] = $exception->getLine();
             }
         }
 
-        return new JsonResponse($data, $exception->getStatusCode());
-    }
-
-    /**
-     * @return string
-     */
-    private function getEnvironment()
-    {
-        return $this->getParameter('kernel.environment');
+        $event->setResponse(new JsonResponse($data, $exception->getStatusCode()));
     }
 
     /**
      * @return mixed
      */
-    private function getDebug()
+    protected function getEnvironment()
     {
-        return $this->getParameter('kernel.debug');
+        return $this->environment;
+    }
+
+    protected function getDebug()
+    {
+        return $this->debug;
     }
 }

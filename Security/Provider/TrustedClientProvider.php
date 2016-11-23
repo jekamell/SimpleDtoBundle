@@ -2,6 +2,7 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Security\Provider;
 
+use Mell\Bundle\SimpleDtoBundle\Model\TrustedUser;
 use Mell\Bundle\SimpleDtoBundle\Security\Model\UserCredentialsInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -18,15 +19,15 @@ class TrustedClientProvider extends AbstractUserProvider
     const ROLE_TRUSTED_USER = 'ROLE_TRUSTED_USER';
 
     /** @var array */
-    protected $trustedClient = [];
+    protected $trustedClients = [];
 
     /**
      * TrustedClientProvider constructor.
      * @param array $trustedClient
      */
-    public function __construct(array $trustedClient)
+    public function __construct(array $trustedClients)
     {
-        $this->trustedClient = $trustedClient;
+        $this->trustedClients = $trustedClients;
     }
 
     /**
@@ -43,9 +44,14 @@ class TrustedClientProvider extends AbstractUserProvider
      */
     public function loadUserByUsername($username)
     {
-        foreach ($this->trustedClient as $id => $name) {
-            if ($name === $username) {
-                return new User($username, null, [self::ROLE_TRUSTED_USER]);
+        foreach ($this->trustedClients as $trustedClient) {
+            if ($trustedClient['name'] === $username) {
+                return new TrustedUser(
+                    $trustedClient['id'],
+                    $trustedClient['name'],
+                    [self::ROLE_TRUSTED_USER],
+                    $trustedClient['access']
+                );
             }
         }
 
