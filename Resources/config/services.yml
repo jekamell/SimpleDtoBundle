@@ -32,6 +32,7 @@ services:
             - "@simple_dto.dto_validator"
             - "@simple_dto.dto_helper"
             - "@simple_dto.dto_manager_configurator"
+            - "@simple_dto.request_manager_configurator"
             - "@event_dispatcher"
 
     simple_dto.api_filter_manager:

@@ -31,4 +31,11 @@ interface ApiFilterCollectionInterface extends \Iterator, \Countable, \ArrayAcce
      * @return bool
      */
     public function exists($param);
+
+    /**
+     * Get single filter by param
+     * @param $param
+     * @return ApiFilter
+     */
+    public function getByParam($param);
 }
