@@ -5,6 +5,7 @@ namespace Mell\Bundle\SimpleDtoBundle\Security\Provider;
 use Mell\Bundle\SimpleDtoBundle\Model\TrustedUser;
 use Mell\Bundle\SimpleDtoBundle\Security\Model\UserCredentialsInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\User;
@@ -23,7 +24,8 @@ class TrustedClientProvider extends AbstractUserProvider
 
     /**
      * TrustedClientProvider constructor.
-     * @param array $trustedClient
+     * @param array $trustedClients
+     * @internal param array $trustedClient
      */
     public function __construct(array $trustedClients)
     {
@@ -55,10 +57,7 @@ class TrustedClientProvider extends AbstractUserProvider
             }
         }
 
-        $exception = new UsernameNotFoundException();
-        $exception->setUsername($username);
-
-        throw $exception;
+        throw new AuthenticationException('User was not found');
     }
 
     /**

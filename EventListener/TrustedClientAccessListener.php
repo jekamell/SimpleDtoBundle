@@ -36,8 +36,11 @@ class TrustedClientAccessListener
      */
     public function onKernelController(FilterControllerEvent $event)
     {
+        if (!$this->tokenStorage->getToken() || !$this->tokenStorage->getToken()->getUser()) {
+            return;
+        }
         $user = $this->tokenStorage->getToken()->getUser();
-        if (!$user->hasRole(TrustedClientProvider::ROLE_TRUSTED_USER) 
+        if (!$user->hasRole(TrustedClientProvider::ROLE_TRUSTED_USER)
             || !$user instanceof TrustedUser
             || in_array(self::ACCESS_FULL, $user->getAccess())
         ) {
@@ -46,5 +49,6 @@ class TrustedClientAccessListener
         if (!in_array($event->getRequest()->get('_route'), $user->getAccess())) {
             throw new AccessDeniedHttpException('Access denied.');
         }
+
     }
 }
