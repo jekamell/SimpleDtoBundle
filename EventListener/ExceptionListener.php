@@ -5,6 +5,7 @@ namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class ExceptionListener
@@ -46,12 +47,12 @@ class ExceptionListener
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-//        $event->getKernel()->getEnvironment();
         $exception = $event->getException();
+        $code = $exception instanceof HttpException ? $exception->getStatusCode() : $exception->getCode();
         $data = [];
         if ($this->getEnvironment() === self::ENV_PROD) {
-            if (isset($this->exceptionCodeMessageMap[$exception->getStatusCode()])) {
-                $data['_error'] = $this->exceptionCodeMessageMap[$exception->getStatusCode()];
+            if (isset($this->exceptionCodeMessageMap[$code])) {
+                $data['_error'] = $this->exceptionCodeMessageMap[$code];
             } else {
                 $data['_error'] = self::UNKNOWN_ERROR_MESSAGE;
             }
@@ -63,7 +64,7 @@ class ExceptionListener
             }
         }
 
-        $event->setResponse(new JsonResponse($data, $exception->getStatusCode()));
+        $event->setResponse(new JsonResponse($data, $code ? : JsonResponse::HTTP_INTERNAL_SERVER_ERROR));
     }
 
     /**
