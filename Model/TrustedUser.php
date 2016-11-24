@@ -67,6 +67,15 @@ class TrustedUser implements UserInterface
     }
 
     /**
+     * @param $access
+     * @return bool
+     */
+    public function hasAccess($access)
+    {
+        return in_array($access, $this->access);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getPassword()
