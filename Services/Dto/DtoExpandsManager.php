@@ -7,6 +7,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class DtoExpandsManager
@@ -40,6 +41,9 @@ class DtoExpandsManager
     {
         $data = [];
         foreach ($expands as $expand => $fields) {
+            if (!isset($config[$dto->getType()]['expands'][$expand])) {
+                throw new BadRequestHttpException(sprintf('Required expand not found: %s', $expand));
+            }
             $expandConfig = $config[$dto->getType()]['expands'][$expand];
             $getter = !empty($expandConfig['getter'])
                 ? $expandConfig['getter']
