@@ -61,6 +61,7 @@ class ExceptionListener
             if ($this->getDebug()) {
                 $data['_file'] = $exception->getFile();
                 $data['_line'] = $exception->getLine();
+                $data['_trace'] = $exception->getTraceAsString();
             }
         }
 
@@ -75,6 +76,9 @@ class ExceptionListener
         return $this->environment;
     }
 
+    /**
+     * @return bool
+     */
     protected function getDebug()
     {
         return $this->debug;
