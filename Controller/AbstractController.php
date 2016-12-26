@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 abstract class AbstractController extends Controller
@@ -196,7 +195,16 @@ abstract class AbstractController extends Controller
      */
     protected function getQueryBuilder($alias = 't')
     {
-        return $this->getEntityManager()->getRepository($this->getEntityAlias())->createQueryBuilder($alias);
+        $queryBuilder = $this->getEntityManager()->getRepository($this->getEntityAlias())->createQueryBuilder($alias);
+        $associationNames = $this->getEntityManager()->getClassMetadata($this->getEntityAlias())->getAssociationNames();
+        foreach (array_keys($this->get('simple_dto.request_manager')->getExpands()) as $expand) {
+            if (in_array($expand, $associationNames)) {
+                $queryBuilder->leftJoin($alias . '.' . $expand, $expand);
+                $queryBuilder->addSelect($expand);
+            }
+        }
+
+        return $queryBuilder;
     }
 
     /**
