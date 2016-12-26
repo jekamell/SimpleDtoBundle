@@ -4,6 +4,7 @@ namespace Mell\Bundle\SimpleDtoBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilter;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
@@ -159,15 +160,15 @@ abstract class AbstractController extends Controller
             $this->processFilters($queryBuilder, $filters);
         }
 
-        if ($this->getRequestManager()->isCountRequired()) {
-            $count = $this->getCollectionCount($queryBuilder);
-        }
-
         $this->processLimit($queryBuilder);
         $this->processOffset($queryBuilder);
         $this->processSort($queryBuilder);
 
-        $collection = $queryBuilder->getQuery()->getResult();
+        $paginator = new Paginator($queryBuilder->getQuery());
+        $collection = $paginator;
+        if ($this->getRequestManager()->isCountRequired()) {
+            $count = $paginator->count();
+        }
 
         $event = new ApiEvent($collection, ApiEvent::ACTION_LIST);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_COLLECTION_LOAD, $event);
