@@ -205,6 +205,10 @@ abstract class AbstractController extends Controller
             }
         }
 
+        if (!empty($this->get('simple_dto.request_manager')->getExpands())) {
+            $queryBuilder->addGroupBy($alias . '.id'); // TODO: use paginator instead
+        }
+
         return $queryBuilder;
     }
 
@@ -313,8 +317,8 @@ abstract class AbstractController extends Controller
     {
         $rootAlias = current($queryBuilder->getRootAliases());
         $builder = clone $queryBuilder;
+        $builder->resetDQLPart('groupBy'); //TODO Use Paginator instead of this
         $builder->select('count(' . $rootAlias . ')');
-
         return (int)$builder->getQuery()->getSingleScalarResult();
     }
 
