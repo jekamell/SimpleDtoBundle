@@ -205,6 +205,10 @@ abstract class AbstractController extends Controller
             }
         }
 
+        if (!empty($this->get('simple_dto.request_manager')->getExpands())) {
+            $queryBuilder->addGroupBy($alias . '.id'); // TODO: use paginator instead
+        }
+
         return $queryBuilder;
     }
 
