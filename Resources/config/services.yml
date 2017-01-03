@@ -156,6 +156,7 @@ services:
     simple_dto.event_listener.exception_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\ExceptionListener
         arguments:
+            - "@logger"
             - "%kernel.environment%"
             - "%kernel.debug%"
         tags:
