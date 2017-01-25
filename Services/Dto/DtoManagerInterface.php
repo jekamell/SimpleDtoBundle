@@ -46,11 +46,11 @@ interface DtoManagerInterface
      * @param string $dtoType
      * @return bool
      */
-    public function hasConfig($dtoType);
+    public function hasDtoConfig($dtoType);
 
     /**
      * @param string $dtoType
      * @return array
      */
-    public function getConfig($dtoType);
+    public function getDtoConfig($dtoType);
 }

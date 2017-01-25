@@ -42,7 +42,7 @@ class DtoParser implements ParserInterface
      */
     public function supports(array $item)
     {
-        return $this->dtoManager->hasConfig($item['class']);
+        return $this->dtoManager->hasDtoConfig($item['class']);
     }
 
     /**
@@ -52,7 +52,7 @@ class DtoParser implements ParserInterface
     public function parse(array $item)
     {
         $data = [];
-        foreach ($this->dtoManager->getConfig($item['class'])['fields'] as $field => $config) {
+        foreach ($this->dtoManager->getDtoConfig($item['class'])['fields'] as $field => $config) {
             if (!empty($config['groups']) && empty(array_intersect($item['groups'], $config['groups']))) {
                 continue;
             }

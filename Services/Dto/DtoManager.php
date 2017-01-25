@@ -159,22 +159,32 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
+     * Get whole dto configuration
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->dtoHelper->getDtoConfig();
+    }
+
+    /**
      * @param string $dtoType DtoConfig name (UserDto as example)
      * @return bool
      */
-    public function hasConfig($dtoType)
+    public function hasDtoConfig($dtoType)
     {
         return array_key_exists($dtoType, $this->dtoHelper->getDtoConfig());
     }
 
     /**
+     * Get item specific dto configuration
      * @param string $dtoType
      * @return mixed
      * @throws DtoException
      */
-    public function getConfig($dtoType)
+    public function getDtoConfig($dtoType)
     {
-        if ($this->hasConfig($dtoType)) {
+        if ($this->hasDtoConfig($dtoType)) {
             return $this->dtoHelper->getDtoConfig()[$dtoType];
         }
 
