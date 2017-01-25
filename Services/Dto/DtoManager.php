@@ -7,8 +7,10 @@ use Mell\Bundle\SimpleDtoBundle\Exceptions\DtoException;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
+use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -48,24 +50,22 @@ class DtoManager implements DtoManagerInterface
 
     /**
      * Convert entity to dto
-     *
      * @param object $entity
      * @param string $dtoType
      * @param string $group
      * @param array $fields
-     * @param bool $trowEvents
+     * @param bool $throwEvent
      * @return DtoInterface
      */
-    public function createDto($entity, $dtoType, $group, array $fields, $trowEvents = true)
+    public function createDto($entity, $dtoType, $group, array $fields, $throwEvent = true)
     {
         $dtoConfig = $this->dtoHelper->getDtoConfig();
         $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
 
-        $dto = new Dto($dtoType, $entity, $group, []);
+        $dto = new Dto($dtoType, $entity, $group);
 
-        if ($trowEvents) {
-            $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
-            $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_ENCODE, $event);
+        if ($throwEvent) {
+            $this->dispatch(new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO), ApiEvent::EVENT_PRE_DTO_ENCODE);
         }
 
         $fieldsConfig = $dtoConfig[$dtoType]['fields'];
@@ -80,66 +80,70 @@ class DtoManager implements DtoManagerInterface
                 continue;
             }
 
-            $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+            $getter = $this->getFieldGetter($options, $field);
             $value = call_user_func([$entity, $getter]);
             $dto->append([$field => $this->dtoHelper->castValueType($options['type'], $value)]);
         }
 
-        if ($trowEvents) {
-            $event = new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO);
-            $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_ENCODE, $event);
+        if ($throwEvent) {
+            $this->dispatch(new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO), ApiEvent::EVENT_POST_DTO_ENCODE);
         }
 
         return $dto;
     }
 
     /**
+     * Create collection of dto's by given data
      * @param array $collection
-     * @param $dtoType
-     * @param $group
+     * @param string $dtoType
+     * @param string $group
      * @param array $fields
-     * @param array $expands
-     * @param string $collectionKey
-     * @return DtoInterface
+     * @param null|integer $count
+     * @return DtoCollectionInterface
      */
-    public function createDtoCollection(
-        $collection,
-        $dtoType,
-        $group,
-        array $fields = [],
-        array $expands = [],
-        $collectionKey = null
-    ) {
-        $dtoCollection = new DtoCollection($dtoType, $collection, $this->processCollectionKey($collectionKey), $group);
-        $event = new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION);
-        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DTO_COLLECTION_ENCODE, $event);
+    public function createDtoCollection($collection, $dtoType, $group, array $fields = [], $count = null)
+    {
+        $dtoCollection = new DtoCollection(
+            $dtoType,
+            $collection,
+            $this->configurator->getCollectionKey(),
+            $group,
+            [],
+            $count
+        );
+        $this->dispatch(
+            new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION),
+            ApiEvent::EVENT_PRE_DTO_COLLECTION_ENCODE
+        );
 
         foreach ($collection as $item) {
             $dtoCollection->append($this->createDto($item, $dtoType, $group, $fields, false));
         }
 
-        $event = new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION);
-        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DTO_COLLECTION_ENCODE, $event);
+        $this->dispatch(
+            new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION),
+            ApiEvent::EVENT_POST_DTO_COLLECTION_ENCODE
+        );
 
         return $dtoCollection;
     }
 
     /**
-     * @param $entity
+     * Convert dto to given entity
+     * @param object $entity
      * @param DtoInterface $dto
-     * @param string $dtoType
-     * @param string|null $group
-     * @return mixed
+     * @return object
      */
-    public function createEntityFromDto($entity, DtoInterface $dto, $dtoType, $group)
+    public function createEntityFromDto($entity, DtoInterface $dto)
     {
-        $dtoConfig = $this->dtoHelper->getDtoConfig();
-        $this->validateDto($dto, $dtoConfig, $dtoType);
+        $dtoConfig = $this->getConfig();
+        $group = $dto->getGroup();
+        $this->validateDto($dto, $dtoConfig, $dto->getType());
 
-        $fieldsConfig = $dtoConfig[$dtoType]['fields'];
+        $fieldsConfig = $this->getDtoConfig($dto->getType())['fields'];
         foreach ($dto->getRawData() as $property => $value) {
             if (!isset($fieldsConfig[$property])) {
-                throw new BadRequestHttpException(sprintf('%s: field "%s" is not defined', $dtoType, $property));
+                throw new BadRequestHttpException(sprintf('%s: field "%s" is not defined', $dto->getType(), $property));
             }
             if (!empty($fieldsConfig[$property]['readonly'])) {
                 continue;
@@ -147,11 +151,8 @@ class DtoManager implements DtoManagerInterface
             if (isset($fieldsConfig[$property]['groups']) && !in_array($group, $fieldsConfig[$property]['groups'])) {
                 continue;
             }
-            $value = $this->castValueType($fieldsConfig[$property]['type'], $value, false);
-            $setter = isset($fieldsConfig[$property]['setter'])
-                ? $fieldsConfig[$property]['setter']
-                : $this->dtoHelper->getFieldSetter($property);
-
+            $value = $this->dtoHelper->castValueType($fieldsConfig[$property]['type'], $value, false);
+            $setter = $this->getFieldSetter($fieldsConfig, $property);
             call_user_func([$entity, $setter], $value);
         }
 
@@ -168,6 +169,7 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
+     * Whether is dto config exists
      * @param string $dtoType DtoConfig name (UserDto as example)
      * @return bool
      */
@@ -179,7 +181,7 @@ class DtoManager implements DtoManagerInterface
     /**
      * Get item specific dto configuration
      * @param string $dtoType
-     * @return mixed
+     * @return array
      * @throws DtoException
      */
     public function getDtoConfig($dtoType)
@@ -211,42 +213,9 @@ class DtoManager implements DtoManagerInterface
                 continue;
             }
 
-            $getter = isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+            $getter = $this->getFieldGetter($options, $field);
             $value = call_user_func([$entity, $getter]);
-            $dtoData[$field] = $this->castValueType($options['type'], $value);
-        }
-    }
-
-    /**
-     * @param $entity
-     * @param array $dtoData Predefined dto data
-     * @param array $expands Required expands
-     * @param array $config Expands configuration
-     * @param string $group Dto group
-     */
-    protected function processExpands($entity, array &$dtoData, array $expands, array $config, $group)
-    {
-        $this->validateExpands($config, $expands);
-        foreach ($expands as $expand => $fields) {
-            $expandConfig = $config[$expand];
-            $expandGetter = !empty($expandConfig['getter'])
-                ? $expandConfig['getter']
-                : $this->dtoHelper->getFieldGetter($expand);
-            if (!$expandObject = call_user_func([$entity, $expandGetter])) {
-                continue;
-            }
-            if (is_array($expandObject) || $expandObject instanceof \ArrayAccess) {
-                $dtoData['_expands'][$expand] = $this->createDtoCollection(
-                    $expandObject,
-                    $expandConfig['type'],
-                    $group,
-                    $fields,
-                    [],
-                    false // do not add collection key
-                );
-            } else {
-                $dtoData['_expands'][$expand] = $this->createDto($expandObject, $expandConfig['type'], $group, $fields);
-            }
+            $dtoData[$field] = $this->dtoHelper->castValueType($options['type'], $value);
         }
     }
 
@@ -271,67 +240,33 @@ class DtoManager implements DtoManagerInterface
     }
 
     /**
-     * @param array $config
-     * @param array $expands
-     */
-    protected function validateExpands(array $config, array $expands)
-    {
-        return $this->dtoValidator->validateExpands($config, $expands);
-    }
-
-    /**
-     * @param string $type
-     * @param mixed $value
-     * @param bool $raw
-     * @return mixed
-     */
-    protected function castValueType($type, $value, $raw = true)
-    {
-        switch ($type) {
-            case DtoInterface::TYPE_INTEGER:
-                $value = intval($value);
-                break;
-            case DtoInterface::TYPE_FLOAT:
-                $value = floatval($value);
-                break;
-            case DtoInterface::TYPE_STRING:
-                $value = (string)$value;
-                break;
-            case DtoInterface::TYPE_BOOLEAN:
-                $value = boolval($value);
-                break;
-            case DtoInterface::TYPE_ARRAY:
-                $value = (array)$value;
-                break;
-            case DtoInterface::TYPE_DATE:
-                if (!$value instanceof \DateTime) {
-                    $value = new \DateTime($value);
-                }
-                if ($raw) {
-                    $value = $value->format($this->configurator->getFormatDate());
-                }
-                break;
-            case DtoInterface::TYPE_DATE_TIME:
-                if (!$value instanceof \DateTime) {
-                    $value = new \DateTime($value);
-                }
-                if ($raw) {
-                    $value = $value->format($this->configurator->getFormatDateTime());
-                }
-                break;
-            default:
-                $value = null;
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param $collectionKey
+     * @param $fieldsConfig
+     * @param $property
      * @return string
      */
-    private function processCollectionKey($collectionKey)
+    private function getFieldSetter($fieldsConfig, $property)
     {
-        return $collectionKey !== null ? $collectionKey : $this->configurator->getCollectionKey();
+        return isset($fieldsConfig[$property]['setter'])
+            ? $fieldsConfig[$property]['setter']
+            : $this->dtoHelper->getFieldSetter($property);
+    }
+
+    /**
+     * @param $options
+     * @param $field
+     * @return string
+     */
+    private function getFieldGetter($options, $field)
+    {
+        return isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+    }
+
+    /**
+     * @param ApiEvent $apiEvent
+     * @param string $eventName
+     */
+    private function dispatch(ApiEvent $apiEvent, $eventName)
+    {
+        $this->eventDispatcher->dispatch($eventName, $apiEvent);
     }
 }

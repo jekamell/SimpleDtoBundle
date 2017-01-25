@@ -26,6 +26,14 @@ interface DtoInterface extends \JsonSerializable
     public function getRawData();
 
     /**
+     * Reset raw data
+     *
+     * @param array $data
+     * @return $this
+     */
+    public function setRawData(array $data);
+
+    /**
      * Set dto source
      *
      * @param $data

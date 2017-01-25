@@ -8,6 +8,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoValidator;
+use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -22,7 +23,7 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider createDtoProvider
      * @group dtoCreate
      */
-    public function testCreateDto(User $entity, $dtoType, $group, array $fields, Dto $expected)
+    public function testCreateDto(User $entity, $dtoType, $group, array $fields, DtoInterface $expected)
     {
         $manager = new DtoManager(
             $this->getDtoValidator(),

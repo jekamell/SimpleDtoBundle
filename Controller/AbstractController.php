@@ -4,7 +4,11 @@ namespace Mell\Bundle\SimpleDtoBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mell\Bundle\SimpleDtoBundle\Model\ApiFilter;
+use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
@@ -16,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 abstract class AbstractController extends Controller
@@ -39,7 +42,7 @@ abstract class AbstractController extends Controller
      * @param Request $request
      * @param $entity
      * @param string|null $dtoGroup
-     * @return Response
+     * @return DtoInterface|Response
      */
     protected function createResource(Request $request, $entity, $dtoGroup = null)
     {
@@ -48,19 +51,14 @@ abstract class AbstractController extends Controller
         }
 
         $dto = new Dto($this->getDtoType(), null, $dtoGroup ?: DtoInterface::DTO_GROUP_CREATE, $data);
-        $entity = $this->getDtoManager()->createEntityFromDto(
-            $entity,
-            $dto,
-            $this->getDtoType(),
-            $dto->getGroup()
-        );
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, $dto);
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
-            return $this->serializeResponse($errors);
+            return $errors;
         }
 
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_PERSIST, $event);
@@ -72,13 +70,11 @@ abstract class AbstractController extends Controller
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
-        return $this->serializeResponse(
-            $this->getDtoManager()->createDto(
-                $entity,
-                $this->getDtoType(),
-                $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->get('simple_dto.request_manager')->getFields()
-            )
+        return $this->getDtoManager()->createDto(
+            $entity,
+            $this->getDtoType(),
+            $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
+            $this->get('simple_dto.request_manager')->getFields()
         );
     }
 
@@ -86,7 +82,7 @@ abstract class AbstractController extends Controller
      * @param Request $request
      * @param $entity
      * @param string|null $dtoGroup
-     * @return Response
+     * @return DtoInterface
      */
     protected function updateResource(Request $request, $entity, $dtoGroup = null)
     {
@@ -95,19 +91,14 @@ abstract class AbstractController extends Controller
         }
 
         $dto = new Dto($this->getDtoType(), $entity, $dtoGroup ?: DtoInterface::DTO_GROUP_UPDATE, $data);
-        $entity = $this->getDtoManager()->createEntityFromDto(
-            $entity,
-            $dto,
-            $this->getDtoType(),
-            $dto->getGroup()
-        );
+        $entity = $this->getDtoManager()->createEntityFromDto($entity, $dto);
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->get('validator')->validate($entity);
         if ($errors->count()) {
-            return $this->serializeResponse($errors);
+            return $errors;
         }
 
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
@@ -115,32 +106,29 @@ abstract class AbstractController extends Controller
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
-        return $this->readResource($entity);
+        return $dto;
     }
 
     /**
      * @param $entity
      * @param string|null $dtoGroup
-     * @return Response
+     * @return DtoInterface
      */
     protected function readResource($entity, $dtoGroup = null)
     {
         $event = new ApiEvent($entity, ApiEvent::ACTION_READ);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_READ, $event);
 
-        return $this->serializeResponse(
-            $this->getDtoManager()->createDto(
-                $entity,
-                $this->getDtoType(),
-                $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
-                $this->get('simple_dto.request_manager')->getFields()
-            )
+        return $this->getDtoManager()->createDto(
+            $entity,
+            $this->getDtoType(),
+            $dtoGroup ?: DtoInterface::DTO_GROUP_READ,
+            $this->get('simple_dto.request_manager')->getFields()
         );
     }
 
     /**
      * @param $entity
-     * @return Response
      */
     protected function deleteResource($entity)
     {
@@ -152,35 +140,45 @@ abstract class AbstractController extends Controller
         $this->getEntityManager()->flush();
         $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
-
-        return new Response('', Response::HTTP_NO_CONTENT, ['Content-Type' => 'application/json']);
     }
 
     /**
      * @param QueryBuilder $queryBuilder
+     * @param ApiFilterCollectionInterface $filters
      * @param string $dtoGroup
-     * @return Response
+     * @return DtoCollectionInterface
      */
-    protected function listResources(QueryBuilder $queryBuilder, $dtoGroup = null)
-    {
+    protected function listResources(
+        QueryBuilder $queryBuilder,
+        ApiFilterCollectionInterface $filters = null,
+        $dtoGroup = null
+    ) {
         $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_COLLECTION_LOAD, $event);
 
+        if ($filters) {
+            $this->processFilters($queryBuilder, $filters);
+        }
+
         $this->processLimit($queryBuilder);
         $this->processOffset($queryBuilder);
+        $this->processSort($queryBuilder);
 
-        $collection = $queryBuilder->getQuery()->getResult();
+        $paginator = new Paginator($queryBuilder->getQuery());
+        $collection = iterator_to_array($paginator);
+        if ($this->getRequestManager()->isCountRequired()) {
+            $count = $paginator->count();
+        }
 
         $event = new ApiEvent($collection, ApiEvent::ACTION_LIST);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_COLLECTION_LOAD, $event);
 
-        return $this->serializeResponse(
-            $this->getDtoManager()->createDtoCollection(
-                $collection,
-                $this->getDtoType(),
-                $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
-                $this->get('simple_dto.request_manager')->getFields()
-            )
+        return $this->getDtoManager()->createDtoCollection(
+            $collection,
+            $this->getDtoType(),
+            $dtoGroup ?: DtoInterface::DTO_GROUP_LIST,
+            $this->get('simple_dto.request_manager')->getFields(),
+            isset($count) ? $count : null
         );
     }
 
@@ -198,11 +196,20 @@ abstract class AbstractController extends Controller
      */
     protected function getQueryBuilder($alias = 't')
     {
-        return $this->getEntityManager()->getRepository($this->getEntityAlias())->createQueryBuilder($alias);
+        $queryBuilder = $this->getEntityManager()->getRepository($this->getEntityAlias())->createQueryBuilder($alias);
+        $associationNames = $this->getEntityManager()->getClassMetadata($this->getEntityAlias())->getAssociationNames();
+        foreach (array_keys($this->get('simple_dto.request_manager')->getExpands()) as $expand) {
+            if (in_array($expand, $associationNames)) {
+                $queryBuilder->leftJoin($alias . '.' . $expand, $expand);
+                $queryBuilder->addSelect($expand);
+            }
+        }
+
+        return $queryBuilder;
     }
 
     /**
-     * @param DtoInterface $data
+     * @param DtoInterface|ConstraintViolationListInterface $data
      * @param int $statusCode
      * @param string $format
      * @return Response
@@ -244,7 +251,7 @@ abstract class AbstractController extends Controller
      */
     protected function processLimit(QueryBuilder $queryBuilder)
     {
-        $limit = $this->getRequestManager()->getLimit() ? : static::LIST_LIMIT_DEFAULT;
+        $limit = $this->getRequestManager()->getLimit() ?: static::LIST_LIMIT_DEFAULT;
         $queryBuilder->setMaxResults(min($limit, static::LIST_LIMIT_MAX));
     }
 
@@ -257,6 +264,57 @@ abstract class AbstractController extends Controller
         if (!empty($offset)) {
             $queryBuilder->setFirstResult($offset);
         }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function processSort(QueryBuilder $queryBuilder)
+    {
+        $sort = $this->getRequestManager()->getSort();
+        if (!empty($sort)) {
+            $rootAliases = $queryBuilder->getRootAliases();
+            foreach ($sort as $param => $direction) {
+                $queryBuilder->addOrderBy(current($rootAliases) . '.' . $param, $direction);
+            }
+        }
+    }
+
+    /**
+     * Append filter criteria to query builder
+     * @param QueryBuilder $queryBuilder
+     * @param ApiFilterCollectionInterface $filters
+     */
+    protected function processFilters(QueryBuilder $queryBuilder, ApiFilterCollectionInterface $filters)
+    {
+        $apiFiltersManager = $this->get('simple_dto.api_filter_manager');
+
+        /** @var ApiFilter $filter */
+        foreach ($filters as $i => $filter) {
+            $queryBuilder->andWhere(
+                sprintf(
+                    current($queryBuilder->getRootAliases()) . '.%s %s %s',
+                    $filter->getParam(),
+                    $apiFiltersManager->getSqlOperationByOperation($filter->getOperation()),
+                    $apiFiltersManager->isArrayOperation($filter->getOperation())
+                        ? '(:' . $filter->getParam() . $i . ')'
+                        : ':' . $filter->getParam() . $i
+                )
+            );
+            $queryBuilder->setParameter($filter->getParam() . $i, $filter->getValue());
+        }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @return int
+     */
+    protected function getCollectionCount(QueryBuilder $queryBuilder)
+    {
+        $rootAlias = current($queryBuilder->getRootAliases());
+        $builder = clone $queryBuilder;
+        $builder->select('count(' . $rootAlias . ')');
+        return (int)$builder->getQuery()->getSingleScalarResult();
     }
 
     /**

@@ -135,7 +135,25 @@ class RequestManager
     {
         $linksStr = $this->request->get($this->requestManagerConfiguration->getLinksParam());
 
-        return $linksStr !== null;
+        return (bool)$linksStr;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCountRequired()
+    {
+        $countStr = $this->request->get($this->requestManagerConfiguration->getCountParam());
+
+        return (bool)$countStr;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiFilters()
+    {
+        return $this->request->get($this->requestManagerConfiguration->getApiFilterParam());
     }
 
     /**

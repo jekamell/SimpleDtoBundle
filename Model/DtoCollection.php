@@ -14,6 +14,8 @@ class DtoCollection implements DtoCollectionInterface
     private $group;
     /** @var string */
     private $collectionKey;
+    /** @var integer */
+    private $count;
 
     /**
      * DtoCollection constructor.
@@ -22,20 +24,32 @@ class DtoCollection implements DtoCollectionInterface
      * @param string $collectionKey
      * @param null $group
      * @param DtoInterface[] $data
+     * @param null $count
      */
-    public function __construct($type, $originalData, $collectionKey, $group = null, array $data = [])
+    public function __construct($type, $originalData, $collectionKey, $group = null, array $data = [], $count = null)
     {
         $this->type = $type;
         $this->data = $data;
         $this->originalData = $originalData;
         $this->collectionKey = $collectionKey;
         $this->group = $group;
+        $this->count = $count;
     }
 
     /** @return array */
     public function getRawData()
     {
         return $this->data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setRawData(array $data)
+    {
+        $this->data = $data;
+
+        return $this;
     }
 
     /**
@@ -50,7 +64,17 @@ class DtoCollection implements DtoCollectionInterface
             $data[] = $item->jsonSerialize();
         }
 
-        return $this->collectionKey ? [$this->collectionKey => $data] : $data;
+        if (!$this->collectionKey) {
+            return $data;
+        }
+
+        if ($this->count !== null) {
+            $result['_count'] = $this->count;
+        }
+
+        $result[$this->collectionKey] = $data;
+
+        return $result;
     }
 
     /**
@@ -177,5 +201,46 @@ class DtoCollection implements DtoCollectionInterface
     public function count()
     {
         return count($this->data);
+    }
+
+    /**
+     * Whether a offset exists
+     * @param mixed $offset
+     * @return boolean true on success or false on failure.
+     */
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->data);
+    }
+
+    /**
+     * Offset to retrieve
+     * @param mixed $offset
+     * @return mixed Can return all value types.
+     */
+    public function offsetGet($offset)
+    {
+        return $this->data[$offset];
+    }
+
+    /**
+     * Offset to set
+     * @param mixed $offset
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->data[$offset] = $value;
+    }
+
+    /**
+     * Offset to unset
+     * @param mixed $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->data[$offset]);
     }
 }

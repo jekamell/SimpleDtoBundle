@@ -32,6 +32,21 @@ class Dto implements DtoInterface
         $this->group = $group;
     }
 
+    public function __call($name, $arguments)
+    {
+        if (method_exists($this, $name)) {
+            return call_user_func([$this, $name], $arguments);
+        }
+        if (strpos($name, 'get') === 0 || strpos($name, 'set') === 0) { // getter or setter called
+            $property = lcfirst(substr($name, 3));
+            if (strpos($name, 'get') === 0) { // getter called
+                return array_key_exists($property, $this->data) ? $this->data[$property] : null;
+            } else { // setter called
+                $this->data[$property] = current($arguments);
+            }
+        }
+    }
+
     /**
      * @return array
      */
@@ -62,6 +77,17 @@ class Dto implements DtoInterface
     {
         return $this->data;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setRawData(array $data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
 
     /**
      * Set dto source

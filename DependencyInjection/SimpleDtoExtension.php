@@ -49,7 +49,7 @@ class SimpleDtoExtension extends Extension
     {
         if (is_array($value)) {
             foreach ($value as $p => $v) {
-                $this->bindParam($container, $v, $prefix . '.' . $v);
+                $this->bindParam($container, $v, $prefix . '.' . (is_array($v) ? current($v) : $v));
             }
         }
         $container->setParameter($prefix, $value);

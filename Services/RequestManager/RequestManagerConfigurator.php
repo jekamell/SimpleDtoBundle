@@ -20,18 +20,23 @@ class RequestManagerConfigurator
     protected $localeHeader;
     /** @var string */
     protected $localeParam;
+    /** @var string */
+    protected $apiFilterParam;
+    /** @var string */
+    protected $countParam;
 
     /**
-     * RequestManagerConfiguration constructor.
+     * RequestManagerConfigurator constructor.
      * @param string $fieldsParam
      * @param string $expandsParam
      * @param string $limitParam
      * @param string $offsetParam
      * @param string $sortParam
-     * @param string $sortParam
-     * * * @param string $localeParam
+     * @param string $localeParam
      * @param string $localeHeader
-     * @param $linksParam
+     * @param string $linksParam
+     * @param string $apiFilterParam
+     * @param string $countParam
      */
     public function __construct(
         $fieldsParam,
@@ -41,7 +46,9 @@ class RequestManagerConfigurator
         $sortParam,
         $localeParam,
         $localeHeader,
-        $linksParam
+        $linksParam,
+        $apiFilterParam,
+        $countParam
     ) {
         $this->fieldsParam = $fieldsParam;
         $this->expandsParam = $expandsParam;
@@ -51,6 +58,8 @@ class RequestManagerConfigurator
         $this->localeHeader = $localeHeader;
         $this->localeParam = $localeParam;
         $this->linksParam = $linksParam;
+        $this->apiFilterParam = $apiFilterParam;
+        $this->countParam = $countParam;
     }
 
     /**
@@ -139,5 +148,37 @@ class RequestManagerConfigurator
     public function setLinksParam($linksParam)
     {
         $this->linksParam = $linksParam;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiFilterParam()
+    {
+        return $this->apiFilterParam;
+    }
+
+    /**
+     * @param string $apiFilterParam
+     */
+    public function setApiFilterParam($apiFilterParam)
+    {
+        $this->apiFilterParam = $apiFilterParam;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountParam()
+    {
+        return $this->countParam;
+    }
+
+    /**
+     * @param string $countParam
+     */
+    public function setCountParam($countParam)
+    {
+        $this->countParam = $countParam;
     }
 }

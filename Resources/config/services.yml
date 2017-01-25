@@ -1,29 +1,12 @@
 parameters:
-    simple_dto.param_fields: "_fields"
-    simple_dto.param_expands: "_expands"
-    simple_dto.param_limit: "_limit"
-    simple_dto.param_offset: "_offset"
-    simple_dto.param_sort: "_sort"
-    simple_dto.param_locale: "_locale"
-    simple_dto.param_links: "_showLinks"
-    simple_dto.header_locale: "Accept-Language"
-
-    simple_dto.date_format: "Y-m-d"
-    simple_dto.date_time_format: "c" # ISO 8601
-
-    simple_dto.collection_key: "_collection"
-
     simple_dto.dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
     simple_dto.jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
-
-    simple_dto.hateoas_enabled: false
-
     simple_dto.auth_entity_alias: ~
     simple_dto.auth_username_fields: ~
 
 services:
     # DTO related services
-    simple_dto.request_manager_configrator:
+    simple_dto.request_manager_configurator:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator
         arguments:
             - "%simple_dto.param_fields%"
@@ -32,14 +15,16 @@ services:
             - "%simple_dto.param_offset%"
             - "%simple_dto.param_sort%"
             - "%simple_dto.param_locale%"
-            - "%simple_dto.param_locale%"
+            - "%simple_dto.header_locale%"
             - "%simple_dto.param_links%"
+            - "%simple_dto.param_filters%"
+            - "%simple_dto.param_count%"
 
     simple_dto.request_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
         arguments:
             - "@request_stack"
-            - "@simple_dto.request_manager_configrator"
+            - "@simple_dto.request_manager_configurator"
 
     simple_dto.dto_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
@@ -49,10 +34,14 @@ services:
             - "@simple_dto.dto_manager_configurator"
             - "@event_dispatcher"
 
+    simple_dto.api_filter_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager
+
     simple_dto.dto_expands_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager
         arguments:
             - "@simple_dto.dto_helper"
+            - "@service_container"
 
     simple_dto.dto_links_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
@@ -102,6 +91,15 @@ services:
             - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
             - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
 
+    simple_dto.event_listener.api_filters_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\ApiFiltersListener
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@simple_dto.api_filter_manager"
+            - "@router"
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
     # Security related services
     simple_dto.jwt_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Jwt\JwtManager
@@ -141,7 +139,24 @@ services:
     simple_dto.doc.param_handler:
         class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler
         arguments:
-            - "@simple_dto.request_manager_configrator"
+            - "@simple_dto.request_manager_configurator"
             - "%simple_dto.hateoas_enabled%"
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    # Event listeners
+    simple_dto.event_listener.trusted_client_access_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\TrustedClientAccessListener
+        arguments:
+            - "@security.token_storage"
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    simple_dto.event_listener.exception_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\ExceptionListener
+        arguments:
+            - "@logger"
+            - "%kernel.environment%"
+            - "%kernel.debug%"
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }

@@ -52,7 +52,11 @@ class JwtManager implements JwtManagerInterface
     public function isValid($token, $publicKey)
     {
         /** @var SimpleJWS $jws */
-        $jws = SimpleJWS::load($token);
+        try {
+            $jws = SimpleJWS::load($token);
+        } catch (\Exception $e) {
+            return false;
+        }
 
         return $jws->isValid($publicKey);
     }

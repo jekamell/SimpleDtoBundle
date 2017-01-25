@@ -6,6 +6,8 @@ use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class DtoExpandsManager
@@ -15,14 +17,18 @@ class DtoExpandsManager
 {
     /** @var DtoHelper */
     protected $dtoHelper;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
      * DtoExpandsManager constructor.
      * @param DtoHelper $dtoHelper
+     * @param ContainerInterface $container
      */
-    public function __construct(DtoHelper $dtoHelper)
+    public function __construct(DtoHelper $dtoHelper, ContainerInterface $container)
     {
         $this->dtoHelper = $dtoHelper;
+        $this->container = $container;
     }
 
     /**
@@ -35,11 +41,19 @@ class DtoExpandsManager
     {
         $data = [];
         foreach ($expands as $expand => $fields) {
+            if (!isset($config[$dto->getType()]['expands'][$expand])) {
+                throw new BadRequestHttpException(sprintf('Required expand not found: %s', $expand));
+            }
             $expandConfig = $config[$dto->getType()]['expands'][$expand];
             $getter = !empty($expandConfig['getter'])
                 ? $expandConfig['getter']
                 : $this->dtoHelper->getFieldGetter($expand);
-            if (!$expandObject = call_user_func([$dto->getOriginalData(), $getter])) {
+            if (is_array($getter)) {
+                $expandObject = $this->getExpandFromRepository($dto->getOriginalData(), $getter);
+            } else {
+                $expandObject = $this->getExpandFromObject($dto->getOriginalData(), $getter);
+            }
+            if (!$expandObject) {
                 continue;
             }
             if (is_array($expandObject) || $expandObject instanceof \ArrayAccess) {
@@ -114,5 +128,47 @@ class DtoExpandsManager
         }
 
         return new DtoCollection($type, $collection, false, $group, $data);
+    }
+
+    /**
+     * @param object $object
+     * @param string $getter
+     * @return mixed
+     */
+    private function getExpandFromObject($object, $getter)
+    {
+        return call_user_func([$object, $getter]);
+    }
+
+    /**
+     * @param object $object
+     * @param array $getterOptions
+     * @return mixed
+     * @throws \Exception
+     */
+    private function getExpandFromRepository($object, array $getterOptions)
+    {
+        if (!isset($getterOptions['repository'], $getterOptions['method'])) {
+            throw new \Exception('"repository" and "method" should be defined');
+        }
+
+        $repository = $this->container->get('doctrine.orm.entity_manager')->getRepository($getterOptions['repository']);
+        $method = $getterOptions['method'];
+        $arguments = [];
+        if (!empty($getterOptions['arguments'])) {
+            foreach ($getterOptions['arguments'] as $argument) {
+                if ($argument === 'object') { // pass object as one of method params
+                    $arguments[] = $object;
+                } elseif (substr($argument, 0, 1) === '@') { // use service as argument
+                    $arguments[] = $this->container->get(substr($argument, 1));
+                } elseif (substr($argument, 0, 1) === '%' && substr($argument, -1) === '%') { // use param as argument
+                    $arguments[] = $this->container->getParameter(trim($argument, '%'));
+                } else { // simple string injection
+                    $arguments[] = $argument;
+                }
+            }
+        }
+
+        return call_user_func_array([$repository, $method], $arguments);
     }
 }

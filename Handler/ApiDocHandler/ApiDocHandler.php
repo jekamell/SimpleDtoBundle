@@ -6,6 +6,7 @@ use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurat
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -46,10 +47,12 @@ class ApiDocHandler implements HandlerInterface
         $this->processParams($annotation, $route);
         $this->processExpands($method, $annotation, $route);
         $this->processShowLinks($annotation, $route);
+        $this->processApiFilters($annotation, $route);
     }
 
     /**
      * @param ApiDoc $annotation
+     * @param Route $route
      */
     protected function processParams(ApiDoc $annotation, Route $route)
     {
@@ -62,6 +65,8 @@ class ApiDocHandler implements HandlerInterface
         if (!empty($output['collection'])) {
             $annotation->addParameter($this->requestManagerConfigurator->getLimitParam(), $this->getLimitParams());
             $annotation->addParameter($this->requestManagerConfigurator->getOffsetParam(), $this->getOffsetParams());
+            $annotation->addParameter($this->requestManagerConfigurator->getSortParam(), $this->getSortParams());
+            $annotation->addParameter($this->requestManagerConfigurator->getCountParam(), $this->getCountParams());
         }
     }
 
@@ -96,6 +101,21 @@ class ApiDocHandler implements HandlerInterface
         }
         if ($this->hateoasEnabled) {
             $annotation->addParameter($this->requestManagerConfigurator->getLinksParam(), $this->getLinksParams());
+        }
+    }
+
+    /**
+     * @param ApiDoc $annotation
+     * @param Route $route
+     */
+    protected function processApiFilters(ApiDoc $annotation, Route $route)
+    {
+        $filters = $route->getDefault('filters');
+        if ($filters) {
+            $annotation->addParameter(
+                $this->requestManagerConfigurator->getApiFilterParam(),
+                $this->getFiltersParams($filters)
+            );
         }
     }
 
@@ -156,6 +176,43 @@ class ApiDocHandler implements HandlerInterface
             'dataType' => 'string',
             'required' => false,
             'description' => 'Collection offset',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getSortParams()
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => 'Collection sorting',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getCountParams()
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => 'Require full collection size',
+        ];
+    }
+
+    /**
+     * @param array $filters
+     * @return array
+     */
+    private function getFiltersParams(array $filters = [])
+    {
+        return [
+            'dataType' => 'string',
+            'required' => false,
+            'description' => sprintf('Api filters. Available: "%s"', implode(',', $filters))
         ];
     }
 }

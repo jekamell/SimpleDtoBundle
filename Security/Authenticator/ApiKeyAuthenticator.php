@@ -49,8 +49,12 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             }
 
             $payload = $userProvider->getPayload($apiKey);
-            if (!isset($payload['username']) || !($user = $userProvider->loadUserByUsername($payload['username']))) {
-                throw new AuthenticationException(sprintf('User %s was not found', $payload['username'] ?? ''));
+            if (empty($payload['username'])) {
+                throw new AuthenticationException('Invalid token');
+            }
+            $user = $userProvider->loadUserByUsername($payload['username']);
+            if (!$user) {
+                throw new AuthenticationException(sprintf('User %s was not found', $payload['username']));
             }
 
             return new PreAuthenticatedToken(

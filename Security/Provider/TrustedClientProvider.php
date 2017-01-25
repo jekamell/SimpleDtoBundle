@@ -2,8 +2,10 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Security\Provider;
 
+use Mell\Bundle\SimpleDtoBundle\Model\TrustedUser;
 use Mell\Bundle\SimpleDtoBundle\Security\Model\UserCredentialsInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\User;
@@ -18,15 +20,16 @@ class TrustedClientProvider extends AbstractUserProvider
     const ROLE_TRUSTED_USER = 'ROLE_TRUSTED_USER';
 
     /** @var array */
-    protected $trustedClient = [];
+    protected $trustedClients = [];
 
     /**
      * TrustedClientProvider constructor.
-     * @param array $trustedClient
+     * @param array $trustedClients
+     * @internal param array $trustedClient
      */
-    public function __construct(array $trustedClient)
+    public function __construct(array $trustedClients)
     {
-        $this->trustedClient = $trustedClient;
+        $this->trustedClients = $trustedClients;
     }
 
     /**
@@ -43,16 +46,18 @@ class TrustedClientProvider extends AbstractUserProvider
      */
     public function loadUserByUsername($username)
     {
-        foreach ($this->trustedClient as $id => $name) {
-            if ($name === $username) {
-                return new User($username, null, [self::ROLE_TRUSTED_USER]);
+        foreach ($this->trustedClients as $trustedClient) {
+            if ($trustedClient['name'] === $username) {
+                return new TrustedUser(
+                    $trustedClient['id'],
+                    $trustedClient['name'],
+                    [self::ROLE_TRUSTED_USER],
+                    $trustedClient['access']
+                );
             }
         }
 
-        $exception = new UsernameNotFoundException();
-        $exception->setUsername($username);
-
-        throw $exception;
+        throw new AuthenticationException('User was not found');
     }
 
     /**
