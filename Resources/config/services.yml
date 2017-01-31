@@ -1,8 +1,5 @@
 parameters:
     simple_dto.dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
-    simple_dto.jwt_public_path: "%kernel.root_dir%/app/config/jwt_public.pem"
-    simple_dto.auth_entity_alias: ~
-    simple_dto.auth_username_fields: ~
 
 services:
     # DTO related services
@@ -69,6 +66,31 @@ services:
             - "%simple_dto.date_format%"
             - "%simple_dto.date_time_format%"
 
+    # Api docs related services
+    simple_dto.doc.parser.dto_parser:
+        class: Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser
+        arguments:
+            - "@simple_dto.dto_manager"
+        tags:
+            - { name: nelmio_api_doc.extractor.parser }
+
+    simple_dto.doc.param_handler:
+        class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler
+        arguments:
+            - "@simple_dto.request_manager_configurator"
+            - "%simple_dto.hateoas_enabled%"
+        tags:
+            - { name: nelmio_api_doc.extractor.handler }
+
+    # Event listeners
+    simple_dto.event_listener.exception_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\ExceptionListener
+        arguments:
+            - "@logger"
+            - "%kernel.environment%"
+            - "%kernel.debug%"
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
     simple_dto.event_listener.expands_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoExpandsListener
         arguments:
@@ -99,64 +121,3 @@ services:
             - "@router"
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
-
-    # Security related services
-    simple_dto.jwt_manager:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Jwt\JwtManager
-    simple_dto.security.provider.abstract_user_provider:
-        class: Mell\Bundle\SimpleDtoBundle\Security\Provider\AbstractUserProvider
-        abstract: true
-        calls:
-            - ['setJwtManager', ["@simple_dto.jwt_manager"]]
-            - ['setPublicKeyPath', ["%simple_dto.jwt_public_path%"]]
-    simple_dto.security.provider.bearer_client_provider:
-        class: Mell\Bundle\SimpleDtoBundle\Security\Provider\BearerClientProvider
-        parent: simple_dto.security.provider.abstract_user_provider
-        arguments:
-            - "@doctrine.orm.entity_manager"
-            - "%simple_dto.auth_entity_alias%"
-            - "%simple_dto.auth_username_fields%"
-    simple_dto.security.provider.trusted_client_provider:
-        class: Mell\Bundle\SimpleDtoBundle\Security\Provider\TrustedClientProvider
-        parent: simple_dto.security.provider.abstract_user_provider
-        arguments:
-            - "%simple_dto.trusted_clients%"
-
-    simple_dto.security.authenticator.api_key_authenticator:
-        class: Mell\Bundle\SimpleDtoBundle\Security\Authenticator\ApiKeyAuthenticator
-        arguments:
-            - ["@simple_dto.security.provider.bearer_client_provider", "@simple_dto.security.provider.trusted_client_provider"]
-            - "%simple_dto.jwt_public_path%"
-
-    # Api docs related services
-    simple_dto.doc.parser.dto_parser:
-        class: Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser
-        arguments:
-            - "@simple_dto.dto_manager"
-        tags:
-            - { name: nelmio_api_doc.extractor.parser }
-
-    simple_dto.doc.param_handler:
-        class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler
-        arguments:
-            - "@simple_dto.request_manager_configurator"
-            - "%simple_dto.hateoas_enabled%"
-        tags:
-            - { name: nelmio_api_doc.extractor.handler }
-
-    # Event listeners
-    simple_dto.event_listener.trusted_client_access_listener:
-        class: Mell\Bundle\SimpleDtoBundle\EventListener\TrustedClientAccessListener
-        arguments:
-            - "@security.token_storage"
-        tags:
-            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
-
-    simple_dto.event_listener.exception_listener:
-        class: Mell\Bundle\SimpleDtoBundle\EventListener\ExceptionListener
-        arguments:
-            - "@logger"
-            - "%kernel.environment%"
-            - "%kernel.debug%"
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception }
