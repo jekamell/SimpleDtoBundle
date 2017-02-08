@@ -1,6 +1,3 @@
-parameters:
-    simple_dto.dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
-
 services:
     # DTO related services
     simple_dto.request_manager_configurator:
