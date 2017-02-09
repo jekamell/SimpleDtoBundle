@@ -24,5 +24,8 @@
         "psr-4": {
             "Mell\\Bundle\\SimpleDtoBundle\\": ""
         }
+    },
+    "suggest": {
+        "nelmio/NelmioApiDocBundle": "Generates documentation for your REST API from annotations"
     }
 }
