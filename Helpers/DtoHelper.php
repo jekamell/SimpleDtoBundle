@@ -4,6 +4,7 @@ namespace Mell\Bundle\SimpleDtoBundle\Helpers;
 
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -14,6 +15,8 @@ class DtoHelper
 {
     /** @var  FileLocator */
     protected $fileLocator;
+    /** @var CacheInterface */
+    protected $cache;
     /** @var string */
     protected $configPath;
     /** @var array */
@@ -26,13 +29,20 @@ class DtoHelper
     /**
      * DtoHelper constructor.
      * @param FileLocator $fileLocator
+     * @param CacheInterface $cache
      * @param string $configPath
      * @param $formatDate
      * @param $formatDateTime
      */
-    public function __construct(FileLocator $fileLocator, $configPath, $formatDate, $formatDateTime)
-    {
+    public function __construct(
+        FileLocator $fileLocator,
+        CacheInterface $cache,
+        $configPath,
+        $formatDate,
+        $formatDateTime
+    ) {
         $this->fileLocator = $fileLocator;
+        $this->cache = $cache;
         $this->configPath = $configPath;
         $this->formatDate = $formatDate;
         $this->formatDateTime = $formatDateTime;

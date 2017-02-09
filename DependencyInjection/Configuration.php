@@ -76,11 +76,16 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->scalarNode('dto_config_path')
                     ->isRequired()
-                    ->info('Path to dto config. Alias can be used: @AppBundle/Resources/config/dto.yml')
+                    ->info('Path to dto configuration file')
+                    ->example('@AppBundle/Resources/config/dto.yml')
                     ->end()
-                ->scalarNode('hateoas_enabled')
+                ->booleanNode('hateoas_enabled')
                     ->defaultValue(false)
                     ->info('Whether the HATEOAS option is enabled')
+                    ->end()
+                ->scalarNode('cache')
+                    ->info('The service that is used to persist dto configuration in a cache. The service has to implement the CacheInterface.')
+                    ->defaultValue('simple_dto.cache_default')
                     ->end()
             ->end();
 
