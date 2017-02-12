@@ -12,7 +12,7 @@ class RequestManager
     const SORT_DIRECTION_ACS = 'asc';
     const SORT_DIRECTION_DESC = 'desc';
 
-    /** @var Request */
+    /** @var RequestStack */
     protected $request;
     /** @var RequestManagerConfigurator */
     protected $requestManagerConfiguration;
@@ -25,7 +25,7 @@ class RequestManager
      */
     public function __construct(RequestStack $requestStack, RequestManagerConfigurator $requestManagerConfiguration)
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
         $this->requestManagerConfiguration = $requestManagerConfiguration;
     }
 
@@ -42,7 +42,8 @@ class RequestManager
      */
     public function getFields()
     {
-        if ($fieldsStr = $this->request->get($this->requestManagerConfiguration->getFieldsParam())) {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($fieldsStr = $request->get($this->requestManagerConfiguration->getFieldsParam())) {
             return array_unique(array_map('trim', explode(',', $fieldsStr)));
         }
 
@@ -54,7 +55,8 @@ class RequestManager
      */
     public function getExpands()
     {
-        if ($expandsStr = $this->request->get($this->requestManagerConfiguration->getExpandsParam())) {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($expandsStr = $request->get($this->requestManagerConfiguration->getExpandsParam())) {
             preg_match_all(
                 '~(?P<expand>\w+)(?P<fields>\(.*?\))?~x',
                 str_replace(' ', '', $expandsStr),
@@ -77,7 +79,8 @@ class RequestManager
      */
     public function getLimit()
     {
-        $limit = $this->request->get($this->requestManagerConfiguration->getLimitParam(), 0);
+        $request = $this->requestStack->getCurrentRequest();
+        $limit = $request->get($this->requestManagerConfiguration->getLimitParam(), 0);
 
         return (int)$limit;
     }
@@ -87,7 +90,8 @@ class RequestManager
      */
     public function getOffset()
     {
-        $offset = $this->request->get($this->requestManagerConfiguration->getOffsetParam(), 0);
+        $request = $this->requestStack->getCurrentRequest();
+        $offset = $request->get($this->requestManagerConfiguration->getOffsetParam(), 0);
 
         return (int)$offset;
     }
@@ -97,7 +101,8 @@ class RequestManager
      */
     public function getSort()
     {
-        if ($sortStr = $this->request->get($this->requestManagerConfiguration->getSortParam())) {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($sortStr = $request->get($this->requestManagerConfiguration->getSortParam())) {
             $sortParts = array_unique(array_map('trim', explode(',', $sortStr)));
             $sort = [];
             foreach ($sortParts as $sortItem) {
@@ -121,11 +126,12 @@ class RequestManager
      */
     public function getLocale()
     {
-        if ($localeStr = $this->request->get($this->requestManagerConfiguration->getLocaleParam())) {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($localeStr = $request->get($this->requestManagerConfiguration->getLocaleParam())) {
             return $localeStr;
         }
 
-        return $this->request->headers->get($this->requestManagerConfiguration->getLocaleHeader());
+        return $request->headers->get($this->requestManagerConfiguration->getLocaleHeader());
     }
 
     /**
@@ -133,7 +139,8 @@ class RequestManager
      */
     public function isLinksRequired()
     {
-        $linksStr = $this->request->get($this->requestManagerConfiguration->getLinksParam());
+        $request = $this->requestStack->getCurrentRequest();
+        $linksStr = $request->get($this->requestManagerConfiguration->getLinksParam());
 
         return (bool)$linksStr;
     }
@@ -143,7 +150,8 @@ class RequestManager
      */
     public function isCountRequired()
     {
-        $countStr = $this->request->get($this->requestManagerConfiguration->getCountParam());
+        $request = $this->requestStack->getCurrentRequest();
+        $countStr = $request->get($this->requestManagerConfiguration->getCountParam());
 
         return (bool)$countStr;
     }
@@ -153,7 +161,9 @@ class RequestManager
      */
     public function getApiFilters()
     {
-        return $this->request->get($this->requestManagerConfiguration->getApiFilterParam());
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request->get($this->requestManagerConfiguration->getApiFilterParam());
     }
 
     /**
