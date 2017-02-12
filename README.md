@@ -26,4 +26,4 @@ For documentation see
  
 ## License 
 
-This bundle is released under the MIT license.
+This bundle is released under the [MIT](https://opensource.org/licenses/MIT) license.
