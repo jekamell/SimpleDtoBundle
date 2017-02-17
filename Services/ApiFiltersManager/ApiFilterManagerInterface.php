@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager;
 
 use Doctrine\Common\Collections\Criteria;
@@ -22,5 +24,5 @@ interface ApiFilterManagerInterface
      * @param string $filtersStr
      * @return ApiFilterCollectionInterface
      */
-    public function parse($filtersStr);
+    public function parse($filtersStr): ApiFilterCollectionInterface;
 }

@@ -7,6 +7,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\ApiFilter;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFilterManagerInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class ApiFiltersManager
@@ -37,20 +38,21 @@ class ApiFiltersManager implements ApiFilterManagerInterface
 
     /**
      * @param string $filtersStr
-     * @return ApiFilter[]
+     * @return ApiFilterCollectionInterface
      */
-    public function parse($filtersStr)
+    public function parse($filtersStr): ApiFilterCollectionInterface
     {
         $collection = new ApiFilterCollection();
         $operationsStr = implode('|', static::getOperationAliases());
         foreach (explode('|', $filtersStr) as $filter) {
             if (preg_match("/^(?<param>[a-zA-Z]+)(?<operation>$operationsStr)(?<value>.+)$/", $filter, $m)) {
                 $isArray = substr($m['value'], 0, 1) === '(' && substr($m['value'], -1);
+                $value = $this->processValue($m['value'], $isArray);
                 $collection->append(
                     new ApiFilter(
                         $m['param'],
-                        $this->processOperation($m['operation'], $isArray),
-                        $this->processValue($m['value'], $isArray)
+                        $this->processOperation($m['operation'], $value, $isArray),
+                        $value
                     )
                 );
             }
@@ -94,11 +96,22 @@ class ApiFiltersManager implements ApiFilterManagerInterface
 
     /**
      * @param string $alias
+     * @param $value
      * @param bool $isArray
      * @return string
      */
-    private function processOperation($alias, $isArray)
+    private function processOperation($alias, $value, $isArray)
     {
+        if ($value === null) {
+            if ($alias === ApiFilter::OPERATION_EQUAL) {
+                return ApiFilter::OPERATION_IS;
+            } elseif ($alias === ApiFilter::OPERATION_NOT_EQUAL) {
+                return ApiFilter::OPERATION_NOT_EQUAL;
+            } else {
+                throw new BadRequestHttpException('Mailformed api filters format');
+            }
+        }
+
         if (!$isArray) {
             return $this->aliasOperationMap[$alias];
         }
@@ -116,7 +129,7 @@ class ApiFiltersManager implements ApiFilterManagerInterface
     private function processValue($value, $isArray)
     {
         if (!$isArray) {
-            return trim($value);
+            return $value === 'null' ? null : trim($value);
         }
 
         $value = trim($value, '()');

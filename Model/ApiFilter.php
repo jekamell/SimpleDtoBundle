@@ -2,10 +2,6 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
-/**
- * Class ApiFilter
- * @package Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager
- */
 class ApiFilter
 {
     const OPERATION_EQUAL = 'eq';
@@ -16,6 +12,8 @@ class ApiFilter
     const OPERATION_LESS_OR_EQUAL_THEN = 'leqt';
     const OPERATION_IN_ARRAY = 'ia';
     const OPERATION_NOT_IN_ARRAY = 'nia';
+    const OPERATION_IS = 'is';
+    const OPERATION_NOT_IS = 'nis';
 
     /** @var string */
     private $param;
