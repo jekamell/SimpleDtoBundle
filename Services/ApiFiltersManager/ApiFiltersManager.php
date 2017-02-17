@@ -33,7 +33,9 @@ class ApiFiltersManager implements ApiFilterManagerInterface
         ApiFilter::OPERATION_MORE_OR_EQUAL_THEN => '>=',
         ApiFilter::OPERATION_LESS_OR_EQUAL_THEN => '<=',
         ApiFilter::OPERATION_IN_ARRAY => 'IN',
-        ApiFilter::OPERATION_NOT_IN_ARRAY => 'NOT IN'
+        ApiFilter::OPERATION_NOT_IN_ARRAY => 'NOT IN',
+        ApiFilter::OPERATION_IS => 'IS',
+        ApiFilter::OPERATION_IS_NOT => 'IS NOT',
     ];
 
     /**
@@ -103,10 +105,10 @@ class ApiFiltersManager implements ApiFilterManagerInterface
     private function processOperation($alias, $value, $isArray)
     {
         if ($value === null) {
-            if ($alias === ApiFilter::OPERATION_EQUAL) {
+            if ($alias === ApiFilterManagerInterface::OPERATION_ALIAS_EQUAL) {
                 return ApiFilter::OPERATION_IS;
-            } elseif ($alias === ApiFilter::OPERATION_NOT_EQUAL) {
-                return ApiFilter::OPERATION_NOT_EQUAL;
+            } elseif (ApiFilterManagerInterface::OPERATION_ALIAS_NOT_EQUAL) {
+                return ApiFilter::OPERATION_IS_NOT;
             } else {
                 throw new BadRequestHttpException('Mailformed api filters format');
             }
