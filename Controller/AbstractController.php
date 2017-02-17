@@ -291,6 +291,17 @@ abstract class AbstractController extends Controller
 
         /** @var ApiFilter $filter */
         foreach ($filters as $i => $filter) {
+            // special case for IS NULL and NOT IS NULL filters
+            if (in_array($filter->getOperation(), [ApiFilter::OPERATION_IS, ApiFilter::OPERATION_IS_NOT])) {
+                $queryBuilder->andWhere(
+                    sprintf(
+                        '%s %s NULL',
+                        current($queryBuilder->getRootAliases()) . $filter->getParam(),
+                        $apiFiltersManager->getSqlOperationByOperation($filter->getOperation())
+                    )
+                );
+                continue;
+            }
             $queryBuilder->andWhere(
                 sprintf(
                     current($queryBuilder->getRootAliases()) . '.%s %s %s',
