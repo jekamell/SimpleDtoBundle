@@ -11,6 +11,8 @@ Filtering param and value separates via operation alias. You can use next types 
 |-------------------|------------------|-------------------|
 | :                 | =                | name:John         |
 | !:                | != or <>         | name!:John        |
+| :null             | IS NULL          | name:null         |
+| !:null            | IS NOT NULL      | name!:null        |
 | <:                | <                | age<:15           |
 | >:                | >                | age>:15           |
 | <=:               | <=               | age<=:15          |
