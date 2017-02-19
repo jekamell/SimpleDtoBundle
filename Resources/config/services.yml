@@ -59,9 +59,16 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper
         arguments:
             - '@file_locator'
+            - '@simple_dto.cache_default'
             - '%simple_dto.dto_config_path%'
             - '%simple_dto.date_format%'
             - '%simple_dto.date_time_format%'
+
+    simple_dto.cache_default:
+        parent: cache.adapter.filesystem
+        public: false
+        tags:
+          - { name: 'cache.pool', clearer: 'cache.app_clearer' }
 
     # Api docs related services
     simple_dto.doc.parser.dto_parser:
