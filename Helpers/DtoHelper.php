@@ -71,13 +71,14 @@ class DtoHelper
      */
     public function getDtoConfig()
     {
-        // TODO: caching
-        if ($this->dtoConfig === null) {
+        $config = $this->cache->getItem('simple_dto.config');
+        if (!$config->isHit()) {
             $absolutePath = $this->fileLocator->locate($this->configPath);
-            $this->dtoConfig = Yaml::parse(file_get_contents($absolutePath));
+            $config->set(Yaml::parse(file_get_contents($absolutePath)));
+            $this->cache->save($config);
         }
 
-        return $this->dtoConfig;
+        return $config->get();
     }
 
     /**
