@@ -8,7 +8,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoValidator;
-use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -180,7 +180,7 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function getDtoHelper()
     {
-        return new DtoHelper(new FileLocator(), __DIR__ . '/' . 'dto.yml', 'Y-m-d', 'c');
+        return new DtoHelper(new FileLocator(), new NullAdapter(), __DIR__ . '/' . 'dto.yml', 'Y-m-d', 'c');
     }
 
     /**
