@@ -27,10 +27,10 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
      */
     public function __construct(
         array $originalData,
-            string $collectionKey,
-            string $group,
-            array $data = [],
-            ?int $count = null
+        string $collectionKey,
+        string $group,
+        array $data = [],
+        ?int $count = null
     ) {
         $this->data = $data;
         $this->originalData = $originalData;
@@ -137,7 +137,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
      * Move forward to next element
      * @return Dto
      */
-    public function next(): Dto
+    public function next()
     {
         return next($this->data);
     }
@@ -157,7 +157,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
      */
     public function valid(): bool
     {
-        return $this->key() !== null && $this->data[$this->key()] instanceof DtoInterface;
+        return $this->key() !== null && $this->data[$this->key()] instanceof Dto;
     }
 
     /**
