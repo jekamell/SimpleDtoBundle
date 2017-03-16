@@ -3,108 +3,83 @@
 namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
-use Mell\Bundle\SimpleDtoBundle\Exceptions\DtoException;
-use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
-use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
-use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializable;
+use Mell\Bundle\SimpleDtoBundle\Serializer\Normalizer\DtoNormalizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Class DtoManager
  * @package Mell\Bundle\SimpleDtoBundle\Services\Dto
  */
-class DtoManager implements DtoManagerInterface
+class DtoManager
 {
-    /** @var DtoValidator */
-    protected $dtoValidator;
-    /** @var DtoHelper */
-    protected $dtoHelper;
-    /** @var DtoManagerConfigurator */
-    protected $configurator;
+    /** @var Serializer */
+    protected $serializer;
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+    /** @var DtoManagerConfigurator */
+    protected $configurator;
 
     /**
      * DtoManager constructor.
-     * @param DtoValidator $dtoValidator
-     * @param DtoHelper $dtoHelper
-     * @param DtoManagerConfigurator $configurator
+     * @param Serializer $serializer
      * @param EventDispatcherInterface $eventDispatcher
+     * @param DtoManagerConfigurator $configurator
      */
     public function __construct(
-        DtoValidator $dtoValidator,
-        DtoHelper $dtoHelper,
-        DtoManagerConfigurator $configurator,
-        EventDispatcherInterface $eventDispatcher
+        Serializer $serializer,
+        EventDispatcherInterface $eventDispatcher,
+        DtoManagerConfigurator $configurator
     ) {
-        $this->dtoValidator = $dtoValidator;
-        $this->dtoHelper = $dtoHelper;
-        $this->configurator = $configurator;
+        $this->serializer = $serializer;
         $this->eventDispatcher = $eventDispatcher;
+        $this->configurator = $configurator;
     }
 
     /**
-     * Convert entity to dto
-     * @param object $entity
-     * @param string $dtoType
+     * @param DtoSerializable $entity
      * @param string $group
      * @param array $fields
      * @param bool $throwEvent
-     * @return DtoInterface
+     * @return Dto
      */
-    public function createDto($entity, $dtoType, $group, array $fields, $throwEvent = true)
+    public function createDto(DtoSerializable $entity, string $group, array $fields, bool $throwEvent = true): Dto
     {
-        $dtoConfig = $this->dtoHelper->getDtoConfig();
-        $this->validateDtoConfig($dtoConfig, $dtoType, $entity);
-
-        $dto = new Dto($dtoType, $entity, $group);
+        $dto = new Dto($entity, $group);
 
         if ($throwEvent) {
             $this->dispatch(new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO), ApiEvent::EVENT_PRE_DTO_ENCODE);
         }
 
-        $fieldsConfig = $dtoConfig[$dtoType]['fields'];
-        /** @var array $options */
-        foreach ($fieldsConfig as $field => $options) {
-            // field was not required (@see dtoManager::getRequiredFields)
-            if (!empty($fields) && !in_array($field, $fields)) {
-                continue;
-            }
-            // field is not allowed for specified group
-            if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
-                continue;
-            }
-
-            $getter = $this->getFieldGetter($options, $field);
-            $value = call_user_func([$entity, $getter]);
-            $dto->append([$field => $this->dtoHelper->castValueType($options['type'], $value)]);
-        }
-
-        if ($throwEvent) {
-            $this->dispatch(new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO), ApiEvent::EVENT_POST_DTO_ENCODE);
-        }
+        $dto->setRawData(
+            $this->serializer->normalize(
+                $entity,
+                DtoNormalizer::FORMAT_DTO,
+                [
+                    'groups' => [$group],
+                    'fields' => $fields,
+                ]
+            )
+        );
 
         return $dto;
     }
 
     /**
-     * Create collection of dto's by given data
      * @param array $collection
-     * @param string $dtoType
      * @param string $group
      * @param array $fields
      * @param null|integer $count
-     * @return DtoCollectionInterface
+     * @return DtoCollection
      */
-    public function createDtoCollection($collection, $dtoType, $group, array $fields = [], $count = null)
+    public function createDtoCollection(array $collection, string $group, array $fields = [], ?int $count = null): DtoCollection
     {
         $dtoCollection = new DtoCollection(
-            $dtoType,
             $collection,
             $this->configurator->getCollectionKey(),
             $group,
@@ -116,8 +91,8 @@ class DtoManager implements DtoManagerInterface
             ApiEvent::EVENT_PRE_DTO_COLLECTION_ENCODE
         );
 
-        foreach ($collection as $item) {
-            $dtoCollection->append($this->createDto($item, $dtoType, $group, $fields, false));
+        foreach ($collection as $entity) {
+            $dtoCollection->append($this->createDto($entity, $group, $fields, false));
         }
 
         $this->dispatch(
@@ -136,61 +111,26 @@ class DtoManager implements DtoManagerInterface
      */
     public function createEntityFromDto($entity, DtoInterface $dto)
     {
-        $dtoConfig = $this->getConfig();
-        $group = $dto->getGroup();
-        $this->validateDto($dto, $dtoConfig, $dto->getType());
-
-        $fieldsConfig = $this->getDtoConfig($dto->getType())['fields'];
-        foreach ($dto->getRawData() as $property => $value) {
-            if (!isset($fieldsConfig[$property])) {
-                throw new BadRequestHttpException(sprintf('%s: field "%s" is not defined', $dto->getType(), $property));
-            }
-            if (!empty($fieldsConfig[$property]['readonly'])) {
-                continue;
-            }
-            if (isset($fieldsConfig[$property]['groups']) && !in_array($group, $fieldsConfig[$property]['groups'])) {
-                continue;
-            }
-            $value = $this->dtoHelper->castValueType($fieldsConfig[$property]['type'], $value, false);
-            $setter = $this->getFieldSetter($fieldsConfig, $property);
-            call_user_func([$entity, $setter], $value);
-        }
-
-        return $entity;
-    }
-
-    /**
-     * Get whole dto configuration
-     * @return array
-     */
-    public function getConfig()
-    {
-        return $this->dtoHelper->getDtoConfig();
-    }
-
-    /**
-     * Whether is dto config exists
-     * @param string $dtoType DtoConfig name (UserDto as example)
-     * @return bool
-     */
-    public function hasDtoConfig($dtoType)
-    {
-        return array_key_exists($dtoType, $this->dtoHelper->getDtoConfig());
-    }
-
-    /**
-     * Get item specific dto configuration
-     * @param string $dtoType
-     * @return array
-     * @throws DtoException
-     */
-    public function getDtoConfig($dtoType)
-    {
-        if ($this->hasDtoConfig($dtoType)) {
-            return $this->dtoHelper->getDtoConfig()[$dtoType];
-        }
-
-        throw new DtoException(sprintf('Dto config not found: %s', $dtoType));
+//        $dtoConfig = $this->getConfig();
+//        $group = $dto->getGroup();
+//        $this->validateDto($dto, $dtoConfig, $dto->getType());
+//
+//        $fieldsConfig = $this->getDtoConfig($dto->getType())['fields'];
+//        foreach ($dto->getRawData() as $property => $value) {
+//            if (!isset($fieldsConfig[$property])) {
+//                throw new BadRequestHttpException(sprintf('%s: field "%s" is not defined', $dto->getType(), $property));
+//            }
+//            if (!empty($fieldsConfig[$property]['readonly'])) {
+//                continue;
+//            }
+//            if (isset($fieldsConfig[$property]['groups']) && !in_array($group, $fieldsConfig[$property]['groups'])) {
+//                continue;
+//            }
+//            $setter = $this->getFieldSetter($fieldsConfig, $property);
+//            call_user_func([$entity, $setter], $value);
+//        }
+//
+//        return $entity;
     }
 
     /**
@@ -202,41 +142,21 @@ class DtoManager implements DtoManagerInterface
      */
     protected function processFields($entity, array &$dtoData, array $fields, array $config, $group)
     {
-        /** @var array $options */
-        foreach ($config as $field => $options) {
-            // field was not required (@see dtoManager::getRequiredFields)
-            if (!empty($fields) && !in_array($field, $fields)) {
-                continue;
-            }
-            // field is not allowed for specified group
-            if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
-                continue;
-            }
-
-            $getter = $this->getFieldGetter($options, $field);
-            $value = call_user_func([$entity, $getter]);
-            $dtoData[$field] = $this->dtoHelper->castValueType($options['type'], $value);
-        }
-    }
-
-    /**
-     * @param array $dtoConfig
-     * @param string $dtoType
-     * @param $object
-     */
-    protected function validateDtoConfig($dtoConfig, $dtoType, $object)
-    {
-        $this->dtoValidator->validateDtoConfig($dtoConfig, $object, $dtoType);
-    }
-
-    /**
-     * @param DtoInterface $dto
-     * @param array $config
-     * @param string $dtoType
-     */
-    protected function validateDto(DtoInterface $dto, $config, $dtoType)
-    {
-        $this->dtoValidator->validateDto($dto, $config, $dtoType);
+//        /** @var array $options */
+//        foreach ($config as $field => $options) {
+//            // field was not required (@see dtoManager::getRequiredFields)
+//            if (!empty($fields) && !in_array($field, $fields)) {
+//                continue;
+//            }
+//            // field is not allowed for specified group
+//            if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
+//                continue;
+//            }
+//
+//            $getter = $this->getFieldGetter($options, $field);
+//            $value = call_user_func([$entity, $getter]);
+//            $dtoData[$field] = $this->dtoHelper->castValueType($options['type'], $value);
+//        }
     }
 
     /**
@@ -246,9 +166,9 @@ class DtoManager implements DtoManagerInterface
      */
     private function getFieldSetter($fieldsConfig, $property)
     {
-        return isset($fieldsConfig[$property]['setter'])
-            ? $fieldsConfig[$property]['setter']
-            : $this->dtoHelper->getFieldSetter($property);
+//        return isset($fieldsConfig[$property]['setter'])
+//            ? $fieldsConfig[$property]['setter']
+//            : $this->dtoHelper->getFieldSetter($property);
     }
 
     /**
@@ -258,7 +178,7 @@ class DtoManager implements DtoManagerInterface
      */
     private function getFieldGetter($options, $field)
     {
-        return isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+//        return isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
     }
 
     /**

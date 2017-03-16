@@ -1,66 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 /**
  * Class Dto
  * @package Mell\Bundle\SimpleDtoBundle\Model
  */
-class Dto implements DtoInterface
+class Dto implements \JsonSerializable
 {
-    /** @var string */
-    private $type;
     /** @var array */
     private $data;
-    /** @var object|array */
-    private $originData;
+    /** @var object */
+    private $entity;
     /** @var string */
     private $group;
 
     /**
      * Dto constructor.
-     * @param string $type
-     * @param object $originalData
+     * @param object $entity
      * @param string|null $group
      * @param array $data
+     * @internal param string $type
      */
-    public function __construct($type, $originalData, $group = null, array $data = [])
+    public function __construct($entity, string $group, array $data = [])
     {
-        $this->type = $type;
         $this->data = $data;
-        $this->originData = $originalData;
+        $this->entity = $entity;
         $this->group = $group;
-    }
-
-    public function __call($name, $arguments)
-    {
-        if (method_exists($this, $name)) {
-            return call_user_func([$this, $name], $arguments);
-        }
-        if (strpos($name, 'get') === 0 || strpos($name, 'set') === 0) { // getter or setter called
-            $property = lcfirst(substr($name, 3));
-            if (strpos($name, 'get') === 0) { // getter called
-                return array_key_exists($property, $this->data) ? $this->data[$property] : null;
-            } else { // setter called
-                $this->data[$property] = current($arguments);
-            }
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public static function getAvailableTypes()
-    {
-        return [
-            DtoInterface::TYPE_INTEGER,
-            DtoInterface::TYPE_FLOAT,
-            DtoInterface::TYPE_STRING,
-            DtoInterface::TYPE_BOOLEAN,
-            DtoInterface::TYPE_ARRAY,
-            DtoInterface::TYPE_DATE,
-            DtoInterface::TYPE_DATE_TIME,
-        ];
     }
 
     /**
@@ -97,7 +65,7 @@ class Dto implements DtoInterface
      */
     public function setOriginalData($data)
     {
-        $this->originData = $data;
+        $this->entity = $data;
 
         return $this;
     }
@@ -109,41 +77,7 @@ class Dto implements DtoInterface
      */
     public function getOriginalData()
     {
-        return $this->originData;
-    }
-
-    /**
-     * @param array $data
-     * @return $this
-     */
-    public function append($data)
-    {
-        if (is_array($data)) {
-            $this->data = array_merge_recursive($this->data, $data);
-        } else {
-            $this->data[] = $data;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     * @return $this
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
+        return $this->entity;
     }
 
     /**

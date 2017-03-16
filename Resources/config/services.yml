@@ -1,6 +1,3 @@
-parameters:
-    simple_dto.dto_config_path: "@AppBundle/Resources/config/dto/dto.yml"
-
 services:
     # DTO related services
     simple_dto.request_manager_configurator:
@@ -26,10 +23,9 @@ services:
     simple_dto.dto_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
         arguments:
-            - "@simple_dto.dto_validator"
-            - "@simple_dto.dto_helper"
-            - "@simple_dto.dto_manager_configurator"
-            - "@event_dispatcher"
+            - '@serializer'
+            - '@event_dispatcher'
+            - '@simple_dto.dto_manager_configurator'
 
     simple_dto.api_filter_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager
@@ -71,8 +67,8 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser
         arguments:
             - "@simple_dto.dto_manager"
-        tags:
-            - { name: nelmio_api_doc.extractor.parser }
+#        tags:
+#            - { name: nelmio_api_doc.extractor.parser }
 
     simple_dto.doc.param_handler:
         class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler

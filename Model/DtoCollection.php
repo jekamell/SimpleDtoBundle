@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
-class DtoCollection implements DtoCollectionInterface
+class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSerializable
 {
-    /** @var string */
-    private $type;
-    /** @var mixed */
+    /** @var array */
     private $originalData;
     /** @var array */
     private $data;
@@ -19,16 +19,19 @@ class DtoCollection implements DtoCollectionInterface
 
     /**
      * DtoCollection constructor.
-     * @param string $type
-     * @param $originalData
+     * @param array $originalData
      * @param string $collectionKey
-     * @param null $group
-     * @param DtoInterface[] $data
-     * @param null $count
+     * @param string $group
+     * @param Dto[] $data
+     * @param int|null $count
      */
-    public function __construct($type, $originalData, $collectionKey, $group = null, array $data = [], $count = null)
-    {
-        $this->type = $type;
+    public function __construct(
+        array $originalData,
+            string $collectionKey,
+            string $group,
+            array $data = [],
+            ?int $count = null
+    ) {
         $this->data = $data;
         $this->originalData = $originalData;
         $this->collectionKey = $collectionKey;
@@ -36,27 +39,27 @@ class DtoCollection implements DtoCollectionInterface
         $this->count = $count;
     }
 
-    /** @return array */
-    public function getRawData()
+    /**
+     * @return array
+     */
+    public function getRawData(): array
     {
         return $this->data;
     }
 
     /**
-     * @inheritdoc
+     * @param array $data
      */
-    public function setRawData(array $data)
+    public function setRawData(array $data): void
     {
         $this->data = $data;
-
-        return $this;
     }
 
     /**
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      */
-    function jsonSerialize()
+    function jsonSerialize(): array
     {
         $data = [];
         /** @var DtoInterface $item */
@@ -78,91 +81,63 @@ class DtoCollection implements DtoCollectionInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getOriginalData()
+    public function getOriginalData(): array
     {
         return $this->originalData;
     }
 
     /**
      * @param mixed $originalData
-     * @return DtoCollectionInterface
      */
-    public function setOriginalData($originalData)
+    public function setOriginalData(array $originalData): void
     {
         $this->originalData = $originalData;
-
-        return $this;
     }
 
     /**
      * @param $data
-     * @return DtoInterface
      */
-    public function append($data)
+    public function append($data): void
     {
         if (is_array($data)) {
             $this->data = array_merge($this->data, $data);
         } else {
             $this->data[] = $data;
         }
-
-        return $this;
     }
 
     /**
      * @return string
      */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     * @return $this
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGroup()
+    public function getGroup(): string
     {
         return $this->group;
     }
 
     /**
      * @param string $group
-     * @return $this
      */
-    public function setGroup($group)
+    public function setGroup(string $group): void
     {
         $this->group = $group;
-
-        return $this;
     }
 
     /**
      * Return the current element
-     * @return DtoInterface.
+     * @return Dto
      */
-    public function current()
+    public function current(): Dto
     {
         return current($this->data);
     }
 
     /**
      * Move forward to next element
-     * @return DtoInterface
+     * @return Dto
      */
-    public function next()
+    public function next(): Dto
     {
         return next($this->data);
     }
@@ -171,7 +146,7 @@ class DtoCollection implements DtoCollectionInterface
      * Return the key of the current element
      * @return int|null
      */
-    public function key()
+    public function key(): ?int
     {
         return key($this->data);
     }
@@ -180,7 +155,7 @@ class DtoCollection implements DtoCollectionInterface
      * Checks if current position is valid
      * @return boolean The return value will be casted to boolean and then evaluated.
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->key() !== null && $this->data[$this->key()] instanceof DtoInterface;
     }
@@ -189,7 +164,7 @@ class DtoCollection implements DtoCollectionInterface
      * Rewind the Iterator to the first element
      * @return void Any returned value is ignored.
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->data);
     }
@@ -198,7 +173,7 @@ class DtoCollection implements DtoCollectionInterface
      * Count elements of an object
      * @return int The custom count as an integer.
      */
-    public function count()
+    public function count(): int
     {
         return count($this->data);
     }
@@ -208,7 +183,7 @@ class DtoCollection implements DtoCollectionInterface
      * @param mixed $offset
      * @return boolean true on success or false on failure.
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->data);
     }
@@ -216,9 +191,9 @@ class DtoCollection implements DtoCollectionInterface
     /**
      * Offset to retrieve
      * @param mixed $offset
-     * @return mixed Can return all value types.
+     * @return Dto
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): Dto
     {
         return $this->data[$offset];
     }
@@ -227,9 +202,8 @@ class DtoCollection implements DtoCollectionInterface
      * Offset to set
      * @param mixed $offset
      * @param mixed $value
-     * @return void
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->data[$offset] = $value;
     }
@@ -239,7 +213,7 @@ class DtoCollection implements DtoCollectionInterface
      * @param mixed $offset
      * @return void
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->data[$offset]);
     }
