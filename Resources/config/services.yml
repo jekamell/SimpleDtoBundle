@@ -32,9 +32,7 @@ services:
 
     simple_dto.dto_expands_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager
-        arguments:
-            - "@simple_dto.dto_helper"
-            - "@service_container"
+        autowire: true
 
     simple_dto.dto_links_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager

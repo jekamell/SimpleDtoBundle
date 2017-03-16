@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
-use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
-use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 
@@ -39,10 +40,10 @@ class DtoExpandsListener
     /**
      * @param ApiEvent $apiEvent
      */
-    public function onPostDtoEncode(ApiEvent $apiEvent)
+    public function onPostDtoEncode(ApiEvent $apiEvent): void
     {
         $dto = $apiEvent->getData();
-        if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO || !$dto instanceof DtoInterface) {
+        if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO || !$dto instanceof Dto) {
             return;
         }
 
@@ -57,12 +58,10 @@ class DtoExpandsListener
     /**
      * @param ApiEvent $apiEvent
      */
-    public function onPostDtoCollectionEncode(ApiEvent $apiEvent)
+    public function onPostDtoCollectionEncode(ApiEvent $apiEvent): void
     {
         $dto = $apiEvent->getData();
-        if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO_COLLECTION
-            || !$dto instanceof DtoCollectionInterface
-        ) {
+        if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO_COLLECTION || !$dto instanceof DtoCollection) {
             return;
         }
 
@@ -78,10 +77,10 @@ class DtoExpandsListener
     /**
      * @param $dto
      * @param $expands
-     * @return DtoInterface
+     * @return Dto
      */
-    private function processDtoExpands($dto, $expands)
+    private function processDtoExpands($dto, $expands): Dto
     {
-        return $this->expandsManager->processExpands($dto, $expands, $this->dtoHelper->getDtoConfig());
+        return $this->expandsManager->processExpands($dto, $expands);
     }
 }
