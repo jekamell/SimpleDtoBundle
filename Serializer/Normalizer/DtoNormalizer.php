@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mell\Bundle\SimpleDtoBundle\Serializer\Normalizer;
 
-use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializable;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
@@ -32,6 +32,6 @@ class DtoNormalizer extends ObjectNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return $format === self::FORMAT_DTO && $data instanceof DtoSerializable;
+        return $format === self::FORMAT_DTO && $data instanceof DtoSerializableInterface;
     }
 }
