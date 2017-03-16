@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
-use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
-use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializable;
+use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Normalizer\DtoNormalizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -18,6 +19,8 @@ use Symfony\Component\Serializer\Serializer;
  */
 class DtoManager
 {
+    const FORMAT_JSON = 'json';
+
     /** @var Serializer */
     protected $serializer;
     /** @var EventDispatcherInterface */
@@ -42,14 +45,18 @@ class DtoManager
     }
 
     /**
-     * @param DtoSerializable $entity
+     * @param DtoSerializableInterface $entity
      * @param string $group
      * @param array $fields
      * @param bool $throwEvent
      * @return Dto
      */
-    public function createDto(DtoSerializable $entity, string $group, array $fields, bool $throwEvent = true): Dto
-    {
+    public function createDto(
+        DtoSerializableInterface $entity,
+        string $group,
+        array $fields,
+        bool $throwEvent = true
+    ): Dto {
         $dto = new Dto($entity, $group);
 
         if ($throwEvent) {
@@ -60,10 +67,7 @@ class DtoManager
             $this->serializer->normalize(
                 $entity,
                 DtoNormalizer::FORMAT_DTO,
-                [
-                    'groups' => [$group],
-                    'fields' => $fields,
-                ]
+                ['groups' => [$group], 'fields' => $fields,]
             )
         );
 
@@ -77,8 +81,12 @@ class DtoManager
      * @param null|integer $count
      * @return DtoCollection
      */
-    public function createDtoCollection(array $collection, string $group, array $fields = [], ?int $count = null): DtoCollection
-    {
+    public function createDtoCollection(
+        array $collection,
+        string $group,
+        array $fields = [],
+        ?int $count = null
+    ): DtoCollection {
         $dtoCollection = new DtoCollection(
             $collection,
             $this->configurator->getCollectionKey(),
@@ -104,88 +112,22 @@ class DtoManager
     }
 
     /**
-     * Convert dto to given entity
-     * @param object $entity
-     * @param DtoInterface $dto
-     * @return object
+     * @param DtoSerializableInterface $entity
+     * @param string $data
+     * @return DtoSerializableInterface
      */
-    public function createEntityFromDto($entity, DtoInterface $dto)
+    public function deserializeEntity(DtoSerializableInterface $entity, string $data): DtoSerializableInterface
     {
-//        $dtoConfig = $this->getConfig();
-//        $group = $dto->getGroup();
-//        $this->validateDto($dto, $dtoConfig, $dto->getType());
-//
-//        $fieldsConfig = $this->getDtoConfig($dto->getType())['fields'];
-//        foreach ($dto->getRawData() as $property => $value) {
-//            if (!isset($fieldsConfig[$property])) {
-//                throw new BadRequestHttpException(sprintf('%s: field "%s" is not defined', $dto->getType(), $property));
-//            }
-//            if (!empty($fieldsConfig[$property]['readonly'])) {
-//                continue;
-//            }
-//            if (isset($fieldsConfig[$property]['groups']) && !in_array($group, $fieldsConfig[$property]['groups'])) {
-//                continue;
-//            }
-//            $setter = $this->getFieldSetter($fieldsConfig, $property);
-//            call_user_func([$entity, $setter], $value);
-//        }
-//
-//        return $entity;
-    }
+        $this->serializer->deserialize($data, get_class($entity), self::FORMAT_JSON, ['object_to_populate' => $entity]);
 
-    /**
-     * @param $entity
-     * @param array $dtoData Predefined dto data
-     * @param array $fields Required fields
-     * @param array $config Fields configuration
-     * @param string $group Dto group
-     */
-    protected function processFields($entity, array &$dtoData, array $fields, array $config, $group)
-    {
-//        /** @var array $options */
-//        foreach ($config as $field => $options) {
-//            // field was not required (@see dtoManager::getRequiredFields)
-//            if (!empty($fields) && !in_array($field, $fields)) {
-//                continue;
-//            }
-//            // field is not allowed for specified group
-//            if (!empty($options['groups']) && !in_array($group, $options['groups'])) {
-//                continue;
-//            }
-//
-//            $getter = $this->getFieldGetter($options, $field);
-//            $value = call_user_func([$entity, $getter]);
-//            $dtoData[$field] = $this->dtoHelper->castValueType($options['type'], $value);
-//        }
-    }
-
-    /**
-     * @param $fieldsConfig
-     * @param $property
-     * @return string
-     */
-    private function getFieldSetter($fieldsConfig, $property)
-    {
-//        return isset($fieldsConfig[$property]['setter'])
-//            ? $fieldsConfig[$property]['setter']
-//            : $this->dtoHelper->getFieldSetter($property);
-    }
-
-    /**
-     * @param $options
-     * @param $field
-     * @return string
-     */
-    private function getFieldGetter($options, $field)
-    {
-//        return isset($options['getter']) ? $options['getter'] : $this->dtoHelper->getFieldGetter($field);
+        return $entity;
     }
 
     /**
      * @param ApiEvent $apiEvent
      * @param string $eventName
      */
-    private function dispatch(ApiEvent $apiEvent, $eventName)
+    private function dispatch(ApiEvent $apiEvent, string $eventName): void
     {
         $this->eventDispatcher->dispatch($eventName, $apiEvent);
     }
