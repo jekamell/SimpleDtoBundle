@@ -71,6 +71,10 @@ class DtoManager
             )
         );
 
+        if ($throwEvent) {
+            $this->dispatch(new ApiEvent($dto, ApiEvent::ACTION_CREATE_DTO), ApiEvent::EVENT_POST_DTO_ENCODE);
+        }
+
         return $dto;
     }
 
