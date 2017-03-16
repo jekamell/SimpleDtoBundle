@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Services\RequestManager;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+/**
+ * Class RequestManager
+ * @package Mell\Bundle\SimpleDtoBundle\Services\RequestManager
+ */
 class RequestManager
 {
     const SORT_DIRECTION_DEFAULT = self::SORT_DIRECTION_ACS;
     const SORT_DIRECTION_ACS = 'asc';
     const SORT_DIRECTION_DESC = 'desc';
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
     /** @var RequestManagerConfigurator */
     protected $requestManagerConfiguration;
 
@@ -25,14 +31,14 @@ class RequestManager
      */
     public function __construct(RequestStack $requestStack, RequestManagerConfigurator $requestManagerConfiguration)
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
         $this->requestManagerConfiguration = $requestManagerConfiguration;
     }
 
     /**
      * @return array
      */
-    public static function getAllowedSortDirections()
+    public static function getAllowedSortDirections(): array
     {
         return [self::SORT_DIRECTION_ACS, self::SORT_DIRECTION_DESC];
     }
@@ -40,9 +46,9 @@ class RequestManager
     /**
      * @return array
      */
-    public function getFields()
+    public function getFields(): array
     {
-        if ($fieldsStr = $this->request->get($this->requestManagerConfiguration->getFieldsParam())) {
+        if ($fieldsStr = $this->getRequest()->get($this->requestManagerConfiguration->getFieldsParam())) {
             return array_unique(array_map('trim', explode(',', $fieldsStr)));
         }
 
@@ -52,9 +58,9 @@ class RequestManager
     /**
      * @return array
      */
-    public function getExpands()
+    public function getExpands(): array
     {
-        if ($expandsStr = $this->request->get($this->requestManagerConfiguration->getExpandsParam())) {
+        if ($expandsStr = $this->getRequest()->get($this->requestManagerConfiguration->getExpandsParam())) {
             preg_match_all(
                 '~(?P<expand>\w+)(?P<fields>\(.*?\))?~x',
                 str_replace(' ', '', $expandsStr),
@@ -75,9 +81,9 @@ class RequestManager
     /**
      * @return integer
      */
-    public function getLimit()
+    public function getLimit(): int
     {
-        $limit = $this->request->get($this->requestManagerConfiguration->getLimitParam(), 0);
+        $limit = $this->getRequest()->get($this->requestManagerConfiguration->getLimitParam(), 0);
 
         return (int)$limit;
     }
@@ -87,7 +93,7 @@ class RequestManager
      */
     public function getOffset()
     {
-        $offset = $this->request->get($this->requestManagerConfiguration->getOffsetParam(), 0);
+        $offset = $this->getRequest()->get($this->requestManagerConfiguration->getOffsetParam(), 0);
 
         return (int)$offset;
     }
@@ -95,9 +101,9 @@ class RequestManager
     /**
      * @return array
      */
-    public function getSort()
+    public function getSort(): array
     {
-        if ($sortStr = $this->request->get($this->requestManagerConfiguration->getSortParam())) {
+        if ($sortStr = $this->getRequest()->get($this->requestManagerConfiguration->getSortParam())) {
             $sortParts = array_unique(array_map('trim', explode(',', $sortStr)));
             $sort = [];
             foreach ($sortParts as $sortItem) {
@@ -117,23 +123,23 @@ class RequestManager
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLocale()
+    public function getLocale(): ?string
     {
-        if ($localeStr = $this->request->get($this->requestManagerConfiguration->getLocaleParam())) {
+        if ($localeStr = $this->getRequest()->get($this->requestManagerConfiguration->getLocaleParam())) {
             return $localeStr;
         }
 
-        return $this->request->headers->get($this->requestManagerConfiguration->getLocaleHeader());
+        return $this->getRequest()->headers->get($this->requestManagerConfiguration->getLocaleHeader());
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function isLinksRequired()
+    public function isLinksRequired(): bool
     {
-        $linksStr = $this->request->get($this->requestManagerConfiguration->getLinksParam());
+        $linksStr = $this->getRequest()->get($this->requestManagerConfiguration->getLinksParam());
 
         return (bool)$linksStr;
     }
@@ -141,19 +147,27 @@ class RequestManager
     /**
      * @return bool
      */
-    public function isCountRequired()
+    public function isCountRequired(): bool
     {
-        $countStr = $this->request->get($this->requestManagerConfiguration->getCountParam());
+        $countStr = $this->getRequest()->get($this->requestManagerConfiguration->getCountParam());
 
         return (bool)$countStr;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getApiFilters()
+    public function getApiFilters(): ?string
     {
-        return $this->request->get($this->requestManagerConfiguration->getApiFilterParam());
+        return $this->getRequest()->get($this->requestManagerConfiguration->getApiFilterParam());
+    }
+
+    /**
+     * @return Request
+     */
+    protected function getRequest(): Request
+    {
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
