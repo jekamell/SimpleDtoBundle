@@ -64,9 +64,9 @@ services:
     simple_dto.doc.parser.dto_parser:
         class: Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser
         arguments:
-            - "@simple_dto.dto_manager"
-#        tags:
-#            - { name: nelmio_api_doc.extractor.parser }
+            - '@serializer.mapping.class_metadata_factory'
+        tags:
+            - { name: nelmio_api_doc.extractor.parser }
 
     simple_dto.doc.param_handler:
         class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler

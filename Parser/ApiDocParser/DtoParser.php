@@ -1,9 +1,11 @@
 <?php
 
 namespace Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser;
-use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManagerInterface;
+
+use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\AttributeMetadata;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
  * Support metadata parsing from dto configuration
@@ -12,37 +14,34 @@ use Nelmio\ApiDocBundle\Parser\ParserInterface;
  */
 class DtoParser implements ParserInterface
 {
+    /** @var ClassMetadataFactoryInterface */
+    protected $metadataFactory;
     /** @var array */
-    protected $typeMap = [
-        'integer' => DataTypes::INTEGER,
-        'string' => DataTypes::STRING,
-        'boolean' => DataTypes::BOOLEAN,
-        'float' => DataTypes::FLOAT,
-        'array' => DataTypes::COLLECTION,
-        'date' => DataTypes::DATE,
-        'datetime' => DataTypes::DATETIME,
+    protected $attributeDataTypeMap = [
+        AttributeMetadata::TYPE_INTEGER => DataTypes::INTEGER,
+        AttributeMetadata::TYPE_STRING => DataTypes::STRING,
+        AttributeMetadata::TYPE_BOOLEAN => DataTypes::BOOLEAN,
+        AttributeMetadata::TYPE_FLOAT => DataTypes::FLOAT,
+        AttributeMetadata::TYPE_DATE => DataTypes::DATE,
+        AttributeMetadata::TYPE_DATE_TIME => DataTypes::DATETIME,
     ];
-    /** @var DtoManagerInterface */
-    protected $dtoManager;
 
     /**
      * DtoParser constructor.
-     * @param DtoManagerInterface $dtoManager
+     * @param ClassMetadataFactoryInterface $metadataFactory
      */
-    public function __construct(DtoManagerInterface $dtoManager)
+    public function __construct(ClassMetadataFactoryInterface $metadataFactory)
     {
-        $this->dtoManager = $dtoManager;
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
-     * Return true/false whether this class supports parsing the given class.
-     *
      * @param  array $item containing the following fields: class, groups. Of which groups is optional
      * @return boolean
      */
     public function supports(array $item)
     {
-        return $this->dtoManager->hasDtoConfig($item['class']);
+        return class_exists($item['class']);
     }
 
     /**
@@ -52,28 +51,18 @@ class DtoParser implements ParserInterface
     public function parse(array $item)
     {
         $data = [];
-        foreach ($this->dtoManager->getDtoConfig($item['class'])['fields'] as $field => $config) {
-            if (!empty($config['groups']) && empty(array_intersect($item['groups'], $config['groups']))) {
+        /** @var AttributeMetadata $attribute */
+        foreach ($this->metadataFactory->getMetadataFor($item['class'])->getAttributesMetadata() as $attribute) {
+            if (empty(array_intersect($attribute->getGroups(), $item['groups']))) {
                 continue;
             }
-            $data[$field] = $this->getPropertyPayload($config, $field);
+            $data[$attribute->getName()] = [
+                'dataType' => $this->attributeDataTypeMap[$attribute->getType()] ?? DataTypes::STRING,
+                'required' => $attribute->isRequired(),
+                'description' => $attribute->getDescription() ?: ucfirst($attribute->getName()),
+            ];
         }
 
         return $data;
-    }
-
-    /**
-     * @param array $config
-     * @param string $field
-     * @return array
-     */
-    public function getPropertyPayload(array $config, $field)
-    {
-        return [
-            'dataType' => $this->typeMap[$config['type']],
-            'required' => !empty($config['required']),
-            'description' => !empty($config['description']) ? $config['description'] : $field,
-            'readonly' => !empty($config['readonly'])
-        ];
     }
 }
