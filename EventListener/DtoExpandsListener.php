@@ -8,6 +8,7 @@ use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
+use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 
@@ -19,21 +20,17 @@ class DtoExpandsListener
 {
     /** @var RequestManager */
     private $requestManager;
-    /** @var DtoHelper */
-    private $dtoHelper;
     /** @var DtoExpandsManager */
     private $expandsManager;
 
     /**
      * DtoExpandsListener constructor.
      * @param RequestManager $requestManager
-     * @param DtoHelper $dtoHelper
      * @param DtoExpandsManager $expandsManager
      */
-    public function __construct(RequestManager $requestManager, DtoHelper $dtoHelper, DtoExpandsManager $expandsManager)
+    public function __construct(RequestManager $requestManager, DtoExpandsManager $expandsManager)
     {
         $this->requestManager = $requestManager;
-        $this->dtoHelper = $dtoHelper;
         $this->expandsManager = $expandsManager;
     }
 
@@ -75,11 +72,11 @@ class DtoExpandsListener
     }
 
     /**
-     * @param $dto
-     * @param $expands
+     * @param Dto $dto
+     * @param array $expands
      * @return Dto
      */
-    private function processDtoExpands($dto, $expands): Dto
+    private function processDtoExpands(Dto $dto, array $expands): Dto
     {
         return $this->expandsManager->processExpands($dto, $expands);
     }
