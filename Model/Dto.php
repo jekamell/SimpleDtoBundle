@@ -6,9 +6,8 @@ namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 /**
  * Class Dto
- * @package Mell\Bundle\SimpleDtoBundle\Model
  */
-class Dto implements \JsonSerializable
+class Dto implements DtoInterface
 {
     /** @var array */
     private $data;
@@ -19,12 +18,11 @@ class Dto implements \JsonSerializable
 
     /**
      * Dto constructor.
-     * @param object $entity
-     * @param string|null $group
+     * @param DtoSerializableInterface $entity
+     * @param string $group
      * @param array $data
-     * @internal param string $type
      */
-    public function __construct($entity, string $group, array $data = [])
+    public function __construct(DtoSerializableInterface $entity, string $group, array $data = [])
     {
         $this->data = $data;
         $this->entity = $entity;
@@ -32,48 +30,40 @@ class Dto implements \JsonSerializable
     }
 
     /**
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     * {@inheritdoc}
      */
-    function jsonSerialize()
-    {
-        return $this->data;
-    }
-
-    /** @return array */
-    public function getRawData()
+    function jsonSerialize(): array
     {
         return $this->data;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function setRawData(array $data)
+    public function getRawData(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRawData(array $data): void
     {
         $this->data = $data;
-
-        return $this;
     }
 
 
     /**
-     * Set dto source
-     *
-     * @param $data
-     * @return $this
+     * {@inheritdoc}
      */
-    public function setOriginalData($data)
+    public function setOriginalData($data): void
     {
         $this->entity = $data;
-
-        return $this;
     }
 
     /**
-     * get dto source
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getOriginalData()
     {
@@ -81,21 +71,18 @@ class Dto implements \JsonSerializable
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getGroup()
+    public function getGroup(): string
     {
         return $this->group;
     }
 
     /**
-     * @param string $group
-     * @return $this
+     * {@inheritdoc}
      */
-    public function setGroup($group)
+    public function setGroup(string $group): void
     {
         $this->group = $group;
-
-        return $this;
     }
 }

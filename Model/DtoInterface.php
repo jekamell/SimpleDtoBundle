@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
+/**
+ * Interface DtoInterface
+ * @package Mell\Bundle\SimpleDtoBundle\Model
+ */
 interface DtoInterface extends \JsonSerializable
 {
     const TYPE_INTEGER = 'integer';
@@ -23,56 +29,36 @@ interface DtoInterface extends \JsonSerializable
      *
      * @return array
      */
-    public function getRawData();
+    public function getRawData(): array;
 
     /**
      * Reset raw data
      *
      * @param array $data
-     * @return $this
      */
-    public function setRawData(array $data);
+    public function setRawData(array $data): void;
 
     /**
-     * Set dto source
+     * Set original data
      *
      * @param $data
-     * @return $this
      */
-    public function setOriginalData($data);
+    public function setOriginalData($data): void;
 
     /**
-     * get dto source
+     * Get original data
      *
      * @return mixed
      */
     public function getOriginalData();
 
     /**
-     * @param array|DtoInterface $data
-     * @return $this
-     */
-    public function append($data);
-
-    /**
      * @return string
      */
-    public function getType();
-
-    /**
-     * @param string $type
-     * @return $this
-     */
-    public function setType($type);
-
-    /**
-     * @return string|null
-     */
-    public function getGroup();
+    public function getGroup(): string;
 
     /**
      * @param string $group
-     * @return $this
      */
-    public function setGroup($group);
+    public function setGroup(string $group): void;
 }

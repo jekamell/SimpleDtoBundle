@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
-class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSerializable
+class DtoCollection implements DtoCollectionInterface
 {
     /** @var array */
     private $originalData;
@@ -40,7 +40,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getRawData(): array
     {
@@ -48,7 +48,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * @param array $data
+     * {@inheritdoc}
      */
     public function setRawData(array $data): void
     {
@@ -56,8 +56,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     * {@inheritdoc}
      */
     function jsonSerialize(): array
     {
@@ -81,7 +80,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getOriginalData(): array
     {
@@ -89,10 +88,14 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * @param mixed $originalData
+     * {@inheritdoc}
      */
-    public function setOriginalData(array $originalData): void
+    public function setOriginalData($originalData): void
     {
+        if (!is_array($originalData) && !$originalData instanceof \Iterator) {
+            throw new \InvalidArgumentException('First argument must be an array or implement \\Iterator interface');
+        }
+
         $this->originalData = $originalData;
     }
 
@@ -109,7 +112,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getGroup(): string
     {
@@ -117,7 +120,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * @param string $group
+     * {@inheritdoc}
      */
     public function setGroup(string $group): void
     {
@@ -125,8 +128,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Return the current element
-     * @return Dto
+     * {@inheritdoc}
      */
     public function current(): Dto
     {
@@ -134,8 +136,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Move forward to next element
-     * @return Dto
+     * {@inheritdoc}
      */
     public function next()
     {
@@ -143,8 +144,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Return the key of the current element
-     * @return int|null
+     * {@inheritdoc}
      */
     public function key(): ?int
     {
@@ -152,8 +152,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Checks if current position is valid
-     * @return boolean The return value will be casted to boolean and then evaluated.
+     * {@inheritdoc}
      */
     public function valid(): bool
     {
@@ -161,8 +160,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Rewind the Iterator to the first element
-     * @return void Any returned value is ignored.
+     * {@inheritdoc}
      */
     public function rewind(): void
     {
@@ -170,8 +168,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Count elements of an object
-     * @return int The custom count as an integer.
+     * {@inheritdoc}
      */
     public function count(): int
     {
@@ -179,9 +176,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Whether a offset exists
-     * @param mixed $offset
-     * @return boolean true on success or false on failure.
+     * {@inheritdoc}
      */
     public function offsetExists($offset): bool
     {
@@ -189,9 +184,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Offset to retrieve
-     * @param mixed $offset
-     * @return Dto
+     * {@inheritdoc}
      */
     public function offsetGet($offset): Dto
     {
@@ -199,9 +192,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Offset to set
-     * @param mixed $offset
-     * @param mixed $value
+     * {@inheritdoc}
      */
     public function offsetSet($offset, $value): void
     {
@@ -209,9 +200,7 @@ class DtoCollection implements \Iterator, \Countable, \ArrayAccess, \JsonSeriali
     }
 
     /**
-     * Offset to unset
-     * @param mixed $offset
-     * @return void
+     * {@inheritdoc}
      */
     public function offsetUnset($offset): void
     {
