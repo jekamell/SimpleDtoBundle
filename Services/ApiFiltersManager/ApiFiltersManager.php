@@ -39,9 +39,12 @@ class ApiFiltersManager implements ApiFilterManagerInterface
      * @param string $filtersStr
      * @return ApiFilterCollectionInterface
      */
-    public function parse(string $filtersStr): ApiFilterCollectionInterface
+    public function parse(?string $filtersStr): ApiFilterCollectionInterface
     {
         $collection = new ApiFilterCollection();
+        if (empty($filtersStr)) {
+            return $collection;
+        }
         $operationsStr = implode('|', static::getOperationAliases());
         foreach (explode('|', $filtersStr) as $filter) {
             if (preg_match("/^(?<param>[a-zA-Z]+)(?<operation>$operationsStr)(?<value>.+)$/", $filter, $m)) {
