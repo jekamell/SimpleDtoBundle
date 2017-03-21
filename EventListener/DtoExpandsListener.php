@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
-use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
-use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 
