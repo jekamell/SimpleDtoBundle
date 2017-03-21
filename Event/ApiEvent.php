@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class ApiEvent
- * @package Mell\Bundle\SimpleDtoBundle\Event
  */
 class ApiEvent extends Event
 {
@@ -37,16 +38,36 @@ class ApiEvent extends Event
     protected $data;
     /** @var string */
     protected $action;
+    /** @var array */
+    protected $context = [];
 
     /**
      * ApiEvent constructor.
      * @param $data
      * @param string $action
+     * @param array $context
      */
-    public function __construct($data, $action)
+    public function __construct($data, $action, array $context = [])
     {
         $this->data = $data;
         $this->action = $action;
+        $this->context = $context;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param array $context
+     */
+    public function setContext(array $context): void
+    {
+        $this->context = $context;
     }
 
     /**
@@ -58,7 +79,7 @@ class ApiEvent extends Event
     }
 
     /**
-     * @param array $data
+     * @param $data
      */
     public function setData($data)
     {
@@ -68,7 +89,7 @@ class ApiEvent extends Event
     /**
      * @return string
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
@@ -76,7 +97,7 @@ class ApiEvent extends Event
     /**
      * @param string $action
      */
-    public function setAction($action)
+    public function setAction($action): void
     {
         $this->action = $action;
     }

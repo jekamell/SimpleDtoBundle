@@ -19,8 +19,6 @@ use Symfony\Component\Serializer\Serializer;
  */
 class DtoManager
 {
-    const FORMAT_JSON = 'json';
-
     /** @var Serializer */
     protected $serializer;
     /** @var EventDispatcherInterface */
@@ -118,11 +116,15 @@ class DtoManager
     /**
      * @param DtoSerializableInterface $entity
      * @param string $data
+     * @param string $format
      * @return DtoSerializableInterface
      */
-    public function deserializeEntity(DtoSerializableInterface $entity, string $data): DtoSerializableInterface
-    {
-        $this->serializer->deserialize($data, get_class($entity), self::FORMAT_JSON, ['object_to_populate' => $entity]);
+    public function deserializeEntity(
+        DtoSerializableInterface $entity,
+        string $data,
+        string $format
+    ): DtoSerializableInterface {
+        $this->serializer->deserialize($data, get_class($entity), $format, ['object_to_populate' => $entity]);
 
         return $entity;
     }
