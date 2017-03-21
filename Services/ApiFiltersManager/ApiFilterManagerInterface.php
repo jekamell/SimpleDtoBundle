@@ -22,5 +22,5 @@ interface ApiFilterManagerInterface
      * @param string $filtersStr
      * @return ApiFilterCollectionInterface
      */
-    public function parse($filtersStr);
+    public function parse(string $filtersStr): ApiFilterCollectionInterface;
 }

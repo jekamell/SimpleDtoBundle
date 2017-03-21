@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -17,7 +19,7 @@ class SimpleDtoExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -31,7 +33,7 @@ class SimpleDtoExtension extends Extension
      * @param ContainerBuilder $container
      * @param array $config
      */
-    private function addContainerParams(ContainerBuilder $container, array $config)
+    private function addContainerParams(ContainerBuilder $container, array $config): void
     {
         foreach ($config as $property => $value) {
             $this->bindParam($container, $value, $this->getAlias() . '.' . $property);
@@ -45,7 +47,7 @@ class SimpleDtoExtension extends Extension
      * @param mixed $value
      * @param string $prefix
      */
-    private function bindParam(ContainerBuilder $container, $value, $prefix)
+    private function bindParam(ContainerBuilder $container, $value, string $prefix): void
     {
         if (is_array($value)) {
             foreach ($value as $p => $v) {

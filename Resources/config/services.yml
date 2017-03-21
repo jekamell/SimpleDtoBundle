@@ -13,66 +13,36 @@ services:
             - "%simple_dto.param_links%"
             - "%simple_dto.param_filters%"
             - "%simple_dto.param_count%"
-
-    simple_dto.request_manager:
-        class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
-        arguments:
-            - "@request_stack"
-            - "@simple_dto.request_manager_configurator"
-
-    simple_dto.dto_manager:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
-        arguments:
-            - '@serializer'
-            - '@event_dispatcher'
-            - '@simple_dto.dto_manager_configurator'
-
-    simple_dto.api_filter_manager:
-        class: Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager
-
-    simple_dto.dto_expands_manager:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager
-        autowire: true
-
-    simple_dto.dto_links_manager:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
-        arguments:
-            - "@sensio_framework_extra.security.expression_language.default"
-            - "@router"
-            - "@simple_dto.dto_helper"
-
-    simple_dto.dto_validator:
-        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoValidator
-        arguments: ["@simple_dto.dto_helper"]
-
     simple_dto.dto_manager_configurator:
         class: Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator
         arguments:
             - "%simple_dto.collection_key%"
             - "%simple_dto.date_format%"
             - "%simple_dto.date_time_format%"
-
-    simple_dto.dto_helper:
-        class: Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper
-        arguments:
-            - "@file_locator"
-            - "%simple_dto.dto_config_path%"
-            - "%simple_dto.date_format%"
-            - "%simple_dto.date_time_format%"
+    simple_dto.request_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
+        autowire: true
+    simple_dto.dto_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
+        autowire: true
+    simple_dto.api_filter_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager
+    simple_dto.dto_expands_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager
+        autowire: true
+    simple_dto.dto_links_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
+        autowire: true
 
     # Api docs related services
     simple_dto.doc.parser.dto_parser:
         class: Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser
-        arguments:
-            - '@serializer.mapping.class_metadata_factory'
+        autowire: true
         tags:
             - { name: nelmio_api_doc.extractor.parser }
-
     simple_dto.doc.param_handler:
         class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler
-        arguments:
-            - "@simple_dto.request_manager_configurator"
-            - "%simple_dto.hateoas_enabled%"
+        autowire: true
         tags:
             - { name: nelmio_api_doc.extractor.handler }
 
@@ -83,37 +53,37 @@ services:
             - "@logger"
             - "%kernel.environment%"
             - "%kernel.debug%"
+        public: false
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
     simple_dto.event_listener.expands_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoExpandsListener
         autowire: true
+        public: false
         tags:
             - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
             - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
     simple_dto.event_listener.list_query_builder_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\ListQueryBuilderListener
         autowire: true
+        public: false
         tags:
             - { name: kernel.event_listener, event: simple_dto.pre_collection_load, method: onPreCollectionLoad }
-    simple_dto.event_listener.links_listener:
-        class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoLinksListener
-        arguments:
-            - "@simple_dto.request_manager"
-            - "@simple_dto.dto_links_manager"
-            - "@simple_dto.dto_helper"
-        calls:
-            - ['setContainer', ["@service_container"]]
-        tags:
-            - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
-            - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
-
+#    simple_dto.event_listener.links_listener:
+#        class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoLinksListener
+#        arguments:
+#            - "@simple_dto.request_manager"
+#            - "@simple_dto.dto_links_manager"
+#            - "@simple_dto.dto_helper"
+#        calls:
+#            - ['setContainer', ["@service_container"]]
+#        tags:
+#            - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
+#            - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
     simple_dto.event_listener.api_filters_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\ApiFiltersListener
-        arguments:
-            - "@simple_dto.request_manager"
-            - "@simple_dto.api_filter_manager"
-            - "@router"
+        autowire: true
+        public: false
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 

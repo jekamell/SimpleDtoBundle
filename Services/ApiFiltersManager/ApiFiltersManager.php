@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager;
 
-use Doctrine\Common\Collections\Criteria;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilter;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
-use Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFilterManagerInterface;
 
 /**
  * Class ApiFiltersManager
@@ -37,9 +37,9 @@ class ApiFiltersManager implements ApiFilterManagerInterface
 
     /**
      * @param string $filtersStr
-     * @return ApiFilter[]
+     * @return ApiFilterCollectionInterface
      */
-    public function parse($filtersStr)
+    public function parse(string $filtersStr): ApiFilterCollectionInterface
     {
         $collection = new ApiFilterCollection();
         $operationsStr = implode('|', static::getOperationAliases());
@@ -62,7 +62,7 @@ class ApiFiltersManager implements ApiFilterManagerInterface
     /**
      * @return array
      */
-    public static function getOperationAliases()
+    public static function getOperationAliases(): array
     {
         return [
             ApiFilterManagerInterface::OPERATION_ALIAS_EQUAL,
@@ -78,7 +78,7 @@ class ApiFiltersManager implements ApiFilterManagerInterface
      * @param string $operation
      * @return mixed
      */
-    public function getSqlOperationByOperation($operation)
+    public function getSqlOperationByOperation(string $operation): string
     {
         return $this->operationSqlOperationMap[$operation];
     }
@@ -87,7 +87,7 @@ class ApiFiltersManager implements ApiFilterManagerInterface
      * @param string $operation
      * @return bool
      */
-    public function isArrayOperation($operation)
+    public function isArrayOperation(string $operation): bool
     {
         return in_array($operation, [ApiFilter::OPERATION_IN_ARRAY, ApiFilter::OPERATION_NOT_IN_ARRAY]);
     }
@@ -97,7 +97,7 @@ class ApiFiltersManager implements ApiFilterManagerInterface
      * @param bool $isArray
      * @return string
      */
-    private function processOperation($alias, $isArray)
+    private function processOperation(string $alias, bool $isArray): string
     {
         if (!$isArray) {
             return $this->aliasOperationMap[$alias];
@@ -111,9 +111,9 @@ class ApiFiltersManager implements ApiFilterManagerInterface
     /**
      * @param string $value
      * @param bool $isArray
-     * @return mixed
+     * @return string|array
      */
-    private function processValue($value, $isArray)
+    private function processValue(string $value, bool $isArray)
     {
         if (!$isArray) {
             return trim($value);
@@ -128,7 +128,7 @@ class ApiFiltersManager implements ApiFilterManagerInterface
      * @param ApiFilterCollectionInterface $filters
      * @return ApiFilterCollectionInterface
      */
-    private function processFilters(ApiFilterCollectionInterface $filters)
+    private function processFilters(ApiFilterCollectionInterface $filters): ApiFilterCollectionInterface
     {
         return $filters->unique();
     }

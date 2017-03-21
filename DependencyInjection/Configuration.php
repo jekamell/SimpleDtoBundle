@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -14,7 +16,7 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('simple_dto');
@@ -73,10 +75,6 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('param_filters')
                     ->defaultValue('_filters')
                     ->info('Get param for define api filters')
-                    ->end()
-                ->scalarNode('dto_config_path')
-                    ->isRequired()
-                    ->info('Path to dto config. Alias can be used: @AppBundle/Resources/config/dto.yml')
                     ->end()
                 ->scalarNode('hateoas_enabled')
                     ->defaultValue(false)

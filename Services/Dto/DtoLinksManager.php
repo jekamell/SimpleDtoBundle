@@ -2,7 +2,6 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 
-use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -20,8 +19,6 @@ class DtoLinksManager
     protected $expressionLanguage;
     /** @var Router */
     protected $router;
-    /** @var DtoHelper */
-    protected $dtoHelper;
     /** @var array */
     protected $expressionVars = [];
     /** @var RouteCollection */
@@ -31,13 +28,11 @@ class DtoLinksManager
      * DtoLinksManager constructor.
      * @param ExpressionLanguage $expressionLanguage
      * @param Router $router
-     * @param DtoHelper $dtoHelper
      */
-    public function __construct(ExpressionLanguage $expressionLanguage, Router $router, DtoHelper $dtoHelper)
+    public function __construct(ExpressionLanguage $expressionLanguage, Router $router)
     {
         $this->expressionLanguage = $expressionLanguage;
         $this->router = $router;
-        $this->dtoHelper = $dtoHelper;
     }
 
     /**
@@ -135,7 +130,7 @@ class DtoLinksManager
     {
         $data = [];
         foreach ($route->getRequirements() as $param => $value) {
-            $data[$param] = call_user_func([$entity, $this->dtoHelper->getFieldGetter($param)]);
+            $data[$param] = call_user_func([$entity, 'get' . ucfirst($param)]);
         }
 
         return $data;
