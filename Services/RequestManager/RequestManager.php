@@ -21,18 +21,24 @@ class RequestManager
     /** @var RequestStack */
     protected $requestStack;
     /** @var RequestManagerConfigurator */
-    protected $requestManagerConfiguration;
+    protected $configurator;
 
     /**
      * RequestManager constructor.
      *
      * @param RequestStack $requestStack
-     * @param RequestManagerConfigurator $requestManagerConfiguration
      */
-    public function __construct(RequestStack $requestStack, RequestManagerConfigurator $requestManagerConfiguration)
+    public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
-        $this->requestManagerConfiguration = $requestManagerConfiguration;
+    }
+
+    /**
+     * @param RequestManagerConfigurator $configurator
+     */
+    public function setConfigurator(RequestManagerConfigurator $configurator): void
+    {
+        $this->configurator = $configurator;
     }
 
     /**
@@ -48,7 +54,7 @@ class RequestManager
      */
     public function getFields(): array
     {
-        if ($fieldsStr = $this->getRequest()->get($this->requestManagerConfiguration->getFieldsParam())) {
+        if ($fieldsStr = $this->getRequest()->get($this->configurator->getFieldsParam())) {
             return array_unique(array_map('trim', explode(',', $fieldsStr)));
         }
 
@@ -60,7 +66,7 @@ class RequestManager
      */
     public function getExpands(): array
     {
-        if ($expandsStr = $this->getRequest()->get($this->requestManagerConfiguration->getExpandsParam())) {
+        if ($expandsStr = $this->getRequest()->get($this->configurator->getExpandsParam())) {
             preg_match_all(
                 '~(?P<expand>\w+)(?P<fields>\(.*?\))?~x',
                 str_replace(' ', '', $expandsStr),
@@ -83,7 +89,7 @@ class RequestManager
      */
     public function getLimit(): int
     {
-        $limit = $this->getRequest()->get($this->requestManagerConfiguration->getLimitParam(), 0);
+        $limit = $this->getRequest()->get($this->configurator->getLimitParam(), 0);
 
         return (int)$limit;
     }
@@ -93,7 +99,7 @@ class RequestManager
      */
     public function getOffset()
     {
-        $offset = $this->getRequest()->get($this->requestManagerConfiguration->getOffsetParam(), 0);
+        $offset = $this->getRequest()->get($this->configurator->getOffsetParam(), 0);
 
         return (int)$offset;
     }
@@ -103,7 +109,7 @@ class RequestManager
      */
     public function getSort(): array
     {
-        if ($sortStr = $this->getRequest()->get($this->requestManagerConfiguration->getSortParam())) {
+        if ($sortStr = $this->getRequest()->get($this->configurator->getSortParam())) {
             $sortParts = array_unique(array_map('trim', explode(',', $sortStr)));
             $sort = [];
             foreach ($sortParts as $sortItem) {
@@ -127,11 +133,11 @@ class RequestManager
      */
     public function getLocale(): ?string
     {
-        if ($localeStr = $this->getRequest()->get($this->requestManagerConfiguration->getLocaleParam())) {
+        if ($localeStr = $this->getRequest()->get($this->configurator->getLocaleParam())) {
             return $localeStr;
         }
 
-        return $this->getRequest()->headers->get($this->requestManagerConfiguration->getLocaleHeader());
+        return $this->getRequest()->headers->get($this->configurator->getLocaleHeader());
     }
 
     /**
@@ -139,7 +145,7 @@ class RequestManager
      */
     public function isLinksRequired(): bool
     {
-        $linksStr = $this->getRequest()->get($this->requestManagerConfiguration->getLinksParam());
+        $linksStr = $this->getRequest()->get($this->configurator->getLinksParam());
 
         return (bool)$linksStr;
     }
@@ -149,7 +155,7 @@ class RequestManager
      */
     public function isCountRequired(): bool
     {
-        $countStr = $this->getRequest()->get($this->requestManagerConfiguration->getCountParam());
+        $countStr = $this->getRequest()->get($this->configurator->getCountParam());
 
         return (bool)$countStr;
     }
@@ -159,7 +165,7 @@ class RequestManager
      */
     public function getApiFilters(): ?string
     {
-        return $this->getRequest()->get($this->requestManagerConfiguration->getApiFilterParam());
+        return $this->getRequest()->get($this->configurator->getApiFilterParam());
     }
 
     /**

@@ -22,9 +22,11 @@ services:
     simple_dto.request_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager
         autowire: true
+        configurator: ['@simple_dto.request_manager_configurator', configure]
     simple_dto.dto_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager
         autowire: true
+        configurator: ['@simple_dto.dto_manager_configurator', configure]
     simple_dto.api_filter_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager
     simple_dto.dto_expands_manager:

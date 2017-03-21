@@ -2,6 +2,8 @@
 
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
+use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
+
 class DtoManagerConfigurator
 {
     /** @var string */
@@ -22,6 +24,14 @@ class DtoManagerConfigurator
         $this->collectionKey = $collectionKey;
         $this->formatDate = $formatDate;
         $this->formatDateTime = $formatDateTime;
+    }
+
+    /**
+     * @param DtoManager $dtoManager
+     */
+    public function configure(DtoManager $dtoManager): void
+    {
+        $dtoManager->setConfigurator($this);
     }
 
     /**

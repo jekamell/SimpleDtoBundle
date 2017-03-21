@@ -30,15 +30,18 @@ class DtoManager
      * DtoManager constructor.
      * @param Serializer $serializer
      * @param EventDispatcher $eventDispatcher
-     * @param DtoManagerConfigurator $configurator
      */
-    public function __construct(
-        Serializer $serializer,
-        EventDispatcher $eventDispatcher,
-        DtoManagerConfigurator $configurator
-    ) {
+    public function __construct(Serializer $serializer, EventDispatcher $eventDispatcher)
+    {
         $this->serializer = $serializer;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param DtoManagerConfigurator $configurator
+     */
+    public function setConfigurator(DtoManagerConfigurator $configurator)
+    {
         $this->configurator = $configurator;
     }
 

@@ -181,4 +181,12 @@ class RequestManagerConfigurator
     {
         $this->countParam = $countParam;
     }
+
+    /**
+     * @param RequestManager $requestManager
+     */
+    public function configure(RequestManager $requestManager): void
+    {
+        $requestManager->setConfigurator($this);
+    }
 }
