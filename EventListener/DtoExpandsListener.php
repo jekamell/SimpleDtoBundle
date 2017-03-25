@@ -72,10 +72,9 @@ class DtoExpandsListener
     /**
      * @param Dto $dto
      * @param array $expands
-     * @return Dto
      */
-    private function processDtoExpands(Dto $dto, array $expands): Dto
+    private function processDtoExpands(Dto $dto, array $expands): void
     {
-        return $this->expandsManager->processExpands($dto, $expands);
+        $this->expandsManager->processExpands($dto, $expands);
     }
 }

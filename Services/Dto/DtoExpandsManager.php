@@ -35,9 +35,8 @@ class DtoExpandsManager
     /**
      * @param Dto $dto
      * @param array $expands
-     * @return Dto
      */
-    public function processExpands(Dto $dto, array $expands): Dto
+    public function processExpands(Dto $dto, array $expands): void
     {
         $entity = $dto->getOriginalData();
         $metadata = $this->metadataFactory->getMetadataFor(get_class($entity));
@@ -59,9 +58,9 @@ class DtoExpandsManager
         }
 
         if (empty($data)) {
-            return $dto;
+            return;
         }
 
-        return $dto->setRawData(array_merge($dto->getRawData(), ['_expands' => $data]));
+        $dto->setRawData(array_merge($dto->getRawData(), ['_expands' => $data]));
     }
 }
