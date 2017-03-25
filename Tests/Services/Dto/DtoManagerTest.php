@@ -48,10 +48,7 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 DtoInterface::DTO_GROUP_READ,
                 [],
                 new Dto(
-                    'UserDto',
-                    $this->generateUser(['email' => 'mail@email.com']),
-                    DtoInterface::DTO_GROUP_READ,
-                    [
+                    $this->generateUser(['email' => 'mail@email.com']), DtoInterface::DTO_GROUP_READ, [
                         'id' => 0,
                         'addressId' => 0,
                         'firstname' => '',
@@ -68,10 +65,14 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 'read',
                 [],
                 new Dto(
-                    'UserDto',
-                    $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                    DtoInterface::DTO_GROUP_READ,
-                    [
+                    $this->generateUser([
+                        'id' => 1,
+                        'addressId' => 1,
+                        'email' => 'mail@email.com',
+                        'firstname' => 'Ivan',
+                        'lastname' => 'Ivanov',
+                        'password' => 'password'
+                    ]), DtoInterface::DTO_GROUP_READ, [
                         'id' => 1,
                         'addressId' => 1,
                         'firstname' => 'Ivan',
@@ -89,10 +90,14 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 DtoInterface::DTO_GROUP_CREATE,
                 [],
                 new Dto(
-                    'UserDto',
-                    $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                    DtoInterface::DTO_GROUP_CREATE,
-                    [
+                    $this->generateUser([
+                        'id' => 1,
+                        'addressId' => 1,
+                        'email' => 'mail@email.com',
+                        'firstname' => 'Ivan',
+                        'lastname' => 'Ivanov',
+                        'password' => 'password'
+                    ]), DtoInterface::DTO_GROUP_CREATE, [
                         'id' => 1,
                         'addressId' => 1,
                         'firstname' => 'Ivan',
@@ -110,10 +115,14 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 DtoInterface::DTO_GROUP_UPDATE,
                 [],
                 new Dto(
-                    'UserDto',
-                    $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                    DtoInterface::DTO_GROUP_UPDATE,
-                    [
+                    $this->generateUser([
+                        'id' => 1,
+                        'addressId' => 1,
+                        'email' => 'mail@email.com',
+                        'firstname' => 'Ivan',
+                        'lastname' => 'Ivanov',
+                        'password' => 'password'
+                    ]), DtoInterface::DTO_GROUP_UPDATE, [
                         'id' => 1,
                         'addressId' => 1,
                         'firstname' => 'Ivan',
@@ -132,10 +141,14 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 DtoInterface::DTO_GROUP_READ,
                 ['id', 'email'],
                 new Dto(
-                    'UserDto',
-                    $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                    DtoInterface::DTO_GROUP_READ,
-                    [
+                    $this->generateUser([
+                        'id' => 1,
+                        'addressId' => 1,
+                        'email' => 'mail@email.com',
+                        'firstname' => 'Ivan',
+                        'lastname' => 'Ivanov',
+                        'password' => 'password'
+                    ]), DtoInterface::DTO_GROUP_READ, [
                         'id' => 1,
                         'email' => 'mail@email.com',
                     ]
@@ -147,10 +160,14 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 DtoInterface::DTO_GROUP_READ,
                 ['id', 'email', 'password'],
                 new Dto(
-                    'UserDto',
-                    $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                    DtoInterface::DTO_GROUP_READ,
-                    [
+                    $this->generateUser([
+                        'id' => 1,
+                        'addressId' => 1,
+                        'email' => 'mail@email.com',
+                        'firstname' => 'Ivan',
+                        'lastname' => 'Ivanov',
+                        'password' => 'password'
+                    ]), DtoInterface::DTO_GROUP_READ, [
                         'id' => 1,
                         'email' => 'mail@email.com',
                     ]
@@ -162,10 +179,14 @@ class DtoManagerTest extends \PHPUnit_Framework_TestCase
                 DtoInterface::DTO_GROUP_CREATE,
                 ['id', 'email', 'password'],
                 new Dto(
-                    'UserDto',
-                    $this->generateUser(['id' => 1, 'addressId' => 1, 'email' => 'mail@email.com', 'firstname' => 'Ivan', 'lastname' => 'Ivanov', 'password' => 'password']),
-                    DtoInterface::DTO_GROUP_CREATE,
-                    [
+                    $this->generateUser([
+                        'id' => 1,
+                        'addressId' => 1,
+                        'email' => 'mail@email.com',
+                        'firstname' => 'Ivan',
+                        'lastname' => 'Ivanov',
+                        'password' => 'password'
+                    ]), DtoInterface::DTO_GROUP_CREATE, [
                         'id' => 1,
                         'email' => 'mail@email.com',
                         'password' => 'password',
