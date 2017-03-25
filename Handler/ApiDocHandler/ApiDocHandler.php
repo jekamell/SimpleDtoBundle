@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler;
 
+use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManagerConfigurator;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 /**
  * Class ApiDocHandler
- * @package Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler
  */
 class ApiDocHandler implements HandlerInterface
 {
@@ -20,17 +22,24 @@ class ApiDocHandler implements HandlerInterface
 
     /** @var RequestManagerConfigurator */
     protected $requestManagerConfigurator;
+    /** @var MetadataFactoryInterface */
+    protected $metadataFactory;
     /** @var bool */
-    protected $hateoasEnabled;
+    protected $hateoasEnabled = false;
 
     /**
-     * ParamsHandler constructor.
+     * ApiDocHandler constructor.
      * @param RequestManagerConfigurator $requestManagerConfigurator
-     * @param $hateoasEnabled
+     * @param ClassMetadataFactory $metadataFactory
+     * @param bool $hateoasEnabled
      */
-    public function __construct(RequestManagerConfigurator $requestManagerConfigurator, $hateoasEnabled)
-    {
+    public function __construct(
+        RequestManagerConfigurator $requestManagerConfigurator,
+        ClassMetadataFactory $metadataFactory,
+        bool $hateoasEnabled
+    ) {
         $this->requestManagerConfigurator = $requestManagerConfigurator;
+        $this->metadataFactory = $metadataFactory;
         $this->hateoasEnabled = $hateoasEnabled;
     }
 
@@ -77,16 +86,17 @@ class ApiDocHandler implements HandlerInterface
      */
     protected function processExpands(\ReflectionMethod $method, ApiDoc $annotation, Route $route)
     {
-        if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
+        if (!in_array(Request::METHOD_GET, $route->getMethods())) {
             return;
         }
 
-        $class = new $method->class;
-        if (method_exists($class, self::METHOD_EXPANDS)) {
-            $expands = call_user_func([$class, self::METHOD_EXPANDS]);
-            foreach ($expands as $expand) {
-                $annotation->addTag($expand, self::COLOR_TAG_EXPANDS);
-            }
+        if (!($class = $annotation->getOutput()['class'] ?? null)) {
+            return;
+        }
+
+        $metadata = $this->metadataFactory->getMetadataFor($class);
+        foreach ($metadata->getExpands() as $expand) {
+            $annotation->addTag($expand, self::COLOR_TAG_EXPANDS);
         }
     }
 

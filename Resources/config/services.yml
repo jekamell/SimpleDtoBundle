@@ -48,6 +48,7 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Handler\ApiDocHandler\ApiDocHandler
         arguments:
             - '@simple_dto.request_manager_configurator'
+            - '@serializer.mapping.class_metadata_factory'
             - '%simple_dto.hateoas_enabled%'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
