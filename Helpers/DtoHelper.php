@@ -4,6 +4,7 @@ namespace Mell\Bundle\SimpleDtoBundle\Helpers;
 
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -99,7 +100,13 @@ class DtoHelper
                 break;
             case DtoInterface::TYPE_DATE:
                 if (!$value instanceof \DateTime) {
-                    $value = new \DateTime($value);
+                    try {
+                        $dateTimeValue = new \DateTime($value);
+                        $value = $dateTimeValue;
+                    } catch (\Exception $e) {
+                        dump($value);
+                        throw new BadRequestHttpException(sprintf('Invalid datetime format for "%s"', $value));
+                    }
                 }
                 if ($raw) {
                     $value = $value->format($this->formatDate);
