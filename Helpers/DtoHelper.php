@@ -4,6 +4,7 @@ namespace Mell\Bundle\SimpleDtoBundle\Helpers;
 
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Symfony\Component\Config\FileLocator;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -15,6 +16,8 @@ class DtoHelper
 {
     /** @var  FileLocator */
     protected $fileLocator;
+    /** @var CacheItemPoolInterface */
+    protected $cache;
     /** @var string */
     protected $configPath;
     /** @var array */
@@ -27,13 +30,20 @@ class DtoHelper
     /**
      * DtoHelper constructor.
      * @param FileLocator $fileLocator
+     * @param CacheItemPoolInterface $cache
      * @param string $configPath
      * @param $formatDate
      * @param $formatDateTime
      */
-    public function __construct(FileLocator $fileLocator, $configPath, $formatDate, $formatDateTime)
-    {
+    public function __construct(
+        FileLocator $fileLocator,
+        CacheItemPoolInterface $cache,
+        $configPath,
+        $formatDate,
+        $formatDateTime
+    ) {
         $this->fileLocator = $fileLocator;
+        $this->cache = $cache;
         $this->configPath = $configPath;
         $this->formatDate = $formatDate;
         $this->formatDateTime = $formatDateTime;
@@ -62,13 +72,14 @@ class DtoHelper
      */
     public function getDtoConfig()
     {
-        // TODO: caching
-        if ($this->dtoConfig === null) {
+        $config = $this->cache->getItem('simple_dto.config');
+        if (!$config->isHit()) {
             $absolutePath = $this->fileLocator->locate($this->configPath);
-            $this->dtoConfig = Yaml::parse(file_get_contents($absolutePath));
+            $config->set(Yaml::parse(file_get_contents($absolutePath)));
+            $this->cache->save($config);
         }
 
-        return $this->dtoConfig;
+        return $config->get();
     }
 
     /**
