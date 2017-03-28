@@ -115,7 +115,6 @@ class DtoHelper
                         $dateTimeValue = new \DateTime($value);
                         $value = $dateTimeValue;
                     } catch (\Exception $e) {
-                        dump($value);
                         throw new BadRequestHttpException(sprintf('Invalid datetime format for "%s"', $value));
                     }
                 }
