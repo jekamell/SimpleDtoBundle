@@ -35,8 +35,9 @@ services:
     simple_dto.dto_links_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
         arguments:
-            - "@sensio_framework_extra.security.expression_language.default"
-            - "@router"
+            - '@sensio_framework_extra.security.expression_language.default'
+            - '@router'
+            - '@serializer.mapping.class_metadata_factory'
 
     # Api docs related services
     simple_dto.doc.parser.dto_parser:
@@ -73,17 +74,17 @@ services:
         autowire: true
         tags:
             - { name: kernel.event_listener, event: simple_dto.pre_collection_load, method: onPreCollectionLoad }
-#    simple_dto.event_listener.links_listener:
-#        class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoLinksListener
-#        arguments:
-#            - "@simple_dto.request_manager"
-#            - "@simple_dto.dto_links_manager"
-#            - "@simple_dto.dto_helper"
-#        calls:
-#            - ['setContainer', ["@service_container"]]
-#        tags:
-#            - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
-#            - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
+    simple_dto.event_listener.links_listener:
+        class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoLinksListener
+        arguments:
+            - "@simple_dto.request_manager"
+            - "@simple_dto.dto_links_manager"
+            - '%simple_dto.hateoas_enabled%'
+        calls:
+            - ['setContainer', ["@service_container"]]
+        tags:
+            - { name: kernel.event_listener, event: simple_dto.post_dto_encode, method: onPostDtoEncode }
+            - { name: kernel.event_listener, event: simple_dto.post_dto_collection_encode, method: onPostDtoCollectionEncode }
     simple_dto.event_listener.api_filters_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\ApiFiltersListener
         autowire: true

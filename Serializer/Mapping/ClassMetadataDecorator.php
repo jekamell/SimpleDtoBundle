@@ -16,6 +16,8 @@ class ClassMetadataDecorator implements ClassMetadataInterface
     protected $decorated;
     /** @var array */
     protected $expands = [];
+    /** @var array */
+    protected $links = [];
 
     /**
      * ClassMetadata constructor.
@@ -40,6 +42,22 @@ class ClassMetadataDecorator implements ClassMetadataInterface
     public function setExpands(array $expands): void
     {
         $this->expands = $expands;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param array $links
+     */
+    public function setLinks(array $links): void
+    {
+        $this->links = $links;
     }
 
     /**

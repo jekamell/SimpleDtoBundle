@@ -44,6 +44,7 @@ class XmlLoader extends XmlFileLoader
 
             $this->processAttributes($classMetadata, $xml, $attributesMetadata);
             $this->processExpands($classMetadata, $xml);
+            $this->processLinks($classMetadata, $xml);
 
             return true;
         }
@@ -131,12 +132,29 @@ class XmlLoader extends XmlFileLoader
      * @param ClassMetadataDecorator $classMetadata
      * @param \SimpleXMLElement $xml
      */
-    private function processExpands(ClassMetadataDecorator $classMetadata, $xml): void
+    protected function processExpands(ClassMetadataDecorator $classMetadata, \SimpleXMLElement $xml): void
     {
         $expands = [];
         foreach ($xml->expand as $expand) {
-            $expands[] = (string)$expand['name'];
+            $expands[] = (string) $expand['name'];
         }
         $classMetadata->setExpands($expands);
+    }
+
+    /**
+     * @param ClassMetadataDecorator $classMetadata
+     * @param \SimpleXMLElement $xml
+     */
+    protected function processLinks(ClassMetadataDecorator $classMetadata, \SimpleXMLElement $xml): void
+    {
+        $links = [];
+        foreach ($xml->link as $link) {
+            $links[(string) $link['name']] = [
+                'route' => (string) $link['route'],
+                'description' => $link['description'] ? (string) $link['description'] : ucfirst((string) $link['name']),
+                'expression' => $link['expression'] ? (string) $link['expression'] : null,
+            ];
+        }
+        $classMetadata->setLinks($links);
     }
 }

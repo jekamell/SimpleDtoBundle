@@ -3,7 +3,7 @@
 namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
-use Mell\Bundle\SimpleDtoBundle\Helpers\DtoHelper;
+use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollectionInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager;
@@ -21,8 +21,8 @@ class DtoLinksListener implements ContainerAwareInterface
     private $requestManager;
     /** @var DtoLinksManager */
     private $linksManager;
-    /** @var DtoHelper */
-    private $dtoHelper;
+    /** @var ContainerInterface */
+    private $linksEnabled;
     /** @var ContainerInterface */
     private $container;
 
@@ -30,13 +30,13 @@ class DtoLinksListener implements ContainerAwareInterface
      * DtoLinksListener constructor.
      * @param RequestManager $requestManager
      * @param DtoLinksManager $linksManager
-     * @param DtoHelper $dtoHelper
+     * @param bool $linksEnabled
      */
-    public function __construct(RequestManager $requestManager, DtoLinksManager $linksManager, DtoHelper $dtoHelper)
+    public function __construct(RequestManager $requestManager, DtoLinksManager $linksManager, bool $linksEnabled)
     {
         $this->requestManager = $requestManager;
         $this->linksManager = $linksManager;
-        $this->dtoHelper = $dtoHelper;
+        $this->linksEnabled = $linksEnabled;
     }
 
     /**
@@ -45,14 +45,13 @@ class DtoLinksListener implements ContainerAwareInterface
     public function onPostDtoEncode(ApiEvent $apiEvent)
     {
         $dto = $apiEvent->getData();
-        if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO || !$dto instanceof DtoInterface) {
+        if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO
+            || !$dto instanceof DtoInterface
+            || !$this->linksEnabled
+            || !$this->requestManager->isLinksRequired()
+        ) {
             return;
         }
-
-        if (!$this->requestManager->isLinksRequired()) {
-            return;
-        }
-
         $this->setExpressionLangVars();
 
         $this->processDtoLinks($dto);
@@ -66,11 +65,8 @@ class DtoLinksListener implements ContainerAwareInterface
         $dto = $apiEvent->getData();
         if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO_COLLECTION
             || !$dto instanceof DtoCollectionInterface
+            || $this->requestManager->isLinksRequired()
         ) {
-            return;
-        }
-
-        if (!$this->requestManager->isLinksRequired()) {
             return;
         }
 
@@ -81,7 +77,7 @@ class DtoLinksListener implements ContainerAwareInterface
     }
 
     /**
-     * @param ContainerInterface|null $container A ContainerInterface instance or null
+     * @param ContainerInterface $container
      */
     public function setContainer(ContainerInterface $container = null)
     {
@@ -106,10 +102,10 @@ class DtoLinksListener implements ContainerAwareInterface
     }
 
     /**
-     * @param $dto
+     * @param Dto $dto
      */
-    private function processDtoLinks($dto)
+    private function processDtoLinks(Dto $dto)
     {
-        $this->linksManager->processLinks($dto, $this->dtoHelper->getDtoConfig());
+        $this->linksManager->processLinks($dto);
     }
 }

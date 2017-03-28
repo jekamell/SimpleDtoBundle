@@ -77,7 +77,7 @@ class YamlLoader extends YamlFileLoader
                     }
                     if (isset($data['required'])) {
                         if (!is_bool($data['required'])) {
-                            throw new MappingException('The "required" value must be an boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                            throw new MappingException('The "required" value must be boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
                         }
                         $attributeMetadata->setRequired($data['required']);
                     }
@@ -87,12 +87,33 @@ class YamlLoader extends YamlFileLoader
             if (isset($yaml['expands']) && is_array($yaml['expands'])) {
                 foreach ($yaml['expands'] as $expand) {
                     if (!is_string($expand)) {
-                        throw new MappingException();
+                        throw new MappingException('The "expand" value must be string in "%s" for class "%s".', $this->file, $classMetadata->getName());
                     }
                 }
 
                 $classMetadata->setExpands($yaml['expands']);
             }
+
+            $links = [];
+            if (isset($yaml['links']) && is_array($yaml['links'])) {
+                foreach ($yaml['links'] as $name => $link) {
+                    if (!isset($link['route']) || !is_string($link['route'])) {
+                        throw new MappingException('The "route" value must be string in "%s" for the link "%s" of the class "%s".', $this->file, $yaml['links'], $classMetadata->getName());
+                    }
+                    if (isset($link['description']) && !is_string($link['description'])) {
+                        throw new MappingException('The "description" value must be string in "%s" for the link "%s" of the class "%s".', $this->file, $yaml['links'], $classMetadata->getName());
+                    }
+                    if (isset($link['expression']) && !is_string($link['expression'])) {
+                        throw new MappingException('The "expression" value must be string in "%s" for the link "%s" of the class "%s".', $this->file, $yaml['links'], $classMetadata->getName());
+                    }
+                    $link[$name] = [
+                        'route' => $link['route'],
+                        'description' => $link['description'] ?? $name,
+                        'expression' => $link['expression'] ?? null,
+                    ];
+                }
+            }
+            $classMetadata->setLinks($links);
 
             return true;
         }
