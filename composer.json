@@ -2,13 +2,13 @@
     "name": "jekamell/simple-dto-bundle",
     "description": "Allow to configure dto objects in easy way, and split persistence and representative application layers",
     "license": "MIT",
-    "keywords": ["dto", "data transfer object", "rest", "restful"],
-    "type": "library",
+    "keywords": ["dto", "rest", "restful", "symfony", "serialization"],
+    "type": "symfony-bundle",
     "authors": [
         { "name": "Evgeniy Malykhin", "email": "55jeka@gmail.com" }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=7.1.0",
         "symfony/symfony": "~3.0",
         "doctrine/orm": "*",
         "namshi/jose": "6.*"
