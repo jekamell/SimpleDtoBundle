@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager;
 
 use Doctrine\Common\Collections\Criteria;
@@ -7,7 +9,6 @@ use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
 
 /**
  * Interface ApiFilterManagerInterface
- * @package Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager
  */
 interface ApiFilterManagerInterface
 {

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 /**
  * Class ApiFilterCollection
- * @package Mell\Bundle\SimpleDtoBundle\Model
  */
 class ApiFilterCollection implements ApiFilterCollectionInterface
 {
@@ -21,8 +22,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Return the current element
-     * @return mixed Can return any type.
+     * {@inheritdoc}
      */
     public function current()
     {
@@ -30,8 +30,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Move forward to next element
-     * @return void Any returned value is ignored.
+     * {@inheritdoc}
      */
     public function next()
     {
@@ -39,8 +38,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Return the key of the current element
-     * @return mixed scalar on success, or null on failure.
+     * {@inheritdoc}
      */
     public function key()
     {
@@ -48,8 +46,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Checks if current position is valid
-     * @return boolean The return value will be casted to boolean and then evaluated.
+     * {@inheritdoc}
      */
     public function valid()
     {
@@ -57,8 +54,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Rewind the Iterator to the first element
-     * @return void Any returned value is ignored.
+     * {@inheritdoc}
      */
     public function rewind()
     {
@@ -66,9 +62,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Whether a offset exists
-     * @param int $offset
-     * @return boolean true on success or false on failure.
+     * {@inheritdoc}
      */
     public function offsetExists($offset)
     {
@@ -76,9 +70,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Offset to retrieve
-     * @param int $offset <p>
-     * @return ApiFilter
+     * {@inheritdoc}
      */
     public function offsetGet($offset)
     {
@@ -86,10 +78,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Offset to set
-     * @param int $offset
-     * @param ApiFilter $value
-     * @return void
+     * {@inheritdoc}
      */
     public function offsetSet($offset, $value)
     {
@@ -97,9 +86,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Offset to unset
-     * @param int $offset
-     * @return void
+     * {@inheritdoc}
      */
     public function offsetUnset($offset)
     {
@@ -107,8 +94,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * Count elements of an object
-     * @return int The custom count as an integer.
+     * {@inheritdoc}
      */
     public function count()
     {
@@ -116,9 +102,9 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * @return ApiFilterCollectionInterface
+     * {@inheritdoc}
      */
-    public function unique()
+    public function unique(): ApiFilterCollectionInterface
     {
         $this->data = array_unique($this->data, SORT_REGULAR);
 
@@ -126,14 +112,11 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
     }
 
     /**
-     * @param ApiFilter $apiFilter
-     * @return ApiFilterCollectionInterface
+     * {@inheritdoc}
      */
-    public function append(ApiFilter $apiFilter)
+    public function append(ApiFilter $apiFilter): void
     {
         $this->data[] = $apiFilter;
-
-        return $this;
     }
 
     /**
@@ -151,7 +134,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
      * @param $param
      * @return bool
      */
-    public function exists($param)
+    public function exists(string $param): bool
     {
         foreach ($this->data as $filter) {
             if ($filter->getParam() === $param) {
@@ -166,7 +149,7 @@ class ApiFilterCollection implements ApiFilterCollectionInterface
      * @param $param
      * @return ApiFilter
      */
-    public function getByParam($param)
+    public function getByParam(string $param): ?ApiFilter
     {
         foreach ($this->data as $filter) {
             if ($filter->getParam() === $param) {

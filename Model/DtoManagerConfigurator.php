@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 
+/**
+ * Class DtoManagerConfigurator
+ */
 class DtoManagerConfigurator
 {
     /** @var string */
@@ -37,7 +42,7 @@ class DtoManagerConfigurator
     /**
      * @return string
      */
-    public function getCollectionKey()
+    public function getCollectionKey(): string
     {
         return $this->collectionKey;
     }
@@ -45,7 +50,7 @@ class DtoManagerConfigurator
     /**
      * @param string $collectionKey
      */
-    public function setCollectionKey($collectionKey)
+    public function setCollectionKey(string $collectionKey): void
     {
         $this->collectionKey = $collectionKey;
     }
@@ -53,7 +58,7 @@ class DtoManagerConfigurator
     /**
      * @return string
      */
-    public function getFormatDate()
+    public function getFormatDate(): string
     {
         return $this->formatDate;
     }
@@ -61,7 +66,7 @@ class DtoManagerConfigurator
     /**
      * @param string $formatDate
      */
-    public function setFormatDate($formatDate)
+    public function setFormatDate(string $formatDate): void
     {
         $this->formatDate = $formatDate;
     }
@@ -69,7 +74,7 @@ class DtoManagerConfigurator
     /**
      * @return string
      */
-    public function getFormatDateTime()
+    public function getFormatDateTime(): string
     {
         return $this->formatDateTime;
     }
@@ -77,7 +82,7 @@ class DtoManagerConfigurator
     /**
      * @param string $formatDateTime
      */
-    public function setFormatDateTime($formatDateTime)
+    public function setFormatDateTime(string $formatDateTime): void
     {
         $this->formatDateTime = $formatDateTime;
     }

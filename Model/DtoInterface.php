@@ -6,7 +6,6 @@ namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 /**
  * Interface DtoInterface
- * @package Mell\Bundle\SimpleDtoBundle\Model
  */
 interface DtoInterface extends \JsonSerializable
 {

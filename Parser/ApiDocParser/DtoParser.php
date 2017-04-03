@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser;
 
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\AttributeMetadata;
@@ -10,7 +12,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 /**
  * Support metadata parsing from dto configuration
  * Class DtoParser
- * @package Mell\Bundle\SimpleDtoBundle\Services\Parser\ApiDocParser
  */
 class DtoParser implements ParserInterface
 {
@@ -39,7 +40,7 @@ class DtoParser implements ParserInterface
      * @param  array $item containing the following fields: class, groups. Of which groups is optional
      * @return boolean
      */
-    public function supports(array $item)
+    public function supports(array $item): bool
     {
         return class_exists($item['class']);
     }
@@ -48,7 +49,7 @@ class DtoParser implements ParserInterface
      * @param  array $item The string type of input to parse.
      * @return array
      */
-    public function parse(array $item)
+    public function parse(array $item): array
     {
         $data = [];
         /** @var AttributeMetadata $attribute */

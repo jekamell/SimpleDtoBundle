@@ -6,7 +6,6 @@ namespace Mell\Bundle\SimpleDtoBundle\Serializer\Mapping;
 
 /**
  * Class AttributeMetadata
- * @package Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Loader
  */
 class AttributeMetadata extends \Symfony\Component\Serializer\Mapping\AttributeMetadata
 {

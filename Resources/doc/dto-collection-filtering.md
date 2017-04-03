@@ -58,7 +58,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class UserController
- * @package AppBundle\Controller
  */
 class UserController extends AbstractController
 {

@@ -12,7 +12,6 @@ use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 
 /**
  * Class DtoExpandsListener
- * @package Mell\Bundle\SimpleDtoBundle\EventListener
  */
 class DtoExpandsListener
 {

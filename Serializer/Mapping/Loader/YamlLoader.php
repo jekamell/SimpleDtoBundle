@@ -24,7 +24,7 @@ class YamlLoader extends YamlFileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         /** @var ClassMetadataDecorator $classMetadata */
         if (null === $this->classes) {
@@ -50,25 +50,47 @@ class YamlLoader extends YamlFileLoader
                     }
                     if (isset($data['groups'])) {
                         if (!is_array($data['groups'])) {
-                            throw new MappingException('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                            throw new MappingException(
+                                'The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".',
+                                $this->file,
+                                $attribute,
+                                $classMetadata->getName()
+                            );
                         }
 
                         foreach ($data['groups'] as $group) {
                             if (!is_string($group)) {
-                                throw new MappingException('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                                throw new MappingException(
+                                    'Group names must be strings in "%s" for the attribute "%s" of the class "%s".',
+                                    $this->file,
+                                    $attribute,
+                                    $classMetadata->getName()
+                                );
                             }
                             $attributeMetadata->addGroup($group);
                         }
                     }
                     if (isset($data['max_depth'])) {
                         if (!is_int($data['max_depth'])) {
-                            throw new MappingException('The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                            throw new MappingException(
+                                'The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".',
+                                $this->file,
+                                $attribute,
+                                $classMetadata->getName()
+                            );
                         }
                         $attributeMetadata->setMaxDepth($data['max_depth']);
                     }
                     if (isset($data['type'])) {
                         if (!in_array($data['type'], AttributeMetadata::getAvailableTypes())) {
-                            throw new MappingException('Type must be one of ' . implode(', ', AttributeMetadata::getAvailableTypes()) . ' in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                            throw new MappingException(
+                                'Type must be one of '
+                                    . implode(', ', AttributeMetadata::getAvailableTypes())
+                                    . ' in "%s" for the attribute "%s" of the class "%s".',
+                                $this->file,
+                                $attribute,
+                                $classMetadata->getName()
+                            );
                         }
                         $attributeMetadata->setType($data['type']);
                     }
@@ -77,7 +99,12 @@ class YamlLoader extends YamlFileLoader
                     }
                     if (isset($data['required'])) {
                         if (!is_bool($data['required'])) {
-                            throw new MappingException('The "required" value must be boolean in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                            throw new MappingException(
+                                'The "required" value must be boolean in "%s" for the attribute "%s" of the class "%s".',
+                                $this->file,
+                                $attribute,
+                                $classMetadata->getName()
+                            );
                         }
                         $attributeMetadata->setRequired($data['required']);
                     }
@@ -87,7 +114,11 @@ class YamlLoader extends YamlFileLoader
             if (isset($yaml['expands']) && is_array($yaml['expands'])) {
                 foreach ($yaml['expands'] as $expand) {
                     if (!is_string($expand)) {
-                        throw new MappingException('The "expand" value must be string in "%s" for class "%s".', $this->file, $classMetadata->getName());
+                        throw new MappingException(
+                            'The "expand" value must be string in "%s" for class "%s".',
+                            $this->file,
+                            $classMetadata->getName()
+                        );
                     }
                 }
 
@@ -98,13 +129,28 @@ class YamlLoader extends YamlFileLoader
             if (isset($yaml['links']) && is_array($yaml['links'])) {
                 foreach ($yaml['links'] as $name => $link) {
                     if (!isset($link['route']) || !is_string($link['route'])) {
-                        throw new MappingException('The "route" value must be string in "%s" for the link "%s" of the class "%s".', $this->file, $yaml['links'], $classMetadata->getName());
+                        throw new MappingException(
+                            'The "route" value must be string in "%s" for the link "%s" of the class "%s".',
+                            $this->file,
+                            $yaml['links'],
+                            $classMetadata->getName()
+                        );
                     }
                     if (isset($link['description']) && !is_string($link['description'])) {
-                        throw new MappingException('The "description" value must be string in "%s" for the link "%s" of the class "%s".', $this->file, $yaml['links'], $classMetadata->getName());
+                        throw new MappingException(
+                            'The "description" value must be string in "%s" for the link "%s" of the class "%s".',
+                            $this->file,
+                            $yaml['links'],
+                            $classMetadata->getName()
+                        );
                     }
                     if (isset($link['expression']) && !is_string($link['expression'])) {
-                        throw new MappingException('The "expression" value must be string in "%s" for the link "%s" of the class "%s".', $this->file, $yaml['links'], $classMetadata->getName());
+                        throw new MappingException(
+                            'The "expression" value must be string in "%s" for the link "%s" of the class "%s".',
+                            $this->file,
+                            $yaml['links'],
+                            $classMetadata->getName()
+                        );
                     }
                     $link[$name] = [
                         'route' => $link['route'],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
@@ -13,7 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class DtoLinksListener
- * @package Mell\Bundle\SimpleDtoBundle\EventListener
  */
 class DtoLinksListener implements ContainerAwareInterface
 {
@@ -42,7 +43,7 @@ class DtoLinksListener implements ContainerAwareInterface
     /**
      * @param ApiEvent $apiEvent
      */
-    public function onPostDtoEncode(ApiEvent $apiEvent)
+    public function onPostDtoEncode(ApiEvent $apiEvent): void
     {
         $dto = $apiEvent->getData();
         if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO
@@ -60,7 +61,7 @@ class DtoLinksListener implements ContainerAwareInterface
     /**
      * @param ApiEvent $apiEvent
      */
-    public function onPostDtoCollectionEncode(ApiEvent $apiEvent)
+    public function onPostDtoCollectionEncode(ApiEvent $apiEvent): void
     {
         $dto = $apiEvent->getData();
         if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO_COLLECTION
@@ -79,7 +80,7 @@ class DtoLinksListener implements ContainerAwareInterface
     /**
      * @param ContainerInterface $container
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
@@ -87,7 +88,7 @@ class DtoLinksListener implements ContainerAwareInterface
     /**
      * Assign expression variables for DtoLinksManager::expressionLanguage
      */
-    private function setExpressionLangVars()
+    private function setExpressionLangVars(): void
     {
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
         $vars = [
@@ -104,7 +105,7 @@ class DtoLinksListener implements ContainerAwareInterface
     /**
      * @param Dto $dto
      */
-    private function processDtoLinks(Dto $dto)
+    private function processDtoLinks(Dto $dto): void
     {
         $this->linksManager->processLinks($dto);
     }

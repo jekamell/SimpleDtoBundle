@@ -9,7 +9,6 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
  * Class DtoNormalizer
- * @package Mell\SimpleDtoBundle\Serializer\Normalizer
  */
 class DtoNormalizer extends ObjectNormalizer
 {
@@ -18,7 +17,7 @@ class DtoNormalizer extends ObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = []): bool
     {
         if (in_array($attribute, $this->ignoredAttributes)) {
             return false;
@@ -30,7 +29,7 @@ class DtoNormalizer extends ObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $format === self::FORMAT_DTO && $data instanceof DtoSerializableInterface;
     }

@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class SimpleDtoBundle
- * @package Mell\Bundle\SimpleDtoBundle
  */
 class SimpleDtoBundle extends Bundle
 {

@@ -14,9 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class OverrideSerializerMetadataFactoryPath implements CompilerPassInterface
 {
     /**
-     * You can modify the container here before it is dumped to PHP code.
-     *
-     * @param ContainerBuilder $container
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container): void
     {

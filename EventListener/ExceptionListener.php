@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Psr\Log\LoggerInterface;
@@ -10,7 +12,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class ExceptionListener
- * @package Mell\Bundle\SimpleDtoBundle\EventListener
  */
 class ExceptionListener
 {
@@ -40,7 +41,7 @@ class ExceptionListener
      * @param param string $environment
      * @param param bool $debug
      */
-    public function __construct(LoggerInterface $logger, $environment, $debug)
+    public function __construct(LoggerInterface $logger, string $environment, bool $debug)
     {
         $this->logger = $logger;
         $this->environment = $environment;
@@ -50,7 +51,7 @@ class ExceptionListener
     /**
      * @param GetResponseForExceptionEvent $event
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         $exception = $event->getException();
         $code = $exception instanceof HttpException
@@ -82,7 +83,7 @@ class ExceptionListener
     /**
      * @return mixed
      */
-    protected function getEnvironment()
+    protected function getEnvironment(): string
     {
         return $this->environment;
     }
@@ -90,7 +91,7 @@ class ExceptionListener
     /**
      * @return bool
      */
-    protected function getDebug()
+    protected function getDebug(): bool
     {
         return $this->debug;
     }

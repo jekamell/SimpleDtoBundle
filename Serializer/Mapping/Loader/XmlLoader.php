@@ -26,7 +26,7 @@ class XmlLoader extends XmlFileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         /** @var ClassMetadataDecorator $classMetadata */
         if (null === $this->classes) {
@@ -57,7 +57,7 @@ class XmlLoader extends XmlFileLoader
      *
      * @return string[] The classes names
      */
-    public function getMappedClasses()
+    public function getMappedClasses(): array
     {
         if (null === $this->classes) {
             $this->classes = $this->getClassesFromXml();
@@ -70,12 +70,10 @@ class XmlLoader extends XmlFileLoader
      * Parses a XML File.
      *
      * @param string $file Path of file
-     *
      * @return \SimpleXMLElement
-     *
      * @throws MappingException
      */
-    private function parseFile($file)
+    private function parseFile($file): \SimpleXMLElement
     {
         try {
             $dom = XmlUtils::loadFile($file, __DIR__.'/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd');
@@ -86,10 +84,13 @@ class XmlLoader extends XmlFileLoader
         return simplexml_import_dom($dom);
     }
 
-    private function getClassesFromXml()
+    /**
+     * @return array
+     */
+    private function getClassesFromXml(): array
     {
         $xml = $this->parseFile($this->file);
-        $classes = array();
+        $classes = [];
 
         foreach ($xml->class as $class) {
             $classes[(string) $class['name']] = $class;
@@ -110,18 +111,15 @@ class XmlLoader extends XmlFileLoader
     ): void {
         foreach ($xml->attribute as $attribute) {
             $attributeName = (string)$attribute['name'];
-
             $attributeMetadata = new AttributeMetadata($attributeName);
             if (isset($attributesMetadata[$attributeName])) {
                 $attributeMetadata->merge($attributesMetadata[$attributeName]);
             } else {
                 $classMetadata->addAttributeMetadata($attributeMetadata);
             }
-
             foreach ($attribute->group as $group) {
                 $attributeMetadata->addGroup((string)$group);
             }
-
             if (isset($attribute['max-depth'])) {
                 $attributeMetadata->setMaxDepth((int)$attribute['max-depth']);
             }

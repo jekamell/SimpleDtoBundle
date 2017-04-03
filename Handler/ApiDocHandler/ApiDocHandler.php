@@ -51,7 +51,7 @@ class ApiDocHandler implements HandlerInterface
      * @param Route $route
      * @param \ReflectionMethod $method
      */
-    public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
+    public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method): void
     {
         $this->processParams($annotation, $route);
         $this->processExpands($method, $annotation, $route);
@@ -63,7 +63,7 @@ class ApiDocHandler implements HandlerInterface
      * @param ApiDoc $annotation
      * @param Route $route
      */
-    protected function processParams(ApiDoc $annotation, Route $route)
+    protected function processParams(ApiDoc $annotation, Route $route): void
     {
         if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
             return;
@@ -84,7 +84,7 @@ class ApiDocHandler implements HandlerInterface
      * @param ApiDoc $annotation
      * @param Route $route
      */
-    protected function processExpands(\ReflectionMethod $method, ApiDoc $annotation, Route $route)
+    protected function processExpands(\ReflectionMethod $method, ApiDoc $annotation, Route $route): void
     {
         if (!in_array(Request::METHOD_GET, $route->getMethods())) {
             return;
@@ -104,7 +104,7 @@ class ApiDocHandler implements HandlerInterface
      * @param ApiDoc $annotation
      * @param Route $route
      */
-    protected function processShowLinks(ApiDoc $annotation, Route $route)
+    protected function processShowLinks(ApiDoc $annotation, Route $route): void
     {
         if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
             return;
@@ -118,7 +118,7 @@ class ApiDocHandler implements HandlerInterface
      * @param ApiDoc $annotation
      * @param Route $route
      */
-    protected function processApiFilters(ApiDoc $annotation, Route $route)
+    protected function processApiFilters(ApiDoc $annotation, Route $route): void
     {
         $filters = $route->getDefault('filters');
         if ($filters) {
@@ -132,7 +132,7 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @return array
      */
-    private function getFieldsParams()
+    private function getFieldsParams(): array
     {
         return [
             'dataType' => 'string',
@@ -144,7 +144,7 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @return array
      */
-    private function getExpandsParams()
+    private function getExpandsParams(): array
     {
         return [
             'dataType' => 'string',
@@ -156,7 +156,7 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @return array
      */
-    private function getLinksParams()
+    private function getLinksParams(): array
     {
         return [
             'dataType' => 'string',
@@ -168,7 +168,7 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @return array
      */
-    private function getLimitParams()
+    private function getLimitParams(): array
     {
         return [
             'dataType' => 'string',
@@ -180,7 +180,7 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @return array
      */
-    private function getOffsetParams()
+    private function getOffsetParams(): array
     {
         return [
             'dataType' => 'string',
@@ -192,7 +192,7 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @return array
      */
-    private function getSortParams()
+    private function getSortParams(): array
     {
         return [
             'dataType' => 'string',
@@ -204,7 +204,7 @@ class ApiDocHandler implements HandlerInterface
     /**
      * @return array
      */
-    private function getCountParams()
+    private function getCountParams(): array
     {
         return [
             'dataType' => 'string',
@@ -217,7 +217,7 @@ class ApiDocHandler implements HandlerInterface
      * @param array $filters
      * @return array
      */
-    private function getFiltersParams(array $filters = [])
+    private function getFiltersParams(array $filters = []): array
     {
         return [
             'dataType' => 'string',

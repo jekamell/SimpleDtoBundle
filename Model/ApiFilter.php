@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 /**
  * Class ApiFilter
- * @package Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager
  */
 class ApiFilter
 {
@@ -40,7 +41,7 @@ class ApiFilter
     /**
      * @return string
      */
-    public function getParam()
+    public function getParam(): string
     {
         return $this->param;
     }
@@ -48,7 +49,7 @@ class ApiFilter
     /**
      * @param string $param
      */
-    public function setParam($param)
+    public function setParam(string $param): void
     {
         $this->param = $param;
     }
@@ -56,7 +57,7 @@ class ApiFilter
     /**
      * @return string
      */
-    public function getOperation()
+    public function getOperation(): string
     {
         return $this->operation;
     }
@@ -64,7 +65,7 @@ class ApiFilter
     /**
      * @param string $operation
      */
-    public function setOperation($operation)
+    public function setOperation(string $operation): void
     {
         $this->operation = $operation;
     }
@@ -80,7 +81,7 @@ class ApiFilter
     /**
      * @param mixed $value
      */
-    public function setValue($value)
+    public function setValue($value): void
     {
         $this->value = $value;
     }

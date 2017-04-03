@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilter;
@@ -11,7 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
  * Class ApiFiltersListener
- * @package Mell\Bundle\SimpleDtoBundle\EventListener
  */
 class ApiFiltersListener
 {
@@ -30,8 +31,11 @@ class ApiFiltersListener
      * @param ApiFilterManagerInterface $apiFilterManager
      * @param Router $router
      */
-    public function __construct(RequestManager $requestManager, ApiFilterManagerInterface $apiFilterManager, Router $router)
-    {
+    public function __construct(
+        RequestManager $requestManager,
+        ApiFilterManagerInterface $apiFilterManager,
+        Router $router
+    ) {
         $this->requestManager = $requestManager;
         $this->apiFilterManager = $apiFilterManager;
         $this->router = $router;
@@ -40,7 +44,7 @@ class ApiFiltersListener
     /**
      * @param FilterControllerEvent $filterControllerArgumentsEvent
      */
-    public function onKernelController(FilterControllerEvent $filterControllerArgumentsEvent)
+    public function onKernelController(FilterControllerEvent $filterControllerArgumentsEvent): void
     {
         try {
             $routeParams = $this->router->matchRequest($filterControllerArgumentsEvent->getRequest());

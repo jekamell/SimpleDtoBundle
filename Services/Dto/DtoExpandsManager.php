@@ -12,7 +12,6 @@ use Symfony\Component\Serializer\Serializer;
 
 /**
  * Class DtoExpandsManager
- * @package Mell\Bundle\SimpleDtoBundle\Services\Dto
  */
 class DtoExpandsManager
 {

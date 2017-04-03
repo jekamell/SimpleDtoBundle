@@ -10,7 +10,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class RequestManager
- * @package Mell\Bundle\SimpleDtoBundle\Services\RequestManager
  */
 class RequestManager
 {
@@ -97,7 +96,7 @@ class RequestManager
     /**
      * @return integer
      */
-    public function getOffset()
+    public function getOffset(): int
     {
         $offset = $this->getRequest()->get($this->configurator->getOffsetParam(), 0);
 

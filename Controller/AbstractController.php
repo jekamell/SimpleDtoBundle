@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
@@ -31,8 +33,10 @@ abstract class AbstractController extends Controller
     const CONTENT_TYPE_JSON = 'application/json';
     const CONTENT_TYPE_XML = 'application/xml';
 
-    /** @return string */
-    abstract public function getEntityAlias();
+    /**
+     * @return string
+     */
+    abstract public function getEntityAlias(): string ;
 
     /**
      * @param Request $request

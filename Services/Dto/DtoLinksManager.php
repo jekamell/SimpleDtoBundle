@@ -16,7 +16,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 
 /**
  * Class DtoLinksManager
- * @package Mell\Bundle\SimpleDtoBundle\Services\Dto
  */
 class DtoLinksManager
 {
@@ -113,7 +112,7 @@ class DtoLinksManager
     }
 
     /**
-     * @param object $entity
+     * @param DtoSerializableInterface $entity
      * @param array $params
      * @param Route $route
      * @param string $link

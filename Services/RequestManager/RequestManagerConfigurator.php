@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Services\RequestManager;
 
+/**
+ * Class RequestManagerConfigurator
+ */
 class RequestManagerConfigurator
 {
     /** @var string */
@@ -39,16 +44,16 @@ class RequestManagerConfigurator
      * @param string $countParam
      */
     public function __construct(
-        $fieldsParam,
-        $expandsParam,
-        $limitParam,
-        $offsetParam,
-        $sortParam,
-        $localeParam,
-        $localeHeader,
-        $linksParam,
-        $apiFilterParam,
-        $countParam
+        string $fieldsParam,
+        string $expandsParam,
+        string $limitParam,
+        string $offsetParam,
+        string $sortParam,
+        string $localeParam,
+        string $localeHeader,
+        string $linksParam,
+        string $apiFilterParam,
+        string $countParam
     ) {
         $this->fieldsParam = $fieldsParam;
         $this->expandsParam = $expandsParam;
@@ -65,7 +70,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getFieldsParam()
+    public function getFieldsParam(): string
     {
         return $this->fieldsParam;
     }
@@ -73,7 +78,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getExpandsParam()
+    public function getExpandsParam(): string
     {
         return $this->expandsParam;
     }
@@ -81,7 +86,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getLimitParam()
+    public function getLimitParam(): string
     {
         return $this->limitParam;
     }
@@ -89,7 +94,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getOffsetParam()
+    public function getOffsetParam(): string
     {
         return $this->offsetParam;
     }
@@ -97,7 +102,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getSortParam()
+    public function getSortParam(): string
     {
         return $this->sortParam;
     }
@@ -105,7 +110,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getLocaleHeader()
+    public function getLocaleHeader(): string
     {
         return $this->localeHeader;
     }
@@ -113,7 +118,7 @@ class RequestManagerConfigurator
     /**
      * @param string $localeHeader
      */
-    public function setLocaleHeader($localeHeader)
+    public function setLocaleHeader(string $localeHeader): void
     {
         $this->localeHeader = $localeHeader;
     }
@@ -121,7 +126,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getLocaleParam()
+    public function getLocaleParam(): string
     {
         return $this->localeParam;
     }
@@ -129,7 +134,7 @@ class RequestManagerConfigurator
     /**
      * @param string $localeParam
      */
-    public function setLocaleParam($localeParam)
+    public function setLocaleParam(string $localeParam): void
     {
         $this->localeParam = $localeParam;
     }
@@ -137,7 +142,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getLinksParam()
+    public function getLinksParam(): string
     {
         return $this->linksParam;
     }
@@ -145,7 +150,7 @@ class RequestManagerConfigurator
     /**
      * @param string $linksParam
      */
-    public function setLinksParam($linksParam)
+    public function setLinksParam(string $linksParam): void
     {
         $this->linksParam = $linksParam;
     }
@@ -153,7 +158,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getApiFilterParam()
+    public function getApiFilterParam(): string
     {
         return $this->apiFilterParam;
     }
@@ -161,7 +166,7 @@ class RequestManagerConfigurator
     /**
      * @param string $apiFilterParam
      */
-    public function setApiFilterParam($apiFilterParam)
+    public function setApiFilterParam(string $apiFilterParam): void
     {
         $this->apiFilterParam = $apiFilterParam;
     }
@@ -169,7 +174,7 @@ class RequestManagerConfigurator
     /**
      * @return string
      */
-    public function getCountParam()
+    public function getCountParam(): string
     {
         return $this->countParam;
     }
@@ -177,7 +182,7 @@ class RequestManagerConfigurator
     /**
      * @param string $countParam
      */
-    public function setCountParam($countParam)
+    public function setCountParam(string $countParam): void
     {
         $this->countParam = $countParam;
     }

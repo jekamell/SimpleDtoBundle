@@ -10,7 +10,6 @@ use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
 
 /**
  * Class ApiFiltersManager
- * @package Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager
  */
 class ApiFiltersManager implements ApiFilterManagerInterface
 {

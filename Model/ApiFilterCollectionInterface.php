@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mell\Bundle\SimpleDtoBundle\Model;
 
 /**
  * Interface ApiFilterCollectionInterface
- * @package Mell\Bundle\SimpleDtoBundle\Model
  */
 interface ApiFilterCollectionInterface extends \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @return ApiFilterCollectionInterface
      */
-    public function unique();
+    public function unique(): ApiFilterCollectionInterface;
 
     /**
      * @param ApiFilter $apiFilter
-     * @return ApiFilterCollectionInterface
      */
-    public function append(ApiFilter $apiFilter);
+    public function append(ApiFilter $apiFilter): void;
 
     /**
      * @param \Closure $closure
@@ -30,12 +30,12 @@ interface ApiFilterCollectionInterface extends \Iterator, \Countable, \ArrayAcce
      * @param $param
      * @return bool
      */
-    public function exists($param);
+    public function exists(string $param): bool;
 
     /**
      * Get single filter by param
      * @param $param
      * @return ApiFilter
      */
-    public function getByParam($param);
+    public function getByParam(string $param): ?ApiFilter;
 }

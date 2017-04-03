@@ -15,7 +15,6 @@ use Symfony\Component\Serializer\Serializer;
 
 /**
  * Class DtoManager
- * @package Mell\Bundle\SimpleDtoBundle\Services\Dto
  */
 class DtoManager
 {
@@ -40,7 +39,7 @@ class DtoManager
     /**
      * @param DtoManagerConfigurator $configurator
      */
-    public function setConfigurator(DtoManagerConfigurator $configurator)
+    public function setConfigurator(DtoManagerConfigurator $configurator): void
     {
         $this->configurator = $configurator;
     }

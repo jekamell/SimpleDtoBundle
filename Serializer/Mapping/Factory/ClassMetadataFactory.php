@@ -52,7 +52,7 @@ class ClassMetadataFactory extends \Symfony\Component\Serializer\Mapping\Factory
     /**
      * {@inheritdoc}
      */
-    public function getMetadataFor($value)
+    public function getMetadataFor($value): ClassMetadataDecorator
     {
         $class = $this->getClass($value);
 
