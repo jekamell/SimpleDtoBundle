@@ -66,7 +66,8 @@ class DtoLinksListener implements ContainerAwareInterface
         $dto = $apiEvent->getData();
         if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO_COLLECTION
             || !$dto instanceof DtoCollectionInterface
-            || $this->requestManager->isLinksRequired()
+            || !$this->linksEnabled
+            || !$this->requestManager->isLinksRequired()
         ) {
             return;
         }
@@ -93,7 +94,7 @@ class DtoLinksListener implements ContainerAwareInterface
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
         $vars = [
             'user' => $user,
-            'roles' => $user ? $user->getRoles() : [],
+            'roles' => ($user && is_object($user) && method_exists($user, 'getRoles')) ? $user->getRoles() : [],
             'request' => $this->container->get('request_stack')->getCurrentRequest(),
             'trust_resolver' => $this->container->get('security.authentication.trust_resolver'),
             'auth_checker' => $this->container->get('security.authorization_checker'),
