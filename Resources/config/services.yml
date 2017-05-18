@@ -32,6 +32,9 @@ services:
     simple_dto.dto_expands_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager
         autowire: true
+    simple_dto.crud_manager:
+        class: Mell\Bundle\SimpleDtoBundle\Services\Crud\CrudManager
+        autowire: true
     simple_dto.dto_links_manager:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
         arguments:
