@@ -13,6 +13,7 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
+use Mell\Bundle\SimpleDtoBundle\Services\Crud\CrudManager;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -45,32 +46,17 @@ abstract class AbstractController extends Controller
      */
     protected function createResource(Request $request, DtoSerializableInterface $entity)
     {
-        $entity = $this->getDtoManager()->deserializeEntity($entity, $request->getContent(), $this->getInputFormat());
-
-        $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
-
-        $errors = $this->get('validator')->validate($entity);
-        if ($errors->count()) {
-            return $errors;
+        if (!$data = $this->getSerializer()->decode($request->getContent(), $this->getInputFormat())) {
+            throw new BadRequestHttpException('Malformed request data');
         }
 
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_PERSIST, $event);
-        $this->getEntityManager()->persist($entity);
-
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
-        $this->getEntityManager()->flush();
-
-        $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
-
-        return $entity;
+        return $this->get('simple_dto.crud_manager')->createResource($entity, $data);
     }
 
     /**
      * @param Request $request
      * @param DtoSerializableInterface $entity
-     * @return Dto|ConstraintViolationListInterface
+     * @return DtoSerializableInterface|ConstraintViolationListInterface
      */
     protected function updateResource(Request $request, DtoSerializableInterface $entity)
     {
@@ -78,23 +64,7 @@ abstract class AbstractController extends Controller
             throw new BadRequestHttpException('Malformed request data');
         }
 
-        $dto = new Dto($entity, DtoInterface::DTO_GROUP_UPDATE, $data);
-        $entity = $this->getDtoManager()->deserializeEntity($entity, $request->getContent(), $this->getInputFormat());
-
-        $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
-
-        $errors = $this->get('validator')->validate($entity);
-        if ($errors->count()) {
-            return $errors;
-        }
-
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
-        $this->getEntityManager()->flush();
-        $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
-
-        return $dto;
+        return $this->getCrudManager()->updateResource($entity, $data);
     }
 
     /**
@@ -103,29 +73,15 @@ abstract class AbstractController extends Controller
      */
     protected function readResource(DtoSerializableInterface $entity): Dto
     {
-        $event = new ApiEvent($entity, ApiEvent::ACTION_READ);
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_READ, $event);
-
-        return $this->getDtoManager()->createDto(
-            $entity,
-            DtoInterface::DTO_GROUP_READ,
-            $this->getRequestManager()->getFields()
-        );
+        return $this->get('simple_dto.crud_manager')->readResource($entity);
     }
 
     /**
-     * @param $entity
+     * @param DtoSerializableInterface $entity
      */
-    protected function deleteResource($entity): void
+    protected function deleteResource(DtoSerializableInterface $entity): void
     {
-        $this->getEntityManager()->remove($entity);
-
-        $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_FLUSH, $event);
-
-        $this->getEntityManager()->flush();
-        $event = new ApiEvent($entity, ApiEvent::ACTION_DELETE);
-        $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
+        $this->get('simple_dto.crud_manager')->deleteResource($entity);
     }
 
     /**
@@ -341,5 +297,13 @@ abstract class AbstractController extends Controller
     protected function getRequest(): Request
     {
         return $this->get('request_stack')->getCurrentRequest();
+    }
+
+    /**
+     * @return CrudManager
+     */
+    protected function getCrudManager(): CrudManager
+    {
+        return $this->get('simple_dto.crud_manager');
     }
 }
