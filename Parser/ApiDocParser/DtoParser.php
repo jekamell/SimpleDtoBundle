@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser;
 
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\AttributeMetadata;
+use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -29,9 +30,9 @@ class DtoParser implements ParserInterface
 
     /**
      * DtoParser constructor.
-     * @param ClassMetadataFactoryInterface $metadataFactory
+     * @param ClassMetadataFactory $metadataFactory
      */
-    public function __construct(ClassMetadataFactoryInterface $metadataFactory)
+    public function __construct(ClassMetadataFactory $metadataFactory)
     {
         $this->metadataFactory = $metadataFactory;
     }
