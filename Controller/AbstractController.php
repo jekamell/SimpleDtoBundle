@@ -192,7 +192,7 @@ abstract class AbstractController extends Controller
     {
         $request = $this->getRequest();
         if (!$request->headers->has('Accept')) {
-            throw new BadRequestHttpException('Request \'Accept\' http header is required');
+            return static::FORMAT_JSON; // be default
         }
         if (strpos($request->headers->get('Accept'), self::CONTENT_TYPE_JSON) !== false) {
             return self::FORMAT_JSON;
