@@ -17,9 +17,9 @@ use Mell\Bundle\SimpleDtoBundle\Services\Crud\CrudManager;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -268,9 +268,9 @@ abstract class AbstractController extends Controller
     }
 
     /**
-     * @return TraceableEventDispatcher
+     * @return EventDispatcherInterface
      */
-    protected function getEventDispatcher(): TraceableEventDispatcher
+    protected function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->get('event_dispatcher');
     }
