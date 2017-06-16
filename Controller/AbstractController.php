@@ -218,10 +218,10 @@ abstract class AbstractController extends Controller
         if (!$request->headers->has('Content-type')) {
             throw new BadRequestHttpException('Request \'Content-type\' http header is required');
         }
-        if ($request->headers->get('Content-type') === self::CONTENT_TYPE_JSON) {
+        if (strpos($request->headers->get('Content-type'), self::CONTENT_TYPE_JSON) !== false) {
             return self::FORMAT_JSON;
         }
-        if ($request->headers->get('Content-type') === self::CONTENT_TYPE_XML) {
+        if (strpos($request->headers->get('Content-type'), self::CONTENT_TYPE_XML) !== false) {
             return self::FORMAT_XML;
         }
 
