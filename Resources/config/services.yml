@@ -58,14 +58,6 @@ services:
             - { name: nelmio_api_doc.extractor.handler }
 
     # Event listeners
-    simple_dto.event_listener.exception_listener:
-        class: Mell\Bundle\SimpleDtoBundle\EventListener\ExceptionListener
-        arguments:
-            - '@logger'
-            - '%kernel.environment%'
-            - '%kernel.debug%'
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception }
     simple_dto.event_listener.expands_listener:
         class: Mell\Bundle\SimpleDtoBundle\EventListener\DtoExpandsListener
         autowire: true
