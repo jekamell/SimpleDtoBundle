@@ -23,7 +23,7 @@ class SimpleDtoExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
         $this->addContainerParams($container, $config);
@@ -36,7 +36,7 @@ class SimpleDtoExtension extends Extension
     private function addContainerParams(ContainerBuilder $container, array $config): void
     {
         foreach ($config as $property => $value) {
-            $this->bindParam($container, $value, $this->getAlias() . '.' . $property);
+            $this->bindParam($container, $value, $this->getAlias().'.'.$property);
         }
     }
 
@@ -51,7 +51,7 @@ class SimpleDtoExtension extends Extension
     {
         if (is_array($value)) {
             foreach ($value as $p => $v) {
-                $this->bindParam($container, $v, $prefix . '.' . (is_array($v) ? current($v) : $v));
+                $this->bindParam($container, $v, $prefix.'.'.(is_array($v) ? current($v) : $v));
             }
         }
         $container->setParameter($prefix, $value);

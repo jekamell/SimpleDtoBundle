@@ -39,7 +39,9 @@ services:
         class: Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoLinksManager
         autowire: true
         arguments:
-            $expressionLanguage: '@sensio_framework_extra.security.expression_language.default'
+            - '@sensio_framework_extra.security.expression_language.default'
+            - '@router'
+            - '@serializer.mapping.class_metadata_factory'
 
     # Api docs related services
     simple_dto.doc.parser.dto_parser:

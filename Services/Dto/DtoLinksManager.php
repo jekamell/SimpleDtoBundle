@@ -7,7 +7,7 @@ namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\ClassMetadataDecorator;
-use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
@@ -23,7 +23,7 @@ class DtoLinksManager
     protected $expressionLanguage;
     /** @var Router */
     protected $router;
-    /** @var ClassMetadataFactory */
+    /** @var ClassMetadataFactoryInterface */
     protected $metadataFactory;
     /** @var array */
     protected $expressionVars = [];
@@ -39,7 +39,7 @@ class DtoLinksManager
     public function __construct(
         ExpressionLanguage $expressionLanguage,
         Router $router,
-        ClassMetadataFactory $metadataFactory
+        ClassMetadataFactoryInterface $metadataFactory
     ) {
         $this->expressionLanguage = $expressionLanguage;
         $this->router = $router;
