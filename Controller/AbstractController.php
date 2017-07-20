@@ -191,7 +191,7 @@ abstract class AbstractController extends Controller
     protected function getOutputFormat(): string
     {
         $request = $this->getRequest();
-        if (!$request->headers->has('Accept')) {
+        if (!$request->headers->has('Accept') || $request->headers->get('Accept') === '*/*') {
             return static::FORMAT_JSON; // be default
         }
         if (strpos($request->headers->get('Accept'), self::CONTENT_TYPE_JSON) !== false) {
