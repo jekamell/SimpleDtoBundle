@@ -119,14 +119,24 @@ class DtoManager
      * @param DtoSerializableInterface $entity
      * @param string $data
      * @param string $format
+     * @param string $group
      * @return DtoSerializableInterface
      */
     public function deserializeEntity(
         DtoSerializableInterface $entity,
         string $data,
-        string $format
+        string $format,
+        string $group
     ): DtoSerializableInterface {
-        $this->serializer->deserialize($data, get_class($entity), $format, ['object_to_populate' => $entity]);
+        $this->serializer->deserialize(
+            $data,
+            get_class($entity),
+            $format,
+            [
+                'object_to_populate' => $entity,
+                'groups' => [$group],
+            ]
+        );
 
         return $entity;
     }

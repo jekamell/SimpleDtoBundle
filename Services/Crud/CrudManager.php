@@ -72,7 +72,12 @@ class CrudManager
      */
     public function createResource(DtoSerializableInterface $entity, array $data, string $format = self::FORMAT_JSON)
     {
-        $entity = $this->dtoManager->deserializeEntity($entity, $this->serializer->serialize($data, $format), $format);
+        $entity = $this->dtoManager->deserializeEntity(
+            $entity,
+            $this->serializer->serialize($data, $format),
+            $format,
+            DtoInterface::DTO_GROUP_READ
+        );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
@@ -114,7 +119,12 @@ class CrudManager
      */
     public function updateResource(DtoSerializableInterface $entity, array $data, string $format = self::FORMAT_JSON)
     {
-        $entity = $this->dtoManager->deserializeEntity($entity, $this->serializer->serialize($data, $format), $format);
+        $entity = $this->dtoManager->deserializeEntity(
+            $entity,
+            $this->serializer->serialize($data, $format),
+            $format,
+            DtoInterface::DTO_GROUP_UPDATE
+        );
 
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
