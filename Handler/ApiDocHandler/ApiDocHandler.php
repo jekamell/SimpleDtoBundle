@@ -68,8 +68,10 @@ class ApiDocHandler implements HandlerInterface
         if (in_array(Request::METHOD_DELETE, $route->getMethods())) {
             return;
         }
-        $annotation->addParameter($this->requestManagerConfigurator->getFieldsParam(), $this->getFieldsParams());
-        $annotation->addParameter($this->requestManagerConfigurator->getExpandsParam(), $this->getExpandsParams());
+        if (in_array(Request::METHOD_GET, $route->getMethods())) {
+            $annotation->addParameter($this->requestManagerConfigurator->getFieldsParam(), $this->getFieldsParams());
+            $annotation->addParameter($this->requestManagerConfigurator->getExpandsParam(), $this->getExpandsParams());
+        }
         $output = $annotation->getOutput();
         if (!empty($output['collection'])) {
             $annotation->addParameter($this->requestManagerConfigurator->getLimitParam(), $this->getLimitParams());
