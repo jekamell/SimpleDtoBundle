@@ -9,7 +9,6 @@ use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
-use Mell\Bundle\SimpleDtoBundle\Serializer\Normalizer\DtoNormalizer;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Serializer;
 
@@ -66,8 +65,8 @@ class DtoManager
         $dto->setRawData(
             $this->serializer->normalize(
                 $entity,
-                DtoNormalizer::FORMAT_DTO,
-                ['groups' => [$group], 'fields' => $fields,]
+                null,
+                array_merge(['groups' => [$group],], $fields ? ['attributes' => $fields] : [])
             )
         );
 

@@ -88,16 +88,6 @@ services:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
     # serializer
-    serializer.dto_normalizer:
-        class: Mell\Bundle\SimpleDtoBundle\Serializer\Normalizer\DtoNormalizer
-        arguments:
-            - '@serializer.mapping.class_metadata_factory'
-            - null
-            - '@serializer.property_accessor'
-            - '@?property_info'
-        public: false
-        tags:
-            - { name: serializer.normalizer }
     serializer.date_time_normalizer:
         class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
         arguments:
