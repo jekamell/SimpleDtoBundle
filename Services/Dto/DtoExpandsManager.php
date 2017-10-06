@@ -7,7 +7,6 @@ namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Mell\Bundle\SimpleDtoBundle\Serializer\Normalizer\DtoNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
 /**
@@ -51,8 +50,8 @@ class DtoExpandsManager
             $object = call_user_func([$entity, $getter]);
             $data[$expand] = $this->serializer->normalize(
                 $object,
-                DtoNormalizer::FORMAT_DTO,
-                ['groups' => [DtoInterface::DTO_GROUP_READ], 'fields' => $fields]
+                null,
+                array_merge(['groups' => [DtoInterface::DTO_GROUP_READ],], $fields ? ['attributes' => $fields] : [])
             );
         }
 
