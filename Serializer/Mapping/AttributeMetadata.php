@@ -15,6 +15,7 @@ class AttributeMetadata extends \Symfony\Component\Serializer\Mapping\AttributeM
     const TYPE_FLOAT = 'float';
     const TYPE_DATE = 'date';
     const TYPE_DATE_TIME = 'datetime';
+    const TYPE_ARRAY = 'array';
 
     /** @var string */
     public $type;
@@ -35,6 +36,7 @@ class AttributeMetadata extends \Symfony\Component\Serializer\Mapping\AttributeM
             self::TYPE_FLOAT,
             self::TYPE_DATE,
             self::TYPE_DATE_TIME,
+            self::TYPE_ARRAY,
         ];
     }
 
