@@ -37,16 +37,36 @@ class ApiEvent extends Event
     protected $data;
     /** @var string */
     protected $action;
+    /** @var array */
+    protected $context = [];
 
     /**
      * ApiEvent constructor.
      * @param $data
      * @param string $action
+     * @param array $context
      */
-    public function __construct($data, $action)
+    public function __construct($data, $action, array $context = [])
     {
         $this->data = $data;
         $this->action = $action;
+        $this->context = $context;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param array $context
+     */
+    public function setContext(array $context)
+    {
+        $this->context = $context;
     }
 
     /**
