@@ -146,14 +146,16 @@ abstract class AbstractController extends Controller
      * @param QueryBuilder $queryBuilder
      * @param ApiFilterCollectionInterface $filters
      * @param string $dtoGroup
+     * @param array $context
      * @return DtoCollectionInterface
      */
     protected function listResources(
         QueryBuilder $queryBuilder,
         ApiFilterCollectionInterface $filters = null,
-        $dtoGroup = null
+        $dtoGroup = null,
+        array $context = []
     ) {
-        $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST);
+        $event = new ApiEvent($queryBuilder, ApiEvent::ACTION_LIST, $context);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_PRE_COLLECTION_LOAD, $event);
 
         if ($filters) {
@@ -170,7 +172,7 @@ abstract class AbstractController extends Controller
             $count = $paginator->count();
         }
 
-        $event = new ApiEvent($collection, ApiEvent::ACTION_LIST);
+        $event = new ApiEvent($collection, ApiEvent::ACTION_LIST, $context);
         $this->getEventDispatcher()->dispatch(ApiEvent::EVENT_POST_COLLECTION_LOAD, $event);
 
         return $this->getDtoManager()->createDtoCollection(

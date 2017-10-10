@@ -99,10 +99,17 @@ class DtoManager implements DtoManagerInterface
      * @param string $group
      * @param array $fields
      * @param null|integer $count
+     * @param array $context
      * @return DtoCollectionInterface
      */
-    public function createDtoCollection($collection, $dtoType, $group, array $fields = [], $count = null)
-    {
+    public function createDtoCollection(
+        $collection,
+        $dtoType,
+        $group,
+        array $fields = [],
+        $count = null,
+        array $context = []
+    ) {
         $dtoCollection = new DtoCollection(
             $dtoType,
             $collection,
@@ -112,7 +119,7 @@ class DtoManager implements DtoManagerInterface
             $count
         );
         $this->dispatch(
-            new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION),
+            new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION, $context),
             ApiEvent::EVENT_PRE_DTO_COLLECTION_ENCODE
         );
 
@@ -121,7 +128,7 @@ class DtoManager implements DtoManagerInterface
         }
 
         $this->dispatch(
-            new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION),
+            new ApiEvent($dtoCollection, ApiEvent::ACTION_CREATE_DTO_COLLECTION, $context),
             ApiEvent::EVENT_POST_DTO_COLLECTION_ENCODE
         );
 
