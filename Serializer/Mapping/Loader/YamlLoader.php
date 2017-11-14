@@ -170,7 +170,7 @@ class YamlLoader extends YamlFileLoader
                             )
                         );
                     }
-                    $link[$name] = [
+                    $links[$name] = [
                         'route' => $link['route'],
                         'description' => $link['description'] ?? $name,
                         'expression' => $link['expression'] ?? null,
