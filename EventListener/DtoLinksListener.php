@@ -66,7 +66,7 @@ class DtoLinksListener implements ContainerAwareInterface
         $dto = $apiEvent->getData();
         if ($apiEvent->getAction() !== ApiEvent::ACTION_CREATE_DTO_COLLECTION
             || !$dto instanceof DtoCollectionInterface
-            || $this->requestManager->isLinksRequired()
+            || !$this->requestManager->isLinksRequired()
         ) {
             return;
         }
