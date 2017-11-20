@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Loader;
 
+use Mell\Bundle\SimpleDtoBundle\Model\Relation;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\AttributeMetadata;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\ClassMetadataDecorator;
 use Symfony\Component\Serializer\Exception\MappingException;
@@ -178,6 +179,87 @@ class YamlLoader extends YamlFileLoader
                 }
             }
             $classMetadata->setLinks($links);
+            $relations = [];
+            if (isset($yaml['relations']) && is_array($yaml['relations'])) {
+                foreach ($yaml['relations'] as $name => $relationConfig) {
+                    // Required config params
+                    if (!isset($relationConfig['targetEntity'])
+                        || !isset($relationConfig['targetEntity']['class'])
+                        || !is_string($relationConfig['targetEntity']['class'])) {
+                        throw new MappingException(
+                            sprintf(
+                                'The "targetEntity.class" value must be string in "%s" for the relation "%s" of the class "%s".',
+                                $this->file,
+                                $name,
+                                $classMetadata->getName()
+                            )
+                        );
+                    }
+                    if (!isset($relationConfig['attribute']) || !is_string($relationConfig['attribute'])) {
+                        throw new MappingException(
+                            sprintf(
+                                'The "attribute" value must be string in "%s" for the relation "%s" of the class "%s".',
+                                $this->file,
+                                $name,
+                                $classMetadata->getName()
+                            )
+                        );
+                    }
+                    // Optional config params
+                    if (isset($relationConfig['groups']) && !is_array($relationConfig['groups'])) {
+                        throw new MappingException(
+                            sprintf(
+                                'The "grops" value must be array in "%s" for the relation "%s" of the class "%s".',
+                                $this->file,
+                                $name,
+                                $classMetadata->getName()
+                            )
+                        );
+                    }
+                    if (isset($relationConfig['targetEntity'])
+                        && isset($relationConfig['targetEntity']['attribute'])
+                        && !is_string($relationConfig['targetEntity']['attribute'])) {
+                        throw new MappingException(
+                            sprintf(
+                                'The "targetEntity.attribute" value must be string in "%s" for the relation "%s" of the class "%s".',
+                                $this->file,
+                                $name,
+                                $classMetadata->getName()
+                            )
+                        );
+                    }
+                    if (isset($relationConfig['repositoryMethod']) && !is_string($relationConfig['repositoryMethod'])) {
+                        throw new MappingException(
+                            sprintf(
+                                'The "repositoryMethod" value must be string in "%s" for the relation "%s" of the class "%s".',
+                                $this->file,
+                                $name,
+                                $classMetadata->getName()
+                            )
+                        );
+                    }
+                    if (isset($relationConfig['setter']) && !is_string($relationConfig['setter'])) {
+                        throw new MappingException(
+                            sprintf(
+                                'The "setter" value must be string in "%s" for the relation "%s" of the class "%s".',
+                                $this->file,
+                                $name,
+                                $classMetadata->getName()
+                            )
+                        );
+                    }
+                    $relations[] = new Relation(
+                        $name,
+                        $relationConfig['targetEntity']['class'],
+                        $relationConfig['attribute'],
+                        $relationConfig['groups'] ?? [],
+                        $relationConfig['targetEntity']['attribute'] ?? null,
+                        $relationConfig['repositoryMethod'] ?? null,
+                        $relationConfig['setter'] ?? null
+                    );
+                }
+            }
+            $classMetadata->setRelations($relations);
 
             return true;
         }

@@ -72,6 +72,10 @@ class CrudManager
      */
     public function createResource(DtoSerializableInterface $entity, array $data, string $format = self::FORMAT_JSON)
     {
+        $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE, ['group' => 'create']);
+
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DESERIALIZE, $event);
+
         $entity = $this->dtoManager->deserializeEntity(
             $entity,
             $this->serializer->serialize($data, $format),
@@ -79,7 +83,8 @@ class CrudManager
             DtoInterface::DTO_GROUP_READ
         );
 
-        $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DESERIALIZE, $event);
+
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->validator->validate($entity);
@@ -119,6 +124,10 @@ class CrudManager
      */
     public function updateResource(DtoSerializableInterface $entity, array $data, string $format = self::FORMAT_JSON)
     {
+        $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE, ['group' => 'update']);
+
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DESERIALIZE, $event);
+
         $entity = $this->dtoManager->deserializeEntity(
             $entity,
             $this->serializer->serialize($data, $format),
@@ -126,7 +135,8 @@ class CrudManager
             DtoInterface::DTO_GROUP_UPDATE
         );
 
-        $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
+        $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DESERIALIZE, $event);
+
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
         $errors = $this->validator->validate($entity);

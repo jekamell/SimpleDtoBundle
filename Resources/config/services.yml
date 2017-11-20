@@ -42,7 +42,8 @@ services:
             - '@sensio_framework_extra.security.expression_language.default'
             - '@router'
             - '@serializer.mapping.class_metadata_factory'
-
+    Mell\Bundle\SimpleDtoBundle\Services\Crud\RelationManager:
+        autowire: true
     # Api docs related services
     simple_dto.doc.parser.dto_parser:
         class: Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser
@@ -86,7 +87,12 @@ services:
         autowire: true
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
-
+    Mell\Bundle\SimpleDtoBundle\EventListener\RelationListener:
+        autowire: true
+        arguments:
+            $relationHandlingEnabled: '%simple_dto.relation_handling_enabled%'
+        tags:
+            - { name: kernel.event_listener, event: simple_dto.post_deserialize, method: updateRelations }
     # serializer
     serializer.date_time_normalizer:
         class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer

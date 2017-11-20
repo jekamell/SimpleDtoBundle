@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mell\Bundle\SimpleDtoBundle\Serializer\Mapping;
 
+use Mell\Bundle\SimpleDtoBundle\Model\Relation;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
@@ -18,6 +19,8 @@ class ClassMetadataDecorator implements ClassMetadataInterface
     protected $expands = [];
     /** @var array */
     protected $links = [];
+    /** @var array */
+    protected $relations = [];
 
     /**
      * ClassMetadata constructor.
@@ -58,6 +61,22 @@ class ClassMetadataDecorator implements ClassMetadataInterface
     public function setLinks(array $links): void
     {
         $this->links = $links;
+    }
+
+    /**
+     * @return Relation[]
+     */
+    public function getRelations(): array
+    {
+        return $this->relations;
+    }
+
+    /**
+     * @param array $relations
+     */
+    public function setRelations(array $relations): void
+    {
+        $this->relations = $relations;
     }
 
     /**
