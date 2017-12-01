@@ -8,24 +8,24 @@ use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\ClassMetadataDecorator;
 use Mell\Bundle\SimpleDtoBundle\Services\Crud\RelationManager;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
 
 /**
  * Class RelationListener
  */
 class RelationListener
 {
-    /** @var ClassMetadataFactoryInterface */
+    /** @var ClassMetadataFactory */
     protected $metadataFactory;
     /** @var RelationManager */
     protected $relationManager;
 
     /**
      * RelationListener constructor.
-     * @param ClassMetadataFactoryInterface $metadataFactory
+     * @param ClassMetadataFactory $metadataFactory
      * @param RelationManager $relationManager
      */
-    public function __construct(ClassMetadataFactoryInterface $metadataFactory, RelationManager $relationManager)
+    public function __construct(ClassMetadataFactory $metadataFactory, RelationManager $relationManager)
     {
         $this->metadataFactory = $metadataFactory;
         $this->relationManager = $relationManager;

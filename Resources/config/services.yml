@@ -89,8 +89,6 @@ services:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
     Mell\Bundle\SimpleDtoBundle\EventListener\RelationListener:
         autowire: true
-        arguments:
-            $relationHandlingEnabled: '%simple_dto.relation_handling_enabled%'
         tags:
             - { name: kernel.event_listener, event: simple_dto.post_deserialize, method: updateRelations }
     # serializer
