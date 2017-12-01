@@ -79,10 +79,6 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(false)
                     ->info('Whether the HATEOAS option is enabled')
                     ->end()
-                ->scalarNode('relation_handling_enabled')
-                    ->defaultTrue()
-                    ->info('Whether relation handling is enabled')
-                    ->end()
             ->end();
 
         return $treeBuilder;

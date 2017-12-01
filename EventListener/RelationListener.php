@@ -19,33 +19,26 @@ class RelationListener
     protected $metadataFactory;
     /** @var RelationManager */
     protected $relationManager;
-    /** @var bool */
-    protected $relationHandlingEnabled;
 
     /**
      * RelationListener constructor.
-     * @param MetadataFactoryInterface $metadataFactory
+     * @param ClassMetadataFactoryInterface $metadataFactory
      * @param RelationManager $relationManager
-     * @param bool $relationHandlingEnabled
      */
-    public function __construct(
-        ClassMetadataFactoryInterface $metadataFactory,
-        RelationManager $relationManager,
-        $relationHandlingEnabled
-    ) {
+    public function __construct(ClassMetadataFactoryInterface $metadataFactory, RelationManager $relationManager)
+    {
         $this->metadataFactory = $metadataFactory;
         $this->relationManager = $relationManager;
-        $this->relationHandlingEnabled = $relationHandlingEnabled;
     }
 
     /**
      * @param ApiEvent $apiEvent
+     * @throws \Exception
      */
     public function updateRelations(ApiEvent $apiEvent): void
     {
         $entity = $apiEvent->getData();
-        if (!$this->relationHandlingEnabled
-            || !in_array($apiEvent->getAction(), [ApiEvent::ACTION_CREATE, ApiEvent::ACTION_UPDATE])
+        if (!in_array($apiEvent->getAction(), [ApiEvent::ACTION_CREATE, ApiEvent::ACTION_UPDATE])
             || !$entity instanceof DtoSerializableInterface
         ) {
             return;
