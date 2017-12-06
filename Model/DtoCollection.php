@@ -130,7 +130,7 @@ class DtoCollection implements DtoCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function current(): Dto
+    public function current()
     {
         return current($this->data);
     }
