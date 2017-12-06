@@ -80,7 +80,7 @@ class CrudManager
             $entity,
             $this->serializer->serialize($data, $format),
             $format,
-            DtoInterface::DTO_GROUP_READ
+            DtoInterface::DTO_GROUP_CREATE
         );
 
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DESERIALIZE, $event);
