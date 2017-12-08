@@ -66,7 +66,7 @@ class DtoLinksManager
             if (!empty($params['expression']) && !$this->evaluate($params['expression'])) {
                 continue;
             }
-            $route = $this->getRoute($params['route']);
+            $route = isset($params['route']) ? $this->getRoute($params['route']) : null;
             $data['_links'][$link] = $this->generateLinkData($dto->getOriginalData(), $params, $route, $link);
         }
 
@@ -118,17 +118,20 @@ class DtoLinksManager
      * @param string $link
      * @return array
      */
-    private function generateLinkData($entity, array $params, Route $route, $link): array
+    private function generateLinkData($entity, array $params, ?Route $route, $link): array
     {
-        return [
-            'url' => $this->router->generate(
+        $data = [];
+        $data['description'] = isset($params['description']) ? $params['description'] : ucfirst($link);
+        if ($route) {
+            $data['methods'] = $route->getMethods();
+            $data['url'] =$this->router->generate(
                 $params['route'],
                 $this->getRouteParams($route, $entity),
                 UrlGeneratorInterface::ABSOLUTE_URL
-            ),
-            'methods' => $route->getMethods(),
-            'description' => isset($params['description']) ? $params['description'] : ucfirst($link),
-        ];
+            );
+        }
+
+        return $data;
     }
 
     /**

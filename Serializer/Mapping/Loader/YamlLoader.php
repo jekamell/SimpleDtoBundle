@@ -141,12 +141,12 @@ class YamlLoader extends YamlFileLoader
             $links = [];
             if (isset($yaml['links']) && is_array($yaml['links'])) {
                 foreach ($yaml['links'] as $name => $link) {
-                    if (!isset($link['route']) || !is_string($link['route'])) {
+                    if (isset($link['route']) && !is_string($link['route'])) {
                         throw new MappingException(
                             sprintf(
                                 'The "route" value must be string in "%s" for the link "%s" of the class "%s".',
                                 $this->file,
-                                $yaml['links'],
+                                $name,
                                 $classMetadata->getName()
                             )
                         );
@@ -172,10 +172,12 @@ class YamlLoader extends YamlFileLoader
                         );
                     }
                     $links[$name] = [
-                        'route' => $link['route'],
                         'description' => $link['description'] ?? $name,
                         'expression' => $link['expression'] ?? null,
                     ];
+                    if (isset($link['route'])) {
+                        $links[$name]['route'] = $link['route'];
+                    }
                 }
             }
             $classMetadata->setLinks($links);
