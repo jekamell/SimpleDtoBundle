@@ -101,7 +101,7 @@ class CrudManager
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE);
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
-        return $entity;
+        return $this->dtoManager->createDto($entity, DtoInterface::DTO_GROUP_READ, $this->requestManager->getFields());
     }
 
     /**
@@ -149,7 +149,7 @@ class CrudManager
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE);
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_FLUSH, $event);
 
-        return $entity;
+        return $this->dtoManager->createDto($entity, DtoInterface::DTO_GROUP_READ, $this->requestManager->getFields());
     }
 
     /**
