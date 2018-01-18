@@ -67,11 +67,17 @@ class CrudManager
     /**
      * @param DtoSerializableInterface $entity
      * @param array $data
+     * @param callable|null $accessChecker
      * @param string $format @see self::FORMAT_JSON|self::FORMAT_XML
      * @return DtoSerializableInterface|ConstraintViolationListInterface
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function createResource(DtoSerializableInterface $entity, array $data, string $format = self::FORMAT_JSON)
-    {
+    public function createResource(
+        DtoSerializableInterface $entity,
+        array $data,
+        Callable $accessChecker = null,
+        string $format = self::FORMAT_JSON
+    ) {
         $event = new ApiEvent($entity, ApiEvent::ACTION_CREATE, ['group' => 'create']);
 
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DESERIALIZE, $event);
@@ -84,6 +90,10 @@ class CrudManager
         );
 
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DESERIALIZE, $event);
+
+        if ($accessChecker) {
+            call_user_func($accessChecker);
+        }
 
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
@@ -117,13 +127,19 @@ class CrudManager
     }
 
     /**
-     * @param array $data
      * @param DtoSerializableInterface $entity
+     * @param array $data
+     * @param callable|null $accessChecker
      * @param string $format
      * @return DtoSerializableInterface|ConstraintViolationListInterface
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function updateResource(DtoSerializableInterface $entity, array $data, string $format = self::FORMAT_JSON)
-    {
+    public function updateResource(
+        DtoSerializableInterface $entity,
+        array $data,
+        Callable $accessChecker = null,
+        string $format = self::FORMAT_JSON
+    ) {
         $event = new ApiEvent($entity, ApiEvent::ACTION_UPDATE, ['group' => 'update']);
 
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_DESERIALIZE, $event);
@@ -136,6 +152,10 @@ class CrudManager
         );
 
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_POST_DESERIALIZE, $event);
+
+        if ($accessChecker) {
+            call_user_func($accessChecker);
+        }
 
         $this->eventDispatcher->dispatch(ApiEvent::EVENT_PRE_VALIDATE, $event);
 
@@ -154,6 +174,7 @@ class CrudManager
 
     /**
      * @param $entity
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function deleteResource($entity): void
     {

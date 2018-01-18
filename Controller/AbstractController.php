@@ -42,29 +42,33 @@ abstract class AbstractController extends Controller
     /**
      * @param Request $request
      * @param DtoSerializableInterface $entity
+     * @param callable|null $accessChecker
      * @return DtoSerializableInterface|ConstraintViolationListInterface
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function createResource(Request $request, DtoSerializableInterface $entity)
+    protected function createResource(Request $request, DtoSerializableInterface $entity, Callable $accessChecker = null)
     {
         if (!$data = $this->getSerializer()->decode($request->getContent(), $this->getInputFormat())) {
             throw new BadRequestHttpException('Malformed request data');
         }
 
-        return $this->get('simple_dto.crud_manager')->createResource($entity, $data);
+        return $this->get('simple_dto.crud_manager')->createResource($entity, $data, $accessChecker);
     }
 
     /**
      * @param Request $request
      * @param DtoSerializableInterface $entity
+     * @param callable|null $accessChecker
      * @return DtoSerializableInterface|ConstraintViolationListInterface
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function updateResource(Request $request, DtoSerializableInterface $entity)
+    protected function updateResource(Request $request, DtoSerializableInterface $entity, Callable $accessChecker = null)
     {
         if (!$data = $this->getSerializer()->decode($request->getContent(), $this->getInputFormat())) {
             throw new BadRequestHttpException('Malformed request data');
         }
 
-        return $this->getCrudManager()->updateResource($entity, $data);
+        return $this->getCrudManager()->updateResource($entity, $data, $accessChecker);
     }
 
     /**
@@ -78,6 +82,7 @@ abstract class AbstractController extends Controller
 
     /**
      * @param DtoSerializableInterface $entity
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function deleteResource(DtoSerializableInterface $entity): void
     {
@@ -175,6 +180,8 @@ abstract class AbstractController extends Controller
     /**
      * @param QueryBuilder $queryBuilder
      * @return int
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     protected function getCollectionCount(QueryBuilder $queryBuilder): int
     {
