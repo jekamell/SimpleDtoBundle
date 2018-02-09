@@ -47,7 +47,9 @@ class ListQueryBuilderListener
         }
 
         $this->processFilters($queryBuilder, $apiEvent->getContext()['filters']);
-        $this->processLimit($queryBuilder);
+        if (empty($apiEvent->getContext()['skipLimit'])) {
+            $this->processLimit($queryBuilder);
+        }
         $this->processOffset($queryBuilder);
         $this->processSort($queryBuilder);
     }
