@@ -46,7 +46,7 @@ class ClassMetadataFactory extends \Symfony\Component\Serializer\Mapping\Factory
             @trigger_error(sprintf('Passing a Doctrine Cache instance as 2nd parameter of the "%s" constructor is deprecated since version 3.1. This parameter will be removed in Symfony 4.0. Use the "%s" class instead.', __CLASS__, CacheClassMetadataFactory::class), E_USER_DEPRECATED);
         }
 
-        parent::__construct($loader, $cache);
+        parent::__construct($loader);
     }
 
     /**

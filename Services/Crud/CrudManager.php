@@ -71,6 +71,7 @@ class CrudManager
      * @param string $format @see self::FORMAT_JSON|self::FORMAT_XML
      * @return DtoSerializableInterface|ConstraintViolationListInterface
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function createResource(
         DtoSerializableInterface $entity,
@@ -133,6 +134,7 @@ class CrudManager
      * @param string $format
      * @return DtoSerializableInterface|ConstraintViolationListInterface
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function updateResource(
         DtoSerializableInterface $entity,
@@ -175,6 +177,7 @@ class CrudManager
     /**
      * @param $entity
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function deleteResource($entity): void
     {

@@ -34,6 +34,7 @@ class RelationManager
     /**
      * @param DtoSerializableInterface $entity
      * @param Relation $relation
+     * @throws \Exception
      */
     public function handleRelation(DtoSerializableInterface $entity, Relation $relation): void
     {
@@ -52,7 +53,7 @@ class RelationManager
         $repository = $this->entityManager->getRepository($relation->getTargetEntityClass());
         if (!is_callable([$repository, $relation->getRepositoryMethod()])) {
             throw new \Exception(
-                sprintf('%s: Method is not callable: %s', get_class($repository, $relation->getRepositoryMethod()))
+                sprintf('%s: Method is not callable: %s', get_class($repository), $relation->getRepositoryMethod())
             );
         }
         $relationObject = call_user_func(

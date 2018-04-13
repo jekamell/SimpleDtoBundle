@@ -70,7 +70,8 @@ class Relation
     }
 
     /**
-     * @param string $name
+     * @param string $relation
+     * @return Relation
      */
     public function setRelation(string $relation): Relation
     {
@@ -88,7 +89,8 @@ class Relation
     }
 
     /**
-     * @param mixed $targetEntityClass
+     * @param string $targetEntityClass
+     * @return Relation
      */
     public function setTargetEntityClass(string $targetEntityClass): Relation
     {
@@ -106,7 +108,8 @@ class Relation
     }
 
     /**
-     * @param mixed $attribute
+     * @param string $attribute
+     * @return Relation
      */
     public function setAttribute(string $attribute): Relation
     {
@@ -125,6 +128,7 @@ class Relation
 
     /**
      * @param array $groups
+     * @return Relation
      */
     public function setGroups(array $groups): Relation
     {
@@ -143,6 +147,7 @@ class Relation
 
     /**
      * @param string $targetEntityAttribute
+     * @return Relation
      */
     public function setTargetEntityAttribute(string $targetEntityAttribute): Relation
     {
@@ -161,6 +166,7 @@ class Relation
 
     /**
      * @param string $repositoryMethod
+     * @return Relation
      */
     public function setRepositoryMethod(string $repositoryMethod): Relation
     {
@@ -179,6 +185,7 @@ class Relation
 
     /**
      * @param mixed $setter
+     * @return Relation
      */
     public function setSetter($setter): Relation
     {
