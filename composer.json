@@ -12,7 +12,6 @@
         "symfony/framework-bundle": "^4.0",
         "symfony/expression-language": "^4.0",
         "symfony/flex": "^1.0",
-        "symfony/lts": "^4@dev",
         "symfony/maker-bundle": "^1.4",
         "symfony/orm-pack": "^1.0",
         "symfony/serializer-pack": "^1.0",
