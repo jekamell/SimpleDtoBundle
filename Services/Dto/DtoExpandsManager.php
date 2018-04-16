@@ -7,7 +7,9 @@ namespace Mell\Bundle\SimpleDtoBundle\Services\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class DtoExpandsManager
@@ -16,7 +18,7 @@ class DtoExpandsManager
 {
     /** @var Serializer */
     protected $serializer;
-    /** @var ClassMetadataFactory */
+    /** @var ClassMetadataFactoryInterface */
     protected $metadataFactory;
 
     /**
@@ -24,7 +26,7 @@ class DtoExpandsManager
      * @param Serializer $serializer
      * @param ClassMetadataFactory $metadataFactory
      */
-    public function __construct(Serializer $serializer, ClassMetadataFactory $metadataFactory)
+    public function __construct(SerializerInterface $serializer, ClassMetadataFactoryInterface $metadataFactory)
     {
         $this->serializer = $serializer;
         $this->metadataFactory = $metadataFactory;

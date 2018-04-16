@@ -5,27 +5,29 @@ declare(strict_types=1);
 namespace Mell\Bundle\SimpleDtoBundle\Services\Crud;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
 use Mell\Bundle\SimpleDtoBundle\Model\Relation;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Class RelationManager
  */
 class RelationManager
 {
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
     /**
      * RelationManager constructor.
-     * @param PropertyAccessor $propertyAccessor
+     * @param PropertyAccessorInterface $propertyAccessor
      * @param EntityManager $entityManager
      */
-    public function __construct(PropertyAccessor $propertyAccessor, EntityManager $entityManager)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, EntityManagerInterface $entityManager)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->entityManager = $entityManager;

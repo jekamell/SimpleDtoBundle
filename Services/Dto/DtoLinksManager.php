@@ -13,6 +13,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
  * Class DtoLinksManager
@@ -21,9 +23,9 @@ class DtoLinksManager
 {
     /** @var ExpressionLanguage */
     protected $expressionLanguage;
-    /** @var Router */
+    /** @var RouterInterface */
     protected $router;
-    /** @var ClassMetadataFactory */
+    /** @var ClassMetadataFactoryInterface */
     protected $metadataFactory;
     /** @var array */
     protected $expressionVars = [];
@@ -33,15 +35,12 @@ class DtoLinksManager
     /**
      * DtoLinksManager constructor.
      * @param ExpressionLanguage $expressionLanguage
-     * @param Router $router
-     * @param ClassMetadataFactory $metadataFactory
+     * @param RouterInterface $router
+     * @param ClassMetadataFactoryInterface $metadataFactory
      */
-    public function __construct(
-        ExpressionLanguage $expressionLanguage,
-        Router $router,
-        ClassMetadataFactory $metadataFactory
-    ) {
-        $this->expressionLanguage = $expressionLanguage;
+    public function __construct(RouterInterface $router, ClassMetadataFactoryInterface $metadataFactory) 
+    {
+        $this->expressionLanguage = new ExpressionLanguage();
         $this->router = $router;
         $this->metadataFactory = $metadataFactory;
     }

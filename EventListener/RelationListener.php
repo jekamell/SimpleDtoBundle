@@ -9,23 +9,24 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\ClassMetadataDecorator;
 use Mell\Bundle\SimpleDtoBundle\Services\Crud\RelationManager;
 use Mell\Bundle\SimpleDtoBundle\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
  * Class RelationListener
  */
 class RelationListener
 {
-    /** @var ClassMetadataFactory */
+    /** @var ClassMetadataFactoryInterface */
     protected $metadataFactory;
     /** @var RelationManager */
     protected $relationManager;
 
     /**
      * RelationListener constructor.
-     * @param ClassMetadataFactory $metadataFactory
+     * @param ClassMetadataFactoryInterface $metadataFactory
      * @param RelationManager $relationManager
      */
-    public function __construct(ClassMetadataFactory $metadataFactory, RelationManager $relationManager)
+    public function __construct(ClassMetadataFactoryInterface $metadataFactory, RelationManager $relationManager)
     {
         $this->metadataFactory = $metadataFactory;
         $this->relationManager = $relationManager;
