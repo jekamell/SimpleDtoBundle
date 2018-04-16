@@ -9,7 +9,7 @@
     ],
     "require": {
         "php": ">=7.1.0",
-        "symfony/symfony": "^4.0",
+        "symfony/framework-bundle": "^4.0",
         "doctrine/orm": "^2.6",
         "namshi/jose": "^7.2"
     },

@@ -6,10 +6,12 @@ namespace Mell\Bundle\SimpleDtoBundle\EventListener;
 
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilter;
 use Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFilterManagerInterface;
+use Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class ApiFiltersListener
@@ -20,21 +22,21 @@ class ApiFiltersListener
 
     /** @var RequestManager */
     protected $requestManager;
-    /** @var ApiFilterManagerInterface */
+    /** @var ApiFilterManager */
     protected $apiFilterManager;
-    /** @var Router */
+    /** @var RouterInterface */
     protected $router;
 
     /**
      * ApiFiltersListener constructor.
      * @param RequestManager $requestManager
-     * @param ApiFilterManagerInterface $apiFilterManager
-     * @param Router $router
+     * @param ApiFilterManager $apiFilterManager
+     * @param RouterInterface $router
      */
     public function __construct(
         RequestManager $requestManager,
-        ApiFilterManagerInterface $apiFilterManager,
-        Router $router
+        ApiFiltersManager $apiFilterManager,
+        RouterInterface $router
     ) {
         $this->requestManager = $requestManager;
         $this->apiFilterManager = $apiFilterManager;
