@@ -1,0 +1,15 @@
+# SimpleDtoBundle documentation
+
+- [Installation](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/installation.md)
+- [Configuration](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/configuration.md)
+- [Dto configuration](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/dto-configuration.md)
+- [Dto fields filtering](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/fields-filtering.md)
+- [Base crud functionality](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/crud-functionality.md)
+- [Dto embedding](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/dto-embedding.md)
+- [Dto collection sorting](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/dto-collection-sorting.md)
+- [Dto collection filtering](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/dto-collection-filtering.md)
+- [HATEOAS support](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/hateoas-support.md)
+- [NelmioApiDoc integration](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/nelmio-api-doc-integration.md)
+- [ApiKey based authentication](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/api-key-authentication.md)
+- [Direct services access](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/direct-services-access.md)
+- [Relation support](https://github.com/jekamell/SimpleDtoBundle/blob/1.0/Resources/doc/relations-support.md)

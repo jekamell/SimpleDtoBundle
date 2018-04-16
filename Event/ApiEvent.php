@@ -1,0 +1,106 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mell\Bundle\SimpleDtoBundle\Event;
+
+use Symfony\Component\EventDispatcher\Event;
+
+/**
+ * Class ApiEvent
+ */
+class ApiEvent extends Event
+{
+    const ACTION_CREATE = 'create';
+    const ACTION_UPDATE = 'update';
+    const ACTION_READ = 'read';
+    const ACTION_DELETE = 'delete';
+    const ACTION_LIST = 'list';
+    const ACTION_CREATE_DTO = 'create_dto';
+    const ACTION_CREATE_DTO_COLLECTION = 'create_dto_collection';
+
+    const EVENT_PRE_VALIDATE = 'simple_dto.pre_validate';
+    const EVENT_PRE_COLLECTION_LOAD = 'simple_dto.pre_collection_load';
+    const EVENT_POST_COLLECTION_LOAD = 'simple_dto.post_collection_load';
+    const EVENT_PRE_PERSIST = 'simple_dto.pre_persist';
+    const EVENT_PRE_FLUSH = 'simple_dto.pre_flush';
+    const EVENT_POST_FLUSH = 'simple_dto.post_flush';
+    const EVENT_POST_READ = 'simple_dto.post_read';
+    const EVENT_PRE_DTO_ENCODE = 'simple_dto.pre_dto_encode';
+    const EVENT_POST_DTO_ENCODE = 'simple_dto.post_dto_encode';
+    const EVENT_PRE_DTO_DECODE = 'simple_dto.pre_dto_decode';
+    const EVENT_POST_DTO_DECODE = 'simple_dto.post_dto_decode';
+    const EVENT_PRE_DTO_COLLECTION_ENCODE = 'simple_dto.pre_dto_collection_encode';
+    const EVENT_POST_DTO_COLLECTION_ENCODE = 'simple_dto.post_dto_collection_encode';
+    const EVENT_PRE_DESERIALIZE = 'simple_dto.pre_deserialize';
+    const EVENT_POST_DESERIALIZE = 'simple_dto.post_deserialize';
+
+
+    /** @var array */
+    protected $data;
+    /** @var string */
+    protected $action;
+    /** @var array */
+    protected $context = [];
+
+    /**
+     * ApiEvent constructor.
+     * @param $data
+     * @param string $action
+     * @param array $context
+     */
+    public function __construct($data, $action, array $context = [])
+    {
+        $this->data = $data;
+        $this->action = $action;
+        $this->context = $context;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param array $context
+     */
+    public function setContext(array $context): void
+    {
+        $this->context = $context;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param $data
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction(): string
+    {
+        return $this->action;
+    }
+
+    /**
+     * @param string $action
+     */
+    public function setAction($action): void
+    {
+        $this->action = $action;
+    }
+}

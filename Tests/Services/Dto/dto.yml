@@ -1,0 +1,57 @@
+UserDto:
+    fields:
+        id:
+            type: integer
+            readonly: true
+            description: Identifier
+        addressId:
+            type: integer
+            readonly: true
+            description: Address identifier
+        email:
+            type: string
+            required: true
+            description: Email address
+        firstname:
+            type: string
+            required: true
+            description: First name
+        lastname:
+            type: string
+            required: true
+            description: Last name
+        active:
+            type: boolean
+            description: Whether the user is active
+        password:
+            type: string
+            groups:
+                - create
+                - update
+            required: true
+            description: Password
+        roles:
+            type: array
+            description: Assigned roles
+    expands:
+        address:
+            type: AddressDto
+
+AddressDto:
+    fields:
+        id:
+            type: integer
+            readonly: true
+            description: Identifier
+        country:
+            type: string
+            required: true
+            description: Country
+        city:
+            type: string
+            required: true
+            description: City
+        street:
+            type: string
+            required: true
+            description: Street
