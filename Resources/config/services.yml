@@ -25,7 +25,6 @@ services:
         configurator: ['@Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator', configure]
     Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager: ~
     Mell\Bundle\SimpleDtoBu\SimpleDtoBundle\Services\Crud\RelationManager:
-#        autowire: ndle\Services\Dto\DtoExpandsManager:
         autowire: true
     Mell\Bundle\SimpleDtoBundle\Services\Crud\CrudManager:
         autowire: true
@@ -34,7 +33,8 @@ services:
     Mell\Bundle\SimpleDtoBundle\Services\Crud\RelationManager:
         autowire: true
     Mell\Bundle\SimpleDtoBundle\Services\ApiFiltersManager\ApiFiltersManager: ~
-    Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager: ~
+    Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoExpandsManager:
+        autowire: true
     # Api docs related services
     Mell\Bundle\SimpleDtoBundle\Parser\ApiDocParser\DtoParser:
         autowire: true

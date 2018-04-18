@@ -9,27 +9,27 @@ use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoCollection;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoManagerConfigurator;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class DtoManager
  */
 class DtoManager
 {
-    /** @var Serializer */
+    /** @var SerializerInterface */
     protected $serializer;
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
     /** @var DtoManagerConfigurator */
     protected $configurator;
 
     /**
      * DtoManager constructor.
-     * @param Serializer $serializer
-     * @param EventDispatcher $eventDispatcher
+     * @param SerializerInterface $serializer
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(Serializer $serializer, EventDispatcher $eventDispatcher)
+    public function __construct(SerializerInterface $serializer, EventDispatcherInterface $eventDispatcher)
     {
         $this->serializer = $serializer;
         $this->eventDispatcher = $eventDispatcher;

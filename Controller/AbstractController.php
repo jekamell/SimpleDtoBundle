@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mell\Bundle\SimpleDtoBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mell\Bundle\SimpleDtoBundle\Model\ApiFilterCollectionInterface;
@@ -19,9 +20,11 @@ use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -34,10 +37,53 @@ abstract class AbstractController extends Controller
     const CONTENT_TYPE_JSON = 'application/json';
     const CONTENT_TYPE_XML = 'application/xml';
 
+    /** @var EntityManagerInterface */
+    protected $entityManager;
+    /** @var DtoManager */
+    protected $dtoManager;
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+    /** @var RequestManager */
+    protected $requestManager;
+    /** @var SerializerInterface */
+    protected $serializer;
+    /** @var CrudManager */
+    protected $crudManager;
+    /** @var RequestStack */
+    protected $requestStack;
+
+    /**
+     * AbstractController constructor.
+     * @param EntityManagerInterface $entityManager
+     * @param DtoManager $dtoManager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param RequestManager $requestManager
+     * @param SerializerInterface $serializer
+     * @param CrudManager $crudManager
+     * @param RequestStack $requestStack
+     */
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        DtoManager $dtoManager,
+        EventDispatcherInterface $eventDispatcher,
+        RequestManager $requestManager,
+        SerializerInterface $serializer,
+        CrudManager $crudManager,
+        RequestStack $requestStack
+    ) {
+        $this->entityManager = $entityManager;
+        $this->dtoManager = $dtoManager;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->requestManager = $requestManager;
+        $this->serializer = $serializer;
+        $this->crudManager = $crudManager;
+        $this->requestStack = $requestStack;
+    }
+
     /**
      * @return string
      */
-    abstract public function getEntityAlias(): string ;
+    abstract public function getEntityAlias(): string;
 
     /**
      * @param Request $request
@@ -263,7 +309,7 @@ abstract class AbstractController extends Controller
      */
     protected function getEntityManager(): EntityManager
     {
-        return $this->get('doctrine.orm.entity_manager');
+        return $this->entityManager;
     }
 
     /**
@@ -271,7 +317,7 @@ abstract class AbstractController extends Controller
      */
     protected function getDtoManager(): DtoManager
     {
-        return $this->get('simple_dto.dto_manager');
+        return $this->dtoManager;
     }
 
     /**
@@ -279,7 +325,7 @@ abstract class AbstractController extends Controller
      */
     protected function getEventDispatcher(): EventDispatcherInterface
     {
-        return $this->get('event_dispatcher');
+        return $this->eventDispatcher;
     }
 
     /**
@@ -287,7 +333,7 @@ abstract class AbstractController extends Controller
      */
     protected function getRequestManager(): RequestManager
     {
-        return $this->get('simple_dto.request_manager');
+        return $this->requestManager;
     }
 
     /**
@@ -295,7 +341,7 @@ abstract class AbstractController extends Controller
      */
     protected function getSerializer(): Serializer
     {
-        return $this->get('serializer');
+        return $this->serializer;
     }
 
     /**
@@ -303,7 +349,7 @@ abstract class AbstractController extends Controller
      */
     protected function getRequest(): Request
     {
-        return $this->get('request_stack')->getCurrentRequest();
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
@@ -311,6 +357,6 @@ abstract class AbstractController extends Controller
      */
     protected function getCrudManager(): CrudManager
     {
-        return $this->get('simple_dto.crud_manager');
+        return $this->crudManager;
     }
 }

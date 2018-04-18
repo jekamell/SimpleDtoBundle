@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mell\Bundle\SimpleDtoBundle\Services\Crud;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mell\Bundle\SimpleDtoBundle\Event\ApiEvent;
 use Mell\Bundle\SimpleDtoBundle\Model\Dto;
 use Mell\Bundle\SimpleDtoBundle\Model\DtoInterface;
@@ -12,7 +13,9 @@ use Mell\Bundle\SimpleDtoBundle\Model\DtoSerializableInterface;
 use Mell\Bundle\SimpleDtoBundle\Services\Dto\DtoManager;
 use Mell\Bundle\SimpleDtoBundle\Services\RequestManager\RequestManager;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -26,13 +29,13 @@ class CrudManager
     const CONTENT_TYPE_JSON = 'application/json';
     const CONTENT_TYPE_XML = 'application/xml';
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
     /** @var ValidatorInterface */
     protected $validator;
-    /** @var Serializer */
+    /** @var SerializerInterface */
     protected $serializer;
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
     /** @var DtoManager */
     protected $dtoManager;
@@ -41,18 +44,18 @@ class CrudManager
 
     /**
      * CrudManager constructor.
-     * @param EntityManager $entityManager
+     * @param EntityManagerInterface $entityManager
      * @param ValidatorInterface $validator
-     * @param Serializer $serializer
-     * @param EventDispatcher $eventDispatcher
+     * @param SerializerInterface $serializer
+     * @param EventDispatcherInterface $eventDispatcher
      * @param DtoManager $dtoManager
      * @param RequestManager $requestManager
      */
     public function __construct(
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         ValidatorInterface $validator,
-        Serializer $serializer,
-        EventDispatcher $eventDispatcher,
+        SerializerInterface $serializer,
+        EventDispatcherInterface $eventDispatcher,
         DtoManager $dtoManager,
         RequestManager $requestManager
     ) {
