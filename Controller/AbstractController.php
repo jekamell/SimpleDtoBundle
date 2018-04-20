@@ -98,7 +98,7 @@ abstract class AbstractController extends Controller
             throw new BadRequestHttpException('Malformed request data');
         }
 
-        return $this->get('simple_dto.crud_manager')->createResource($entity, $data, $accessChecker);
+        return $this->getCrudManager()->createResource($entity, $data, $accessChecker);
     }
 
     /**
@@ -123,16 +123,17 @@ abstract class AbstractController extends Controller
      */
     protected function readResource(DtoSerializableInterface $entity): Dto
     {
-        return $this->get('simple_dto.crud_manager')->readResource($entity);
+        return $this->getCrudManager()->readResource($entity);
     }
 
     /**
      * @param DtoSerializableInterface $entity
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     protected function deleteResource(DtoSerializableInterface $entity): void
     {
-        $this->get('simple_dto.crud_manager')->deleteResource($entity);
+        $this->getCrudManager()->deleteResource($entity);
     }
 
     /**
@@ -337,9 +338,9 @@ abstract class AbstractController extends Controller
     }
 
     /**
-     * @return Serializer
+     * @return SerializerInterface
      */
-    protected function getSerializer(): Serializer
+    protected function getSerializer(): SerializerInterface
     {
         return $this->serializer;
     }
